@@ -91,7 +91,7 @@ $(function() {
 		'			<span class="icon-bar"></span>' +
 		'			<span class="icon-bar"></span>' +
 		'			</button>' +
-		'			<a class="navbar-brand logo" href="index.html"><img src="img/logo.png"></a>' +
+		'			<a class="navbar-brand logo" href="index.html"><img src="http://placehold.it/200x68"></a>' +
 		'		</div>' +
 		'		<div id="company_logo">' +
 		'			<img src="img/company.png">' +
