@@ -91,29 +91,28 @@ $(function() {
 		'			<span class="icon-bar"></span>' +
 		'			<span class="icon-bar"></span>' +
 		'			</button>' +
-		'			<a class="navbar-brand logo" href="index.html"><img src="http://placehold.it/200x68"></a>' +
+		'			<a class="navbar-brand logo" href="index.html"><img src="http://placehold.it/200x68/D7000F/FFFFFF?text=logo"></a>' +
 		'		</div>' +
 		'		<div id="company_logo">' +
-		'			<img src="img/company.png">' +
+		'			<img src="http://placehold.it/175x18">' +
 		'		</div>' +
 		'		<div id="navbar" class="navbar-collapse collapse">' +
 		'			<ul id="menu" class="nav navbar-nav navbar-right">' +
-		'			<li><a href="about.html">关于可菱水</a></li>' +
-		'			<li><a href="product_list.html">产品信息</a></li>' +
-		'			<li><a href="news_list.html">品牌动态</a></li>' +
-		'			<li><a href="find.html">店铺信息</a></li>' +
-		'			<li><a href="service.html">用户支持</a></li>' +
-		'			<li><a href="lifestyle_list.html">可菱水生活家</a></li>' +
-		'			<li><a style="border: 0;" href="http://cleansui.jd.com" target="_blank">在线商城</a></li>' +
-		'			<li><a class="maBtn">可菱水官方微信公众号</a></li>' +
-		// '			<li><a class="header_icon" href="search.html"><img src="img/search.png"></a></li>' +
+		'			<li><a href="about.html">About</a></li>' +
+		'			<li><a href="product_list.html">Product List</a></li>' +
+		'			<li><a href="news_list.html">News List</a></li>' +
+		'			<li><a href="find.html">Find</a></li>' +
+		'			<li><a href="service.html">Service</a></li>' +
+		'			<li><a href="lifestyle_list.html">Liftstyle</a></li>' +
+		'			<li><a style="border: 0;">Store</a></li>' +
+		'			<li><a class="maBtn">Weixin</a></li>' +
 		'			<li><a class="header_icon">' +
 		'				<div id="hSearch">' +
 		'					<form action="search.html?s=" id="headerSearch" method="get">' +
-		'						<h1>产品搜索</h1>' +
+		'						<h1>Search</h1>' +
 		'						<div class="wrapper">' +
 		'							<div class="cancel"></div>' +
-		'							<input type="search" placeholder="搜索" name="s" value="">' +
+		'							<input type="search" placeholder="Search" name="s" value="">' +
 		'						</div>' +
 		'					</form>' +
 		'				</div>' +
@@ -132,70 +131,69 @@ $(function() {
 		'		<div class="col-xs-12 col-sm-9 footer_row footer_left text-left">' +
 		'			<div class="footer_item">' +
 		'				<ul>' +
-		'					<li class="footer_title"><a href="about.html">关于可菱水</a></li>' +
-		'					<li><a href="about.html?type=00000">品牌</a></li>' +
-		'					<li><a href="about.html?type=00001">技术</a></li>' +
-		'					<li><a href="about.html?type=00002">企业</a></li>' +
+		'					<li class="footer_title"><a href="about.html">About</a></li>' +
+		'					<li><a href="about.html?type=00000">Brand</a></li>' +
+		'					<li><a href="about.html?type=00001">Tech</a></li>' +
+		'					<li><a href="about.html?type=00002">Company</a></li>' +
 		'				</ul>' +
 		'			</div><div class="footer_item">' +
 		'				<ul>' +
-		'					<li class="footer_title"><a href="product_list.html">产品信息</a></li>' +
-		'					<li><a href="product_list.html?type=00001">台下型净水器</a></li>' +
-		'					<li><a href="product_list.html?type=00002">台上型净水器</a></li>' +
-		'					<li><a href="product_list.html?type=00003">蛇口型净水器</a></li>' +
-		'					<li><a href="product_list.html?type=00004">滤水杯</a></li>' +
-		'					<li><a href="product_list.html?type=00006">商用型净水器</a></li>' +
-		'					<li><a href="product_list.html?type=00007">滤芯</a></li>' +
+		'					<li class="footer_title"><a href="product_list.html">Product List</a></li>' +
+		'					<li><a href="product_list.html?type=00001">Type1</a></li>' +
+		'					<li><a href="product_list.html?type=00002">Type2</a></li>' +
+		'					<li><a href="product_list.html?type=00003">Type3</a></li>' +
+		'					<li><a href="product_list.html?type=00004">Type4</a></li>' +
+		'					<li><a href="product_list.html?type=00006">Type6</a></li>' +
+		'					<li><a href="filter.html">Filter</a></li>' +
 		'				</ul>' +
 		'			</div><div class="footer_item">' +
 		'				<ul>' +
-		'					<li class="footer_title"><a href="news_list.html">品牌动态</a></li>' +
-		'					<li><a href="news_list.html?type=00001">公告</a></li>' +
-		'					<li><a href="news_list.html?type=00002">展会资讯</a></li>' +
-		'					<li><a href="news_list.html?type=00003">产品资讯</a></li>' +
-		'					<li><a href="news_list.html?type=00004">活动资讯</a></li>' +
-		'					<li><a href="news_list.html?type=00005">其他</a></li>' +
+		'					<li class="footer_title"><a href="news_list.html">News List</a></li>' +
+		'					<li><a href="news_list.html?type=00001">Announce Info</a></li>' +
+		'					<li><a href="news_list.html?type=00002">Expo Info</a></li>' +
+		'					<li><a href="news_list.html?type=00003">Product Info</a></li>' +
+		'					<li><a href="news_list.html?type=00004">Event Info</a></li>' +
+		'					<li><a href="news_list.html?type=00005">Other</a></li>' +
 		'				</ul>' +
 		'			</div><div class="footer_item">' +
 		'				<ul>' +
-		'					<li class="footer_title"><a href="find.html">店铺信息</a></li>' +
-		'					<li><a href="find.html">店铺查询</a></li>' +
+		'					<li class="footer_title"><a href="find.html">Find</a></li>' +
+		'					<li><a href="find.html">Find Shop</a></li>' +
 		'				</ul>' +
 		'			</div><div class="footer_item">' +
 		'				<ul>' +
-		'					<li class="footer_title"><a href="service.html">用户支持</a></li>' +
-		'					<li><a href="service.html?type=00000">常见问题</a></li>' +
-		'					<li><a href="service.html?type=00001">配件安装指导</a></li>' +
-		'					<li><a href="service.html?type=00002">产品手册下载</a></li>' +
-		'					<li><a href="service.html?type=00003">微信服务</a></li>' +
-		'					<li><a href="service.html?type=00004">防伪说明</a></li>' +
+		'					<li class="footer_title"><a href="service.html">Support</a></li>' +
+		'					<li><a href="service.html?type=00000">Q&A</a></li>' +
+		'					<li><a href="service.html?type=00001">Setup Guide</a></li>' +
+		'					<li><a href="service.html?type=00002">Tutorial Download</a></li>' +
+		'					<li><a href="service.html?type=00003">Weixin Service</a></li>' +
+		'					<li><a href="service.html?type=00004">Security Proof</a></li>' +
 		'				</ul>' +
 		'			</div><div class="footer_item">' +
 		'				<ul>' +
-		'					<li class="footer_title"><a href="http://cleansui.jd.com" target="_blank">在线商城</a></li>' +
-		// '					<li>天猫旗舰店</li>' +
-		'					<li><a href="http://cleansui.jd.com" target="_blank">京东旗舰店</a></li>' +
+		'					<li class="footer_title"><a>Store</a></li>' +
+		'					<li><a>JD</a></li>' +
 		'				</ul>' +
 		'			</div><div class="footer_item">' +
 		'				<ul>' +
-		'					<li class="footer_title"><a href="other.html">其他</a></li>' +
-		'					<li><a href="other.html?type=00000">隐私政策</a></li>' +
-		'					<li><a href="other.html?type=00001">网站地图</a></li>' +
-		'					<li><a href="other.html?type=00002">网站使用条例</a></li>' +
+		'					<li class="footer_title"><a href="other.html">Other</a></li>' +
+		'					<li><a href="other.html?type=00000">Privacy Policy</a></li>' +
+		'					<li><a href="other.html?type=00001">Site Map</a></li>' +
+		'					<li><a href="other.html?type=00002">Usage Regulations</a></li>' +
 		'				</ul>' +
 		'			</div><div class="footer_item_2">' +
 		'				<ul>' +
-		'					<li class="footer_title"><a href="lifestyle_list.html">可菱水生活家</a></li>' +
+		'					<li class="footer_title"><a href="lifestyle_list.html">Lifestyle</a></li>' +
 		'				</ul>' +
 		'			</div>' +
 		'		</div>' +
 		'		<div class="col-xs-12 col-sm-3 footer_row footer_right text-left">' +
 		'			<div class="row">' +
 		'				<ul>' +
-		'					<li class="footer_title">可菱水客户服务中心</li>' +
-		'					<li>服务热线：4008-155-511</li>' +
-		'					<li>SC专线：021-62220858</li>' +
-		'					<li>(周一～周五 9:00-17:00节假日除外)</li>' +
+		'					<li class="footer_title">Service Center</li>' +
+		'					<li>Tel：XXXX-XXX-XXX</li>' +
+		'					<li>Phone Line：XXX-XXXXXXX</li>' +
+		'					<li>(Monday to Friday 9: 00-17: 00 except holidays)</li>' +
 		'					<li><a class="maBtn"><img class="link_icon_3" src="img/weixin_alter.png">可菱水官方微信公众号</a></li>' +
 		'				</ul>' +
 		'			</div>' +
@@ -203,11 +201,8 @@ $(function() {
 		'				<div class="contact_icon_item">' +
 		'					<a class="wx" href="service.html?type=00003"><img src="img/weixin_icon.png"></a>' +
 		'				</div><div class="contact_icon_item">' +
-		'					<a href="http://cleansui.jd.com" target="_blank"><img src="img/jd_icon.png"></a>' +
+		'					<a><img src="img/jd_icon.png"></a>' +
 		'				</div>' +
-		// '				<div class="wx-qrcode" style="display: none;">' +
-		// '					<img src="img/qrcode_alter.jpg">' +
-		// '				</div>' +
 		'			</div>' +
 		'		</div>' +
 		'	</div>' +
@@ -215,10 +210,10 @@ $(function() {
 		'		<div class="col-xs-12 text-left bottom_row link_row">' +
 		'			<div>' +
 		'				<ul>' +
-		'					<li class="link_span">友情链接</li>' +
-		'					<li class="link_span_1"><a href="http://www.mitsubishichem-hd.co.jp/chinese/"><img class="link_icon_1" src="img/mitsubishi_icon.png">三菱化学控股集团</a></li>' +
-		'					<li class="link_span_1"><a href="http://www.mitsubishichem-hd-china.com/">三菱化学控股管理（北京）有限公司</a></li>' +
-		'					<li class="link_span_2"><a href="http://www.cleansui.com/index.html"><img class="link_icon_2" src="img/logo.png">三菱化学可菱水（日本官网）</a></li>' +
+		'					<li class="link_span">Link</li>' +
+		'					<li class="link_span_1"><a><img class="link_icon_1" src="http://placehold.it/50x43">XXX</a></li>' +
+		'					<li class="link_span_1"><a>XXX</a></li>' +
+		'					<li class="link_span_2"><a><img class="link_icon_2" src="http://placehold.it/200x68/D7000F/FFFFFF?text=logo">XXX</a></li>' +
 		'				</ul>' +
 		'			</div>' +
 		'		</div>' +
@@ -228,8 +223,8 @@ $(function() {
 		'			<div>' +
 		'				<ul>' +
 		'					<li>Copyright &copy;' +
-		'					<li>Mitsubishi Chemical Cleansui Co., Ltd. All Rights Reserved.</li>' +
-		'					<li><img class="icp_icon" src="img/icp_icon.png">沪ICP备07506593号</li>' +
+		'					<li>XXXXXXXXXXX Co., Ltd. All Rights Reserved.</li>' +
+		'					<li><img class="icp_icon" src="img/icp_icon.png">XXXX</li>' +
 		'				</ul>' +
 		'			</div>' +
 		'		</div>' +

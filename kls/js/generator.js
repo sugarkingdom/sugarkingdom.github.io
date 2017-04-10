@@ -1,10 +1,9 @@
 var PY = {
-	rootPath : window.location.protocol + "//" + window.location.host + "/kls/",
 	includeCSS: function(path){
-		document.write('<link rel="stylesheet" href="' + PY.rootPath + path + '" type="text/css"/>'); 
+		document.write('<link rel="stylesheet" href="' + path + '" type="text/css"/>'); 
 	},
 	includeJS: function(path){
-		document.write('<script type="text/javascript" src="' + PY.rootPath + path + '"></script>');
+		document.write('<script type="text/javascript" src="' + path + '"></script>');
 	}
 	
 };
