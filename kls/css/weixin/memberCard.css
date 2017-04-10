@@ -1,0 +1,24 @@
+.vip {
+	padding: 1rem 1rem;
+}
+
+.membership {
+	padding: 1rem 1rem;
+}
+
+.membership img {
+	width: 4.2rem;
+	height: 4.2rem;
+	border-radius: 50%;
+	position: absolute;
+}
+
+.memberinfo {
+	margin-left: 5rem;
+    margin-top: 0.6rem;
+}
+
+.memberinfo span {
+	color: rgb( 255, 244, 206 );
+	text-shadow: 0 0px 1rem rgb(0, 0, 0)
+}

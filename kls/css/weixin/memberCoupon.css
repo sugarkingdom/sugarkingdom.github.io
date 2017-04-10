@@ -1,0 +1,35 @@
+.coupon {
+	margin-top: 0.5rem;
+	margin-left: 0.8rem;
+	margin-right: 0.8rem;
+	position: relative;
+}
+
+.coupon-item {
+	margin-bottom: 0.5rem;
+	height: 6rem;
+}
+
+.coupon-item img {
+	position: absolute;
+	width: 100%;
+	z-index: -1;
+}
+
+.coupon-info .coupon-info-center {
+    text-align: center;
+    padding-top: 0.6rem;
+}
+
+.coupon-info .coupon-type {
+	color: #7f4e28;
+}
+
+.coupon-info .coupon-price {
+	font-size: 1.5rem;
+}
+
+.coupon-info .coupon-time {
+	color: #7f4e28;
+	font-size: 0.7rem;
+}

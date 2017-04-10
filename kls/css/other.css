@@ -1,0 +1,159 @@
+.other_container {
+	display: none;
+	margin-bottom: 50px;
+}
+
+.text_content {
+	margin-top: 20px;
+}
+
+.other_container_00000 .text_content .item_p {
+	margin-bottom: 0;
+}
+
+.other_container_00001 .map_title {
+	font-family: "微软雅黑";
+	font-weight: bold;
+}
+
+.other_container_00001 .map_title .map_title_text {
+	padding-left: 10px;
+	border-left: 5px solid #D7000F;
+}
+
+.other_container_00001 .map_list ul {
+	padding-left: 0;
+}
+
+.other_container_00001 .map_list ul li {
+	line-height: 30px;
+	color: #595959;
+	padding-left: 40px;
+	list-style: none;
+}
+
+.other_container_00001 .map_list .map_list_title a {
+	font-size: 16px;
+	color: #000 !important;
+}
+
+.other_container_00002 .text_content h2 {
+	font-size: 18px;
+	font-weight: bold;
+	text-align: left;
+	margin-top: 40px;
+	margin-bottom: 20px;
+}
+
+.other_container_00002 .text_content .item_p {
+	margin-bottom: 0;
+}
+
+.other_container_00002 .text_content ul {
+	font-family: "Arial", "SimHei";
+	text-align: left;
+	line-height: 30px;
+	font-size: 16px;
+	margin-bottom: 30px;
+	color: #595959;
+}
+
+/* 768以上布局 */
+@media screen and (min-width: 768px) {
+	.other_container_00000 .text_content p {
+		padding: 0 86px;
+	}
+
+	.other_container_00000 .text_content hr {
+		margin: 20px 75px 50px 75px;
+	}
+
+	.other_container_00000 .text_content .indent_p {
+		padding-left: 126px;
+	}
+
+	.other_container_00000 .text_content p span {
+		padding-left: 40px;
+	}
+
+	.other_container_00000 .text_content h2 {
+		font-size: 18px;
+		font-weight: bold;
+		text-align: left;
+		padding: 0 86px;
+		margin-top: 40px;
+		margin-bottom: 20px;
+	}
+
+	.other_container_00001 .map_title {
+		font-size: 18px;
+		padding: 0 90px;
+	}
+
+	.other_container_00001 .map_list_row {
+		margin-top: 30px;
+		padding: 0 90px;
+	}
+
+	.other_container_00001 .map_list {
+		width: 20%;
+	}
+
+	.other_container_00001 .map_list_row {
+		margin-top: 30px;
+		padding: 0 90px;
+	}
+
+	.other_container_00002 .text_content .indent_p {
+		padding-left: 126px;
+	}
+
+	.other_container_00002 .text_content p {
+		padding: 0 86px;
+	}
+
+	.other_container_00002 .text_content p span {
+		padding-left: 40px;
+	}
+
+	.other_container_00002 .text_content h2 {
+		padding: 0 86px;
+	}
+
+	.other_container_00002 .text_content hr {
+		margin: 20px 75px 50px 75px;
+	}
+
+	.other_container_00002 .text_content ul {
+		padding: 0 100px;
+		padding-left: 126px;
+	}
+}
+
+/* 768以上布局 */
+@media screen and (max-width: 768px) {
+
+	.other_container_00000 .text_content h2 {
+		font-size: 16px;
+		font-weight: bold;
+		text-align: left;
+		margin-bottom: 20px;
+	}
+
+	.other_container_00001 .map_title {
+		font-size: 16px;
+	}
+
+	.other_container_00001 .map_list {
+		margin-top: 30px;
+	}
+
+	.other_container_00002 .text_content hr {
+		margin-top: 20px;
+	}
+
+	.other_container_00002 .text_content ul {
+		font-size: 14px;
+		padding-right: 15px;
+	}
+}

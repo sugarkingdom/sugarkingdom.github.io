@@ -1,0 +1,75 @@
+.about_container {
+	display: none;
+	margin-bottom: 50px;
+}
+
+.about_img_1 {
+	margin-top: 30px;
+}
+
+.about_img_1 img {
+	width: 880px;
+}
+
+.text_content {
+	margin-top: 20px;
+}
+
+.about_container_00001 .text_content h1 {
+	font-family: "微软雅黑";
+	font-weight: bold;
+	font-size: 25px;
+	margin-bottom: 40px;
+}
+
+.about_container_00001 .text_content p {
+	margin-bottom: 0;
+}
+
+/* 768以上布局 */
+@media screen and (min-width: 768px) {
+	.about_container_00000 .text_content p {
+		padding: 0 86px;
+	}
+
+	.about_container_00000 .text_content h2 {
+		font-size: 25px;
+		text-align: left;
+		padding: 0 86px;
+		margin-top: 40px;
+		margin-bottom: 20px;
+	}
+
+	.about_container_00001 .text_content h2 {
+		font-size: 20px;
+		font-weight: bold;
+		text-align: left;
+		padding: 0 100px;
+		margin-top: 20px;
+		margin-bottom: 20px;
+	}
+
+	.about_m {
+		display: none;
+	}
+}
+
+/* 768以下布局 */
+@media screen and (max-width: 768px) {
+	.about_container_00001 .text_content h1 {
+		font-size: 20px;
+	}
+	
+	.about_img_1 {
+		padding-left: 0;
+		padding-right: 0;
+	}
+	.about_pc {
+		display: none;
+	}
+
+	.about_m img {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+}
