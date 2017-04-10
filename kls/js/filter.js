@@ -6,6 +6,10 @@ $(function() {
 		$("#list_nav_"+urlGet['type']).show();
 		$(".list_nav").show();
 	}
+	$(".list_nav a").hide();
+	$("#list_nav_00007").addClass('active');
+	$("#list_nav_00007").show();
+	$(".list_nav").show();
 	if (typeof urlGet['id'] !== "undefined") {
 		// getproductbyidnl(urlGet['id']);
 	}
