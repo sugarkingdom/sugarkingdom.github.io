@@ -1,6 +1,6 @@
 var wlh = window.location.protocol + "//" + window.location.host;
 var P = {
-	rootPath: wlh + "/sugar/",
+	rootPath: wlh + "/",
 	uploadPath: wlh + "/",
 	uploadImgPath: wlh + "/upload/",
 	includeCSS: function(path) {
