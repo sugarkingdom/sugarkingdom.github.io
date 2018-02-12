@@ -1,0 +1,11 @@
+P.includeJS("js/common/common.js");
+P.includeJS("js/common/com/table.js");
+P.includeJS("js/common/com/sugarTable.js");
+P.includeJS("js/common/com/select.js");
+P.includeJS("js/common/com/query.js");
+P.includeJS("js/common/com/popoverbtn.js");
+P.includeJS("js/common/com/fileupload.js");
+P.includeJS("js/common/com/export.js");
+P.includeJS("js/common/com/note.js");
+P.includeJS("js/common/com/numberinput.js");
+P.includeJS("js/common/com/page.js");
