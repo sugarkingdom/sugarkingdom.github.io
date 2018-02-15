@@ -1,0 +1,111 @@
+.sugar-table>thead {
+	background-color: #f5f5f5;
+}
+
+.sugar-table th {
+	white-space: nowrap;
+}
+
+.sugar-table.table>tbody>tr>td {
+	vertical-align: middle;
+}
+
+.sugar-table .sugar-checkbox {
+	text-align: center;
+	width: 40px;
+	padding-left: 32px;
+}
+
+.sugar-table .sugar-checkbox .checkbox {
+	margin-top: 0;
+	margin-bottom: 0;
+	padding-left: 0;
+}
+
+.sugar-table .sugar-checkbox .checkbox label::after {
+	padding-left: 1px;
+}
+
+.sugar-table .sugar-checkbox .checkbox label {
+	padding-left: 0;
+	display: inline-block;
+}
+
+.sugar-table .sugar-checkbox .checkbox input[type=checkbox] {
+	top: -1px;
+	left: 0;
+	width: 17px;
+	height: 17px;
+	margin-top: 3px;
+}
+
+.sugar-table .seri {
+	text-align: center;
+}
+
+.sugar-table td.sugar-textarea {
+	padding: 0;
+}
+
+.sugar-table textarea {
+	width: 100%;
+	resize: none;
+	padding: 8px;
+	border: none;
+	background-color: inherit;
+}
+
+.sugar-table .ico_male {
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+	display: inline-block;
+	/*line-height: 100px;*/
+	overflow: hidden;
+	background: url(../img_admin/icon_male.png) no-repeat;
+}
+
+.sugar-table .ico_female {
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+	display: inline-block;
+	/*line-height: 100px;*/
+	overflow: hidden;
+	background: url(../img_admin/icon_female.png) no-repeat;
+}
+
+.sugar-table .ico_question {
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+	display: inline-block;
+	/*line-height: 100px;*/
+	overflow: hidden;
+	background: url(../img_admin/icon_question.png) no-repeat;
+}
+
+.sugar-table .hoverpicbox {
+	width: 180px;
+	height: auto;
+	padding: 5px;
+	overflow: hidden;
+}
+
+.sugar-table .hoverpicbox img {
+	width: 100%;
+}
+
+.pageset {
+	text-align: left;
+	font-size: 13px;
+	padding-top: 0;
+	clear: both;
+	line-height: 34px;
+	min-height: 32px;
+}
+
+.pagination {
+	float: right;
+	margin: 0px;
+}

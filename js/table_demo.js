@@ -1,51 +1,93 @@
-var page = "1";
-var size = '10';
+var page1 = "1";
+var size1 = '10';
+
+var page2 = "1";
+var size2 = '10';
 
 $(function() {
-	$("#listData").sugarTable({
+	$("#listData1").sugarTable({
 		data: tableData1,
 		count: tableData1.length,
-		pageDom: $("#page"),
-		page: page,
-		pageSize: size,
+		pageDom: $("#page1"),
+		page: page1,
+		pageSize: size1,
+		fields: [{
+			id: "id",
+			type: "text",
+			name: "id",
+		}, {
+			id: "text1",
+			type: "text",
+			name: "文本1",
+			width: "200",
+		}, {
+			id: "object1",
+			type: "object",
+			key: "key1",
+			name: "对象1",
+			width: "200",
+		}, {
+			id: "input1",
+			type: "input",
+			name: "输入框1",
+			width: "200",
+		}, {
+			id: "input2",
+			type: "input",
+			name: "输入框2",
+			width: "200",
+		}, {
+			id: "select1",
+			type: "select",
+			name: "选择框1",
+			width: "200",
+			optionType: 'text',
+			optionId: 'select1_options',
+			optionSplit: '#',
+			changeHandler: function(data) {
+				console.info(data);
+			}
+		}, {
+			id: "select2",
+			type: "select",
+			name: "选择框2",
+			width: "200",
+			optionType: 'array',
+			optionId: 'select2_options',
+		}],
+	});
+
+	// console.info($("#listData1").sugarTable("getValues"));
+
+	// console.info($("#listData1").sugarTable("getValue", {
+	// 	id: "select2",
+	// 	lineNum: 3
+	// }));
+
+	$("#listData2").sugarTable({
+		data: tableData2,
+		count: tableData2.length,
+		pageDom: $("#page2"),
+		page: page2,
+		pageSize: size2,
 		fields: [{
 			id: "id",
 			type: "text",
 			name: "id"
 		}, {
-			id: "text1",
-			type: "text",
-			name: "文本1"
-		}, {
-			id: "object1",
-			type: "obj",
-			key: "key1",
-			name: "对象1"
-		}, {
-			id: "input1",
-			type: "input",
-			name: "输入框1"
-		}, {
-			id: "input2",
-			type: "input",
-			name: "输入框2"
-		}, {
-			id: "select1",
-			type: "select",
-			name: "选择框1",
-			optionType: 'text',
-			optionId: 'select1_options',
-			optionSplit: '#',
+			id: "textarea1",
+			type: "textarea",
+			name: "文本框1",
+			readonly: true
 		}],
 	});
-	// console.info($("#listData").sugarTable("getInputValues"));
 
-	// console.info($("#listData").sugarTable("getInputValue", {
-	// 	id: "value3",
-	// 	lineNum: 3
-	// }));
+	console.info($("#listData2").sugarTable("getValues"));
 
-	console.info($("#listData").sugarTable("getSelectValues"));
+	console.info($("#listData2").sugarTable("getValue", {
+		id: "textarea1",
+		lineNum: 3
+	}));
 
 	// genTableData({
 	// 	id: "listData",
