@@ -5,6 +5,7 @@
  * 		bootstrap 3.3.7
  * 		bootstrap select 1.12.2
  * 		awesome bootstrap checkbox 1.0.0-alpha.5
+ * 		fancybox 3.2.1
  */
 (function($, window, undefined) {
 
@@ -54,6 +55,8 @@
 				return $(el).selectpicker('val');
 			case 'textarea':
 				return el.value;
+			case "modal": //// TODO
+				return '';
 			default:
 				return '';
 		}
@@ -66,15 +69,17 @@
 	 * @return {String or Object}  域内容
 	 */
 	function _genField(type, opts) {
+		var _temp = {};
+		_temp.id = opts.id;
+		_temp.index = opts.index;
+		_temp.listData = opts.listData;
+		_temp.fieldData = opts.fieldData;
+
 		switch (type) {
 
 			case 'text': // 文本
-				var _temp = {};
-				_temp.id = opts.id;
-				_temp.index = opts.index;
-				_temp.listData = opts.listData;
-				_temp.fieldData = opts.fieldData;
 
+				// 金额展示处理
 				if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney) {
 					_temp.text = accounting.formatMoney(_temp.listData[_temp.fieldData.id] || '');
 				} else {
@@ -83,11 +88,6 @@
 				return _temp.text;
 
 			case 'object': // 对象
-				var _temp = {};
-				_temp.id = opts.id;
-				_temp.index = opts.index;
-				_temp.listData = opts.listData;
-				_temp.fieldData = opts.fieldData;
 
 				_temp.object = _temp.listData[_temp.fieldData.id] || {};
 
@@ -100,11 +100,6 @@
 				return _temp.text;
 
 			case 'input': // 输入框
-				var _temp = {};
-				_temp.id = opts.id;
-				_temp.index = opts.index;
-				_temp.listData = opts.listData;
-				_temp.fieldData = opts.fieldData;
 
 				_temp.input = $('<input>').addClass('form-control').attr({
 					// id: _temp.id + '_input_' + _temp.index + '_' + _temp.fieldData.id,
@@ -130,11 +125,6 @@
 				return _temp.input;
 
 			case 'select': // 选择框
-				var _temp = {};
-				_temp.id = opts.id;
-				_temp.index = opts.index;
-				_temp.listData = opts.listData;
-				_temp.fieldData = opts.fieldData;
 
 				_temp.select = $('<select>').addClass('form-control').attr({
 					// id: _temp.id + '_select_' + _temp.index + '_' + _temp.fieldData.id,
@@ -170,6 +160,7 @@
 				}
 				_temp.select.val(_temp.listData[_temp.fieldData.id] || "");
 
+				// 处理change事件，传递当前行数与change后值
 				if (typeof _temp.fieldData.changeHandler !== 'undefined') {
 					_temp.select.on('change', function(event) {
 						event.preventDefault();
@@ -183,11 +174,6 @@
 				return _temp.select;
 
 			case 'textarea': // 文本框
-				var _temp = {};
-				_temp.id = opts.id;
-				_temp.index = opts.index;
-				_temp.listData = opts.listData;
-				_temp.fieldData = opts.fieldData;
 
 				_temp.textarea = $("<textarea>").addClass("from-control").attr({
 					// id: id + '_textarea_' + index + '_' + fieldData.id,
@@ -202,12 +188,84 @@
 				_temp.textarea.val(_genField('text', opts));
 				return _temp.textarea;
 
+			case "modal": // 弹出框 //// TODO
+				// tdTemp1 = $("<td>");
+				// divTemp1 = $("<div>").addClass('input-group');
+				// inputTemp1 = $("<input type='text'>").addClass('form-control').attr({
+				// 	id: opts.id + '_input_' + i + '_' + tField.showValue,
+				// 	placeholder: '请选择' + tField.name,
+				// 	readonly: true
+				// }).val((tData[tField.showValue] || ''));
+				// divTemp2 = $("<div>").addClass('input-group-addon btn btn-xs btn-danger ' + tField.clearBtnClass).attr({
+				// 	id: tField.clearBtnId + '_' + i,
+				// 	alt: i,
+				// 	style: ((typeof tData[tField.id] !== 'undefined') ? '' : 'display: none;') + ' border-left: 0;',
+				// 	'data-toggle': 'tooltip',
+				// 	'data-placement': 'left',
+				// 	title: '清空' + tField.name
+				// }).append($("<i>").addClass('fa fa-fw fa-times'));
+				// divTemp2.tooltip();
+				// divTemp3 = $("<div>").addClass('input-group-addon btn btn-xs btn-primary ' + tField.selectBtnClass).attr({
+				// 	alt: i,
+				// 	title: '选择' + tField.name
+				// }).append($("<i>").addClass('fa fa-fw fa-search'));
+				// divTemp1.append(inputTemp1).append(divTemp2).append(divTemp3);
+				// tdTemp1.append(divTemp1);
+				// tr.append(tdTemp1);
+				return '';
+
+			case 'icon': // 图标
+
+				_temp.icon = $('<i>').append('&nbsp;');
+				switch (_temp.fieldData.preset) {
+					case "sex": // 预置模板-性别
+						if (_temp.listData[_temp.fieldData.sexId] == _temp.fieldData.sexOrder[0]) {
+							_temp.icon.addClass('ico_male');
+						} else if (_temp.listData[_temp.fieldData.sexId] == _temp.fieldData.sexOrder[1]) {
+							_temp.icon.addClass('ico_female');
+						} else if (_temp.listData[_temp.fieldData.sexId] == _temp.fieldData.sexOrder[2]) {
+							_temp.icon.addClass('ico_question');
+						}
+						if (typeof _temp.fieldData.hoverImage !== "undefined") {
+							_temp.icon.addClass('sugar-hoverpic').attr({
+								href: (_temp.fieldData.prePath || '') + _temp.listData[_temp.fieldData.hoverImage],
+								'data-fancybox': 'images'
+							});
+						}
+						break;
+					case "pic": // 预置模板-图片
+						_temp.icon.addClass('fa fa-fw fa-picture-o');
+						if (typeof _temp.fieldData.imagePath !== "undefined") {
+							_temp.icon.addClass('sugar-hoverpic').attr({
+								href: (_temp.fieldData.prePath || '') + _temp.listData[_temp.fieldData.hoverImage],
+								'data-fancybox': 'images'
+							});
+						}
+						break;
+					default:
+						break;
+				}
+				return _temp.icon;
+
+			case 'mix': // 混合
+
+				_temp.content = [];
+				$.each(_temp.fieldData.content, function(contentIndex, contentData) {
+					_temp.content.push(_genField(contentData.type, {
+						id: _temp.id,
+						index: _temp.index,
+						listData: _temp.listData,
+						fieldData: contentData,
+					}));
+				});
+				return _temp.content;
 			default:
 				return '';
 		}
 	}
 
 	var methods = {
+
 		/**
 		 * 初始化组件
 		 * @param  {Object} options 参数
@@ -281,295 +339,6 @@
 				_list.tdSeri = $("<td>").addClass('seri').html(_list.seri);
 				_list.tr.append(_list.tdSeri);
 
-				/**
-				 * 构造表格域-文本
-				 * @param  {Object} opts 参数
-				 * @return {String}      表格内文本
-				 */
-				_list.genField_text = function(opts) {
-					var _temp = {};
-					_temp.id = opts.id;
-					_temp.index = opts.index;
-					_temp.listData = opts.listData;
-					_temp.fieldData = opts.fieldData;
-
-					_temp.text = _temp.listData[_temp.fieldData.id] || '';
-					if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney) {
-						_temp.text = accounting.formatMoney(_temp.listData[_temp.fieldData.id] || '');
-					}
-					return _temp.text;
-				};
-
-				/**
-				 * 构造表格域-对象
-				 * @param  {Object} opts 参数
-				 * @return {String}      表格内文本
-				 */
-				_list.genField_object = function(opts) {
-					var _temp = {};
-					_temp.id = opts.id;
-					_temp.index = opts.index;
-					_temp.listData = opts.listData;
-					_temp.fieldData = opts.fieldData;
-
-					_temp.object = _temp.listData[_temp.fieldData.id] || {};
-					_temp.text = _temp.object[_temp.fieldData.key] || '';
-					if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney) {
-						_temp.text = accounting.formatMoney(_temp.object[_temp.fieldData.key] || '');
-					} else {
-						_temp.text = _temp.object[_temp.fieldData.key] || '';
-					}
-					return _temp.text;
-				};
-
-				/**
-				 * 构造表格域-输入框
-				 * @param  {Object} opts 参数
-				 * @return {Element}     input元素
-				 */
-				_list.genField_input = function(opts) {
-					var _temp = {};
-					_temp.id = opts.id;
-					_temp.index = opts.index;
-					_temp.listData = opts.listData;
-					_temp.fieldData = opts.fieldData;
-
-					_temp.input = $("<input type='text'>").addClass('form-control').attr({
-						id: _temp.id + '_input_' + _temp.index + '_' + _temp.fieldData.id,
-						sugarline: _temp.index,
-						sugarid: _temp.fieldData.id,
-						sugartype: 'input',
-						name: 'sugar_' + _temp.fieldData.id,
-						placeholder: '请输入' + _temp.fieldData.name
-					});
-					if (typeof _temp.fieldData.isNumber !== "undefined" && _temp.fieldData.isNumber) {
-						toNumberInput(_temp.input, {
-							decimalLength: _temp.fieldData.decimalLength || 0,
-							allowMinus: _temp.fieldData.allowMinus || false,
-							intLength: _temp.fieldData.intLength || 5
-						});
-					}
-
-					// 赋值逻辑与文本域相同
-					_temp.input.val(_list.genField_text(opts));
-					return _temp.input;
-				};
-
-				/**
-				 * 构造表格域-选择框
-				 * @param  {Object} opts 参数
-				 * @return {Element}     select元素
-				 */
-				_list.genField_select = function(opts) {
-					var _temp = {};
-					_temp.id = opts.id;
-					_temp.index = opts.index;
-					_temp.listData = opts.listData;
-					_temp.fieldData = opts.fieldData;
-
-					_temp.select = $('<select>').addClass('form-control').attr({
-						// id: _temp.id + '_select_' + _temp.index + '_' + _temp.fieldData.id,
-						sugarline: _temp.index,
-						sugarid: _temp.fieldData.id,
-						sugartype: 'select',
-						title: '请选择' + _temp.fieldData.name
-					});
-					switch (_temp.fieldData.optionType) {
-						case 'text':
-							_temp.o_list = _temp.listData[_temp.fieldData.optionId].split(_temp.fieldData.optionSplit);
-							break;
-						case 'array':
-							_temp.o_list = _temp.listData[_temp.fieldData.optionId];
-							break;
-						case 'list':
-							break;
-						default:
-							break;
-					}
-					if (_temp.o_list.length > 0) {
-						_temp.options = [];
-						_temp.options.push($('<option>').attr({
-							selected: '',
-							value: ''
-						}));
-						for (var k = 0; k < _temp.o_list.length; k++) {
-							_temp.options.push($('<option>').attr({
-								value: _temp.o_list[k]
-							}).text(_temp.o_list[k]));
-						}
-						_temp.select.append(_temp.options);
-					}
-					_temp.select.val(_temp.listData[_temp.fieldData.id] || "");
-
-					if (typeof _temp.fieldData.changeHandler !== 'undefined') {
-						_temp.select.on('change', function(event) {
-							event.preventDefault();
-							this.data = {
-								lineNum: $(this).attr("sugarline"),
-								value: $(this).val(),
-							};
-							_temp.fieldData.changeHandler.call(this, this.data);
-						});
-					}
-					return _temp.select;
-				};
-
-				/**
-				 * 构造表格域-文本框
-				 * @param  {Object} opts 参数
-				 * @return {String}      表格内文本
-				 */
-				_list.genField_textarea = function(opts) {
-					var _temp = {};
-					_temp.id = opts.id;
-					_temp.index = opts.index;
-					_temp.listData = opts.listData;
-					_temp.fieldData = opts.fieldData;
-
-					this.textarea = $("<textarea>").addClass("from-control").attr({
-						// id: id + '_textarea_' + index + '_' + fieldData.id,
-						rows: _temp.fieldData.row || 5,
-						sugarline: _temp.index,
-						sugarid: _temp.fieldData.id,
-						sugartype: 'textarea',
-					}).val(_temp.listData[_temp.fieldData.id]);
-					if (typeof _temp.fieldData.readonly !== "undefined") {
-						this.textarea.attr("readonly", true);
-					}
-					return this.textarea;
-				};
-
-				// 构造表格域-弹出框
-				_list.genField_modal = function(index, id, listData, fieldData) {
-					this.td = $("<td>");
-					this.div1 = $("<div>").addClass('input-group');
-					this.input = $("<input type='text'>").addClass('form-control').attr({
-						id: id + '_input_' + index + '_' + fieldData.showValue,
-						placeholder: '请选择' + fieldData.name,
-						readonly: true
-					}).val((listData[fieldData.showValue] || ''));
-					this.div2 = $("<div>").addClass('input-group-addon btn btn-xs btn-danger ' + fieldData.clearBtnClass).attr({
-						id: fieldData.clearBtnId + '_' + index,
-						alt: index,
-						style: ((typeof listData[fieldData.id] !== 'undefined') ? '' : 'display: none;') + ' border-left: 0;',
-						'data-toggle': 'tooltip',
-						'data-placement': 'left',
-						title: '清空' + fieldData.name
-					}).append($("<i>").addClass('fa fa-fw fa-times'));
-					// this.div2.tooltip();
-					this.div3 = $("<div>").addClass('input-group-addon btn btn-xs btn-primary ' + fieldData.selectBtnClass).attr({
-						alt: index,
-						title: '选择' + fieldData.name
-					}).append($("<i>").addClass('fa fa-fw fa-search'));
-					this.div1.append(this.input).append(this.div2).append(this.div3);
-					this.td.append(this.div1);
-					return this.td;
-				};
-
-				// 构造表格域-混合-文本
-				_list.genField_mix_text = function(index, id, listData, contentData) {
-					if (typeof contentData.isMoney !== "undefined" && contentData.isMoney) {
-						return accounting.formatMoney(listData[contentData.id] || '');
-					} else {
-						return listData[contentData.id] || '';
-					}
-				};
-
-				// 构造表格域-混合-图标
-				_list.genField_mix_icon = function(index, id, listData, contentData) {
-					if (typeof tFieldContent.preset !== "undefined") {
-						switch (tFieldContent.preset) {
-							case "sex": // 预置模板-性别
-								if (tData[tFieldContent.sexId] == tFieldContent.sexOrder[0]) {
-									iTemp1 = $("<i>").addClass('ico_male');
-								} else if (tData[tFieldContent.sexId] == tFieldContent.sexOrder[1]) {
-									iTemp1 = $("<i>").addClass('ico_female');
-								} else if (tData[tFieldContent.sexId] == tFieldContent.sexOrder[2]) {
-									iTemp1 = $("<i>").addClass('ico_question');
-								}
-								if (typeof tFieldContent.hoverImage !== "undefined") {
-									iTemp1.addClass('hoverpic').attr('data-pic', tData[tFieldContent.hoverImage]);
-								}
-								break;
-							case "pic": // 预置模板-图片
-								iTemp1 = $("<i>").addClass('fa fa-fw fa-picture-o');
-								if (typeof tFieldContent.uploadImage !== "undefined") {
-									iTemp1.addClass('hoverpic').attr('data-pic', P.uploadImgPath + tData[tFieldContent.uploadImage]);
-								}
-								break;
-							default:
-								break;
-						}
-					}
-					if (typeof tFieldContent.hoverImage !== "undefined") {
-						iTemp1.addClass('hoverpic').attr('data-pic', tData[tFieldContent.hoverImage]);
-					}
-					tdTemp1.append(iTemp1).append("&nbsp;");
-				};
-
-				// 生成表格域-混合
-				_list.genField_mix = function(index, id, listData, fieldData) {
-					var self = this;
-					this.td = $("<td>");
-					$.each(fieldData.content, function(contentIndex, contentData) {
-						switch (tFieldContent.type) {
-							case "text": // 文本
-								self.td.append(_list.genField_mix_text(contentIndex, _table.id, listData, contentData));
-								break;
-							case "icon": // 图标
-								self.td.append(_list.genField_mix_icon(contentIndex, _table.id, listData, contentData));
-								break;
-							default:
-								break;
-						}
-					});
-					for (var k in fieldData.content) {
-						tFieldContent = fieldData.content[k];
-						switch (tFieldContent.type) {
-							case "text": // 文本
-								if (typeof tFieldContent.isMoney !== "undefined" && tFieldContent.isMoney) {
-									tdTemp1.append(accounting.formatMoney(tData[tFieldContent.id] || ''));
-								} else {
-									tdTemp1.append(tData[tFieldContent.id] || '');
-								}
-								break;
-							case "icon": // 图标
-								if (typeof tFieldContent.preset !== "undefined") {
-									switch (tFieldContent.preset) {
-										case "sex": // 预置模板-性别
-											if (tData[tFieldContent.sexId] == tFieldContent.sexOrder[0]) {
-												iTemp1 = $("<i>").addClass('ico_male');
-											} else if (tData[tFieldContent.sexId] == tFieldContent.sexOrder[1]) {
-												iTemp1 = $("<i>").addClass('ico_female');
-											} else if (tData[tFieldContent.sexId] == tFieldContent.sexOrder[2]) {
-												iTemp1 = $("<i>").addClass('ico_question');
-											}
-											if (typeof tFieldContent.hoverImage !== "undefined") {
-												iTemp1.addClass('hoverpic').attr('data-pic', tData[tFieldContent.hoverImage]);
-											}
-											break;
-										case "pic": // 预置模板-图片
-											iTemp1 = $("<i>").addClass('fa fa-fw fa-picture-o');
-											if (typeof tFieldContent.uploadImage !== "undefined") {
-												iTemp1.addClass('hoverpic').attr('data-pic', P.uploadImgPath + tData[tFieldContent.uploadImage]);
-											}
-											break;
-										default:
-											break;
-									}
-								}
-								if (typeof tFieldContent.hoverImage !== "undefined") {
-									iTemp1.addClass('hoverpic').attr('data-pic', tData[tFieldContent.hoverImage]);
-								}
-								tdTemp1.append(iTemp1).append("&nbsp;");
-								break;
-							default:
-								break;
-						}
-					}
-					return this.td;
-				};
-
 				// 生成单行数据
 				$.each(_table.o.fields, function(fieldIndex, fieldData) {
 					switch (fieldData.type) {
@@ -630,7 +399,7 @@
 							break;
 						case "textarea": // 文本输入框
 							_list.td = $("<td>").attr({
-								// id: _table.id + '_' + listIndex + '_select_' + fieldData.id,
+								// id: _table.id + '_' + listIndex + '_textarea_' + fieldData.id,
 							}).addClass('sugar-textarea');
 							_list.td.append(_genField('textarea', {
 								id: _table.id,
@@ -641,10 +410,28 @@
 							_list.tr.append(_list.td);
 							break;
 						case "modal": // 弹出框
-							_list.tr.append(_list.genField_modal(listIndex, _table.id, listData, fieldData));
+							_list.td = $("<td>").attr({
+								// id: _table.id + '_' + listIndex + '_modal_' + fieldData.id,
+							});
+							_list.td.append(_genField('modal', {
+								id: _table.id,
+								index: listIndex,
+								listData: listData,
+								fieldData: fieldData
+							}));
+							_list.tr.append(_list.td);
 							break;
 						case "mix": // 混合
-							_list.tr.append(_list.genField_mix(listIndex, _table.id, listData, fieldData));
+							_list.td = $("<td>").attr({
+								// id: _table.id + '_' + listIndex + '_mix_' + fieldData.id,
+							});
+							_list.td.append(_genField('mix', {
+								id: _table.id,
+								index: listIndex,
+								listData: listData,
+								fieldData: fieldData
+							}));
+							_list.tr.append(_list.td);
 							break;
 						default:
 							break;
@@ -661,6 +448,28 @@
 			$('[sugartype=select]').selectpicker({
 				container: 'body'
 			})
+
+			$(".sugar-hoverpic").hover(function() {
+				if ($(".sugar-hoverpicbox").length == 0) {
+					$("body").append($("<div>").addClass('sugar-hoverpicbox dropdown-menu'));
+				}
+				$(".sugar-hoverpicbox").css("left", $(this).offset().left - 50);
+				$(".sugar-hoverpicbox").css("top", $(this).offset().top - 100);
+				$(".sugar-hoverpicbox").html('<img src="' + $.trim($(this).attr('href')) + '" />');
+				$(".sugar-hoverpicbox").stop(true, true).fadeIn(200);
+			}, function() {
+				$(".sugar-hoverpicbox").stop(true, true).fadeOut(200);
+			});
+			$(".sugar-hoverpic").mousemove(function(e) {
+				var Y = $(this).parent().offset().top;
+				var X = $(this).parent().offset().left;
+				$(".sugar-hoverpicbox").css({
+					top: (e.pageY + 10) + "px",
+					left: (e.pageX + 10) + "px"
+				});
+			});
+
+			$('[data-fancybox="images"]').fancybox();
 
 			// 构造分页组件
 			if (!_table.o.noPaging) {
@@ -737,6 +546,7 @@
 			$.fn.sugarTable.options = $.fn.sugarTable.options || {};
 			$.fn.sugarTable.options[_table.id] = options;
 		},
+
 		/**
 		 * 获取整个表格内所有域的值
 		 * @return {Array} 包含各列键值对的数组，结构：
@@ -755,6 +565,7 @@
 			}
 			return values;
 		},
+
 		/**
 		 * 获取整个表格内指定域的值
 		 * @param  {Object} opts 附加参数

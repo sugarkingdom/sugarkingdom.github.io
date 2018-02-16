@@ -1,6 +1,7 @@
 var wlh = window.location.protocol + "//" + window.location.host;
 var P = {
 	rootPath: wlh + "/sugarkingdom.github.io/",
+	uploadImgPath: wlh + "/upload/",
 	includeCSS: function(path) {
 		document.write('<link rel="stylesheet" href="' + P.rootPath + path + '" type="text/css"/>');
 	},

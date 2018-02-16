@@ -8,4 +8,4 @@ P.includeJS("js/common/com/fileupload.js");
 P.includeJS("js/common/com/export.js");
 P.includeJS("js/common/com/note.js");
 P.includeJS("js/common/com/numberinput.js");
-P.includeJS("js/common/com/page.js");
+// P.includeJS("js/common/com/page.js");

@@ -79,6 +79,22 @@ $(function() {
 			type: "textarea",
 			name: "文本框1",
 			readonly: true
+		}, {
+			type: "mix",
+			name: "什么",
+			content: [{
+				id: "sex",
+				type: "icon",
+				preset: "sex",
+				sexId: "sex",
+				sexOrder: ["1", "2", "3"],
+				hoverImage: "headImgUrl",
+				prePath: P.uploadImgPath
+			}, {
+				id: "id",
+				type: "text",
+				name: "id"
+			}],
 		}],
 	});
 
