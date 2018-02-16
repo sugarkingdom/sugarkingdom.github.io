@@ -52,3 +52,23 @@ var tableData2 = [{
 	sex: 3,
 	headImgUrl: "03.jpg"
 }];
+
+var tableData3 = [{
+	id: 1,
+	money1: 1000,
+	money1Tag: "1",
+	money2: 3000,
+	money2Tag: "2",
+}, {
+	id: 2,
+	money1: 2000,
+	money1Tag: "1",
+	money2: 2000,
+	money2Tag: "3",
+}, {
+	id: 3,
+	money1: 3000,
+	money1Tag: "2",
+	money2: 1000,
+	money2Tag: "3",
+}];

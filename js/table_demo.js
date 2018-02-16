@@ -4,9 +4,12 @@ var size1 = '10';
 var page2 = "1";
 var size2 = '10';
 
+var page3 = "1";
+var size3 = '10';
+
 $(function() {
 	$("#listData1").sugarTable({
-		data: tableData1,
+		list: tableData1,
 		count: tableData1.length,
 		pageDom: $("#page1"),
 		page: page1,
@@ -65,7 +68,7 @@ $(function() {
 	// }));
 
 	$("#listData2").sugarTable({
-		data: tableData2,
+		list: tableData2,
 		count: tableData2.length,
 		pageDom: $("#page2"),
 		page: page2,
@@ -91,6 +94,12 @@ $(function() {
 				hoverImage: "headImgUrl",
 				prePath: P.uploadImgPath
 			}, {
+				id: "sex",
+				type: "icon",
+				preset: "pic",
+				imagePath: "headImgUrl",
+				prePath: P.uploadImgPath
+			}, {
 				id: "id",
 				type: "text",
 				name: "id"
@@ -98,12 +107,62 @@ $(function() {
 		}],
 	});
 
-	console.info($("#listData2").sugarTable("getValues"));
+	// console.info($("#listData2").sugarTable("getValues"));
 
-	console.info($("#listData2").sugarTable("getValue", {
-		id: "textarea1",
-		lineNum: 3
-	}));
+	// console.info($("#listData2").sugarTable("getValue", {
+	// 	id: "textarea1",
+	// 	lineNum: 3
+	// }));
+
+	$("#listData3").sugarTable({
+		list: tableData3,
+		count: tableData3.length,
+		pageDom: $("#page3"),
+		page: page3,
+		pageSize: size3,
+		needSum: true,
+		sumBaseGroup: [{
+			type: "text",
+			id: "money1Tag",
+		}, {
+			type: "text",
+			id: "money2Tag",
+		}],
+		sumCalcGroup: [{
+			type: "text",
+			id: "money1",
+		}],
+		needFinalSum: true,
+		finalSumCalcGroup: [{
+			type: "text",
+			id: "money1",
+		}],
+		fields: [{
+			id: "id",
+			type: "text",
+			name: "id"
+		}, {
+			id: "money1",
+			type: "text",
+			name: "金额1",
+			isMoney: true,
+			moneySymbol: "￥",
+		}, {
+			id: "money1Tag",
+			type: "text",
+			name: "金额1标签",
+		}, {
+			id: "money2",
+			type: "text",
+			name: "金额2",
+			isMoney: true,
+			moneySymbol: "￥",
+		}, {
+			id: "money2Tag",
+			type: "text",
+			name: "金额2标签",
+		}],
+	});
 
 	// genTableData({
 	// 	id: "listData",

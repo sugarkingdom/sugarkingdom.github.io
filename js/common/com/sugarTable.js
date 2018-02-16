@@ -20,7 +20,7 @@
 	};
 
 	$.fn.sugarTable.defaults = {
-		data: [], // 列表数据源
+		list: [], // 列表数据源
 		length: 0, // 生成列表行数
 		count: 0, // 列表计数
 		pageDom: $("#page"), // 分页DOM
@@ -33,7 +33,10 @@
 		noCheckbox: false, // 是否需要勾选框
 		noHideBtn: false, // 是否隐藏按钮
 		needSum: false, // 是否需要额外统计行
+		sumBaseGroup: [], // 统计基于的字段集合
+		sumCalcGroup: [], // 统计计算的字段集合
 		needFinalSum: false, // 是否需要额外总计行
+		finalSumCalcGroup: [], // 总计计算的字段集合
 	};
 
 	/**
@@ -80,8 +83,14 @@
 			case 'text': // 文本
 
 				// 金额展示处理
-				if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney) {
-					_temp.text = accounting.formatMoney(_temp.listData[_temp.fieldData.id] || '');
+				if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney && typeof _temp.listData[_temp.fieldData.id] !== 'undefined') {
+					_temp.text = accounting.formatMoney(_temp.listData[_temp.fieldData.id] || '', {
+						symbol: _temp.fieldData.moneySymbol || "$",
+						decimal: _temp.fieldData.moneyDecimal || ".",
+						thousand: _temp.fieldData.moneyThousand || ",",
+						precision: _temp.fieldData.moneyPrecision || 2,
+						format: _temp.fieldData.moneyFormat || "%s%v"
+					});
 				} else {
 					_temp.text = _temp.listData[_temp.fieldData.id] || '';
 				}
@@ -92,8 +101,14 @@
 				_temp.object = _temp.listData[_temp.fieldData.id] || {};
 
 				// 金额展示处理
-				if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney) {
-					_temp.text = accounting.formatMoney(_temp.object[_temp.fieldData.key] || '');
+				if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney && typeof _temp.listData[_temp.fieldData.id] !== 'undefined') {
+					_temp.text = accounting.formatMoney(_temp.object[_temp.fieldData.key] || '', {
+						symbol: _temp.fieldData.moneySymbol || "$",
+						decimal: _temp.fieldData.moneyDecimal || ".",
+						thousand: _temp.fieldData.moneyThousand || ",",
+						precision: _temp.fieldData.moneyPrecision || 2,
+						format: _temp.fieldData.moneyFormat || "%s%v"
+					});
 				} else {
 					_temp.text = _temp.object[_temp.fieldData.key] || '';
 				}
@@ -189,6 +204,7 @@
 				return _temp.textarea;
 
 			case "modal": // 弹出框 //// TODO
+
 				// tdTemp1 = $("<td>");
 				// divTemp1 = $("<div>").addClass('input-group');
 				// inputTemp1 = $("<input type='text'>").addClass('form-control').attr({
@@ -237,7 +253,7 @@
 						_temp.icon.addClass('fa fa-fw fa-picture-o');
 						if (typeof _temp.fieldData.imagePath !== "undefined") {
 							_temp.icon.addClass('sugar-hoverpic').attr({
-								href: (_temp.fieldData.prePath || '') + _temp.listData[_temp.fieldData.hoverImage],
+								href: (_temp.fieldData.prePath || '') + _temp.listData[_temp.fieldData.imagePath],
 								'data-fancybox': 'images'
 							});
 						}
@@ -250,15 +266,17 @@
 			case 'mix': // 混合
 
 				_temp.content = [];
-				$.each(_temp.fieldData.content, function(contentIndex, contentData) {
+				for (var contentIndex = 0; contentIndex < _temp.fieldData.content.length; contentIndex++) {
+					var contentData = _temp.fieldData.content[contentIndex];
 					_temp.content.push(_genField(contentData.type, {
 						id: _temp.id,
 						index: _temp.index,
 						listData: _temp.listData,
 						fieldData: contentData,
 					}));
-				});
+				}
 				return _temp.content;
+
 			default:
 				return '';
 		}
@@ -306,16 +324,136 @@
 			_table.theadTr.append($("<th>").attr('style', 'width:40px;').html(_table.o.seriText));
 
 			// 构造表头
-			$.each(_table.o.fields, function(fieldIndex, fieldData) {
+			for (var fieldIndex = 0; fieldIndex < _table.o.fields.length; fieldIndex++) {
+				var fieldData = _table.o.fields[fieldIndex];
 				_table.theadTr.append($("<th>").css('width', fieldData.width || 'auto').html(fieldData.name));
-			});
+			}
 
 			// 装入表头元素
 			_table.thead.append(_table.theadTr);
 
+			// 如果需要统计或总计，处理列表数据
+			if (_table.o.needSum || _table.o.needFinalSum) {
+				if (_table.o.needSum) { // 需要额外统计行
+					// 用于统计比较的字段
+					_table.sumBaseStrA = "";
+					_table.sumBaseStrB = "";
+
+					// 统计后数据
+					_table.afterSumList = [];
+
+					// 统计行数据
+					_table.sumData = {};
+
+					// 统计行数据
+					_table.finalSumData = {};
+				}
+
+				for (var listIndex = 0; listIndex < _table.o.list.length; listIndex++) {
+					var listData = _table.o.list[listIndex];
+
+					// 构造原始行号
+					listData.sugarSeri = (_table.o.page - 1) * _table.o.pageSize + parseInt(listIndex) + 1;
+
+					if (_table.o.needSum) { // 需要额外统计行
+
+						// 拼装统计比较字段
+						_table.sumBaseStrB = "";
+						for (var baseIndex = 0; baseIndex < _table.o.sumBaseGroup.length; baseIndex++) {
+							var baseData = _table.o.sumBaseGroup[baseIndex];
+							if (baseData.type === 'text') { // 文本
+								_table.sumBaseStrB += listData[baseData.id];
+							} else if (baseData.type === 'object') { // 对象
+								_table.sumBaseStrB += listData[baseData.id][baseData.key];
+							}
+						}
+
+						// 如果比较字段不相符且不为首行，则添加统计结果到列表数据，并清空统计结果
+						if (_table.sumBaseStrA !== _table.sumBaseStrB && _table.sumBaseStrA !== "") {
+
+							// 添加统计数据行号
+							_table.sumData.sugarSeri = "合计";
+							_table.afterSumList.push(_table.sumData);
+							_table.sumData = {};
+						}
+
+						// 重置比较字段
+						_table.sumBaseStrA = _table.sumBaseStrB;
+
+						// 记录统计计算字段
+						for (var calcIndex = 0; calcIndex < _table.o.sumCalcGroup.length; calcIndex++) {
+							var calcData = _table.o.sumCalcGroup[calcIndex];
+							if (calcData.type === 'text') { // 文本
+								_table.sumData[calcData.id] = _table.sumData[calcData.id] || 0;
+								_table.sumData[calcData.id] =
+									$.fn.sugarAddFloats(_table.sumData[calcData.id],
+										parseFloat(listData[calcData.id]));
+							} else if (calcData.type === 'object') { // 对象
+								_table.sumData[calcData.id] = _table.sumData[calcData.id] || {};
+								_table.sumData[calcData.id][calcData.key] = _table.sumData[calcData.id][calcData.key] || 0;
+								_table.sumData[calcData.id][calcData.key] =
+									$.fn.sugarAddFloats(_table.sumData[calcData.id][calcData.key],
+										parseFloat(listData[calcData.id][calcData.key]));
+							}
+						}
+
+						// 保存当前行数据
+						_table.afterSumList.push(listData);
+					}
+
+					if (_table.o.needFinalSum) { // 需要额外总计行
+
+						// 记录总计计算字段
+						for (var calcIndex = 0; calcIndex < _table.o.finalSumCalcGroup.length; calcIndex++) {
+							var calcData = _table.o.finalSumCalcGroup[calcIndex];
+							if (calcData.type === 'text') { // 文本
+								_table.finalSumData[calcData.id] = _table.finalSumData[calcData.id] || 0;
+								_table.finalSumData[calcData.id] =
+									$.fn.sugarAddFloats(_table.finalSumData[calcData.id],
+										parseFloat(listData[calcData.id]));
+							} else if (calcData.type === 'object') { // 对象
+								_table.finalSumData[calcData.id] = _table.finalSumData[calcData.id] || {};
+								_table.finalSumData[calcData.id][calcData.key] = _table.finalSumData[calcData.id][calcData.key] || 0;
+								_table.finalSumData[calcData.id][calcData.key] =
+									$.fn.sugarAddFloats(_table.finalSumData[calcData.id][calcData.key],
+										parseFloat(listData[calcData.id][calcData.key]));
+							}
+						}
+					}
+				}
+
+				if (_table.o.needSum) { // 需要额外统计行
+
+					// 如果末行统计结果不为空，则添加统计结果到列表数据
+					if (_table.sumData !== {}) {
+
+						// 添加统计数据行号
+						_table.sumData.sugarSeri = "合计";
+						_table.afterSumList.push(_table.sumData);
+						_table.sumData = {};
+					}
+				}
+
+				if (_table.o.needFinalSum) { // 需要额外总计行
+
+					// 如果末行总计结果不为空，则添加总计结果到列表数据
+					if (_table.finalSumData !== {}) {
+
+						// 添加统计数据行号
+						_table.finalSumData.sugarSeri = "总计";
+						_table.afterSumList.push(_table.finalSumData);
+						_table.finalSumData = {};
+					}
+				}
+
+				// 替换列表数据
+				_table.o.list = _table.afterSumList;
+			}
+
 			// 生成列表数据
 			_table.trArr = [];
-			$.each(_table.o.data, function(listIndex, listData) {
+			for (var listIndex = 0; listIndex < _table.o.list.length; listIndex++) {
+				var listData = _table.o.list[listIndex];
 				var _list = {};
 				_list.tr = $("<tr>");
 
@@ -334,13 +472,13 @@
 					_list.tr.append(_list.tdCheckbox);
 				}
 
-				// 构造序号列
-				_list.seri = (_table.o.page - 1) * _table.o.pageSize + parseInt(listIndex) + 1;
-				_list.tdSeri = $("<td>").addClass('seri').html(_list.seri);
+				// 构造序号列（如果存在统计生成的序列，则使用）
+				_list.tdSeri = $("<td>").addClass('seri').html(listData.sugarSeri);
 				_list.tr.append(_list.tdSeri);
 
 				// 生成单行数据
-				$.each(_table.o.fields, function(fieldIndex, fieldData) {
+				for (var fieldIndex = 0; fieldIndex < _table.o.fields.length; fieldIndex++) {
+					var fieldData = _table.o.fields[fieldIndex];
 					switch (fieldData.type) {
 						case "text": // 文本
 							_list.td = $("<td>").attr({
@@ -436,19 +574,25 @@
 						default:
 							break;
 					}
-					_table.trArr.push(_list.tr);
-				});
-			});
+				}
+
+				// 生成列表的每列时的额外处理
+				if (typeof _table.o.rowGenHandler !== "undefined") {
+					_table.o.rowGenHandler.call(this, listData);
+				}
+				_table.trArr.push(_list.tr);
+			}
 
 			// 组装表格
 			_table.tbody.append(_table.trArr);
 			this.append(_table.thead).append(_table.tbody);
 
-			// 渲染组件
+			// 渲染选择组件
 			$('[sugartype=select]').selectpicker({
 				container: 'body'
 			})
 
+			// 渲染图标组件
 			$(".sugar-hoverpic").hover(function() {
 				if ($(".sugar-hoverpicbox").length == 0) {
 					$("body").append($("<div>").addClass('sugar-hoverpicbox dropdown-menu'));
@@ -469,7 +613,17 @@
 				});
 			});
 
+			// 渲染图片组件
 			$('[data-fancybox="images"]').fancybox();
+
+			// 查询完成后隐藏左侧按钮
+			if (!_table.o.noHideBtn) {
+				$(".btn-begin-hide").hide();
+				$(".btn-begin-hide").attr({
+					alt: '',
+					href: '#'
+				});
+			}
 
 			// 构造分页组件
 			if (!_table.o.noPaging) {
@@ -480,6 +634,7 @@
 					totalPage: _table.o.count / _table.o.pageSize,
 					onPage: function(event) {
 						page = event.data.page;
+
 						// 查询完成后隐藏左侧按钮
 						if (!_table.o.noHideBtn) {
 							$(".btn-begin-hide").hide();
@@ -540,6 +695,11 @@
 					};
 					currentRow.onclick = rowClickHandler(currentRow);
 				}
+			}
+
+			// 生成列表后的额外处理
+			if (typeof _table.o.tableGenHandler !== "undefined") {
+				_table.o.tableGenHandler.call(this);
 			}
 
 			// 保存参数到全局变量
@@ -754,5 +914,35 @@
 		} else {
 			$ul.append('<li class="active"><a href="javascript:;">1</a></li>');
 		}
+	};
+
+
+	/**
+	 * 浮点数相加
+	 * @param {float} f1
+	 * @param {float} f2
+	 */
+	$.fn.sugarAddFloats = function(f1, f2) {
+		//Helper function to find the number of decimal places
+		function findDec(f1) {
+			function isInt(n) {
+				return typeof n === 'number' &&
+					parseFloat(n) == parseInt(n, 10) && !isNaN(n);
+			}
+			var a = Math.abs(f1);
+			f1 = a, count = 1;
+			while (!isInt(f1) && isFinite(f1)) {
+				f1 = a * Math.pow(10, count++);
+			}
+			return count - 1;
+		}
+		//Determine the greatest number of decimal places
+		var dec1 = findDec(f1);
+		var dec2 = findDec(f2);
+		var fixed = dec1 > dec2 ? dec1 : dec2;
+
+		//do the math then do a toFixed, could do a toPrecision also
+		var n = (f1 + f2).toFixed(fixed);
+		return +n;
 	}
 })(jQuery, window);
