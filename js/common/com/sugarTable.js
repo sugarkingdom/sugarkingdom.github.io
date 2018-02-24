@@ -480,7 +480,7 @@
 			}
 
 			// 构造表头序号列
-			_table.theadTr.append($("<th>").attr('style', 'width:40px;').html(_table.o.seriText));
+			_table.theadTr.append($("<th>").addClass('seri').html(_table.o.seriText));
 
 			// 构造表头
 			for (var fieldIndex = 0; fieldIndex < _table.o.fields.length; fieldIndex++) {
@@ -632,6 +632,7 @@
 				}
 
 				// 构造序号列（如果存在统计生成的序列，则使用）
+				listData.sugarSeri = listData.sugarSeri || ((_table.o.page - 1) * _table.o.pageSize + parseInt(listIndex) + 1);
 				_list.tdSeri = $("<td>").addClass('seri').html(listData.sugarSeri);
 				_list.tr.append(_list.tdSeri);
 
@@ -802,7 +803,7 @@
 								href: '#'
 							});
 						}
-						opts.searchHandler.call(this, page);
+						_table.o.searchHandler.call(this, page);
 					}
 				});
 			}
@@ -840,7 +841,7 @@
 								currentCheckbox.checked = true;
 								row.className = "info";
 								if (typeof _table.o.checkHandler !== "undefined") {
-									_table.o.checkHandler.call(this, currentCheckbox.sugarline);
+									_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
 								}
 							} else {
 								// 隐藏左侧按钮
