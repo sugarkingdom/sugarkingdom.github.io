@@ -791,7 +791,7 @@
 					page: _table.o.page,
 					pageSet: 2,
 					count: _table.o.count,
-					totalPage: _table.o.count / _table.o.pageSize,
+					totalPage: (_table.o.count / _table.o.pageSize) || 1,
 					onPage: function(event) {
 						page = event.data.page;
 
@@ -944,7 +944,7 @@
 			defaultOptions = {
 				page: 0,
 				pageSet: 2,
-				totalPage: 0
+				totalPage: 1
 			}
 		}
 		options = $.extend(defaultOptions, options);
