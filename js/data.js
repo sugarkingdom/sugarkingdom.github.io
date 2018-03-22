@@ -40,17 +40,17 @@ var tableData2 = [{
 	id: 1,
 	textarea1: '1_1 文本框内容 01\n1_1 文本框内容 02\n1_1 文本内容 03',
 	sex: 1,
-	headImgUrl: "01.jpg"
+	headImgUrl: "01.png"
 }, {
 	id: 2,
 	textarea1: '2_1 文本框内容 01\n2_1 文本框内容 02\n2_1 文本内容 03',
 	sex: 2,
-	headImgUrl: "02.jpg"
+	headImgUrl: "02.png"
 }, {
 	id: 3,
 	textarea1: '3_1 文本框内容 01\n3_1 文本框内容 02\n3_1 文本内容 03',
 	sex: 3,
-	headImgUrl: "03.jpg"
+	headImgUrl: "03.png"
 }];
 
 var tableData3 = [{
