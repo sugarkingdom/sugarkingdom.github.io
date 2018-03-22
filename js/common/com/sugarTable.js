@@ -647,6 +647,14 @@
 								sugarid: fieldData.id,
 								sugartype: 'text',
 							});
+							_list.tdStyle = "";
+							if (typeof fieldData.bold !== "undefined") {
+								_list.tdStyle += "font-weight: bold;";
+							}
+							if (typeof fieldData.colors !== "undefined") {
+								_list.tdStyle += "color:" + fieldData.colors[listData[fieldData.id]];
+							}
+							_list.td.attr("style", _list.tdStyle);
 							_list.td.append(_genField('text', {
 								id: _table.id,
 								index: listIndex,
