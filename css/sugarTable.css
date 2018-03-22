@@ -91,6 +91,7 @@
 	height: auto;
 	padding: 5px;
 	overflow: hidden;
+	z-index: 9999;
 }
 
 .sugar-hoverpicbox img {
