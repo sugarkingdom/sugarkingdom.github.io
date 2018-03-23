@@ -499,7 +499,8 @@ $(function() {
 		$("#listData").sugarTable({
 			list: tableData,
 			count: tableData.length,
-			isLocal: true,
+			noPaging: true,
+			// isLocal: true,
 			pageDom: $("#page"),
 			page: page,
 			pageSize: size,
