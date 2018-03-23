@@ -1,1 +1,0 @@
-P.includeCSS("css/global.css");

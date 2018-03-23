@@ -1,1 +1,0 @@
-P.includeJS("include/ckeditor/ckeditor.js");

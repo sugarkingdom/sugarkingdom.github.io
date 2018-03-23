@@ -92,13 +92,13 @@ $(function() {
 				sexId: "sex",
 				sexOrder: ["1", "2", "3"],
 				hoverImage: "headImgUrl",
-				prePath: P.uploadImgPath
+				prePath: "https://sugarkingdom.github.io/upload/"
 			}, {
 				id: "sex",
 				type: "icon",
 				preset: "pic",
 				imagePath: "headImgUrl",
-				prePath: P.uploadImgPath
+				prePath: "https://sugarkingdom.github.io/upload/"
 			}, {
 				id: "id",
 				type: "text",
