@@ -23,6 +23,7 @@
 		list: [], // 列表数据源
 		length: 0, // 生成列表行数
 		count: 0, // 列表计数
+		isLocal: false, // 是否需要本地分页
 		pageDom: $("#page"), // 分页DOM
 		page: 1, // 页数
 		pageSize: 10, // 每页数量
@@ -491,6 +492,11 @@
 			// 装入表头元素
 			_table.thead.append(_table.theadTr);
 
+			// 如果需要本地分页，处理列表数据
+			if (_table.o.isLocal) {
+				_table.o.list = _table.o.list.slice((_table.o.page - 1) * _table.o.pageSize, _table.o.page * _table.o.pageSize);
+			}
+
 			// 如果需要统计或总计，处理列表数据
 			if (_table.o.needSum || _table.o.needFinalSum) {
 				if (_table.o.needSum) { // 需要额外统计行
@@ -647,6 +653,8 @@
 								sugarid: fieldData.id,
 								sugartype: 'text',
 							});
+
+							// 处理样式
 							_list.tdStyle = "";
 							if (typeof fieldData.bold !== "undefined") {
 								_list.tdStyle += "font-weight: bold;";

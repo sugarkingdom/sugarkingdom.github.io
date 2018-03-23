@@ -494,36 +494,46 @@ var page = "1";
 var size = '10';
 
 $(function() {
-	$("#listData").sugarTable({
-		list: tableData,
-		count: tableData.length,
-		noPaging: true,
-		fields: [{
-			id: "accName",
-			type: "text",
-			name: "名称",
-			width: "100",
-		}, {
-			id: "accRare",
-			type: "text",
-			name: "稀有度",
-			width: "100",
-			bold: true,
-			colors: {
-				"RARE5": "#8AECF8",
-				"RARE6": "#7EA8FB",
-				"RARE7": "#7555E1",
-				"RARE8": "#FF985E",
+	var searchHandler = function(p) {
+		page = p || page;
+		$("#listData").sugarTable({
+			list: tableData,
+			count: tableData.length,
+			isLocal: true,
+			pageDom: $("#page"),
+			page: page,
+			pageSize: size,
+			fields: [{
+				id: "accName",
+				type: "text",
+				name: "名称",
+				width: "100",
+			}, {
+				id: "accRare",
+				type: "text",
+				name: "稀有度",
+				width: "100",
+				bold: true,
+				colors: {
+					"RARE5": "#8AECF8",
+					"RARE6": "#7EA8FB",
+					"RARE7": "#7555E1",
+					"RARE8": "#FF985E",
+				}
+			}, {
+				id: "accLevel",
+				type: "text",
+				name: "技能等级",
+				width: "100",
+			}, {
+				id: "accDetail",
+				type: "text",
+				name: "技能说明",
+			}],
+			searchHandler: function(p) {
+				searchHandler(p);
 			}
-		}, {
-			id: "accLevel",
-			type: "text",
-			name: "技能等级",
-			width: "100",
-		}, {
-			id: "accDetail",
-			type: "text",
-			name: "技能说明",
-		}],
-	});
+		});
+	}
+	searchHandler("1");
 });
