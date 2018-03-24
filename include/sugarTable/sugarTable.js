@@ -973,9 +973,11 @@
 		var hasEvent = typeof(options.onPage) == "function";
 
 		var $ul = $('<ul class="pagination"></ul>');
+		// var $pagesize = $('<input type="text">')
 		var $span = $('<span class="pageinfo"></span>');
 		this.empty();
 		this.append($ul);
+		// this.append($pagesize);
 		this.append($span);
 		$span.text("第 " + page + " 页，共 " + total + " 页， " + count + " 条记录");
 		if (total > 0) {
