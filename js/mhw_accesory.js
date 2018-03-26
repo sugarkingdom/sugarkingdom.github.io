@@ -649,14 +649,18 @@ $(function() {
 			id: "id"
 		});
 		var arr = [];
-		for (var name in obj) {
-			arr[name] = name;
+		for (var i in obj) {
+			arr.push(obj[i]);
 		}
 		console.info(arr);
 		var len = arr.length;
 		while (len--) {
 			if (arr[len] !== undefined) {
-				tableData.splice(len, 1);
+				for (var i = tableData.length - 1; i >= 0; i--) {
+					if (parseInt(arr[len].id) === tableData[i].id) {
+						tableData.splice(i, 1);
+					}
+				}
 			}
 		}
 		searchHandler("1", tableData);
