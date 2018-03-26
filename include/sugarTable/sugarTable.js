@@ -30,8 +30,10 @@
 		fields: [], // 列表列名称
 		seriText: "序号", // 序号显示文本
 		tableClass: "table table-bordered table-hover", // 列表样式
+		noSeri: false, // 是否需要序号列
 		noPaging: false, // 是否需要分页
 		noCheckbox: false, // 是否需要勾选框
+		multiCheck: false, // 是否为多选模式
 		noHideBtn: false, // 是否隐藏按钮
 		needSum: false, // 是否需要额外统计行
 		sumBaseGroup: [], // 统计基于的字段集合
@@ -62,7 +64,7 @@
 			case "modal": //// TODO
 				return '';
 			default:
-				return '';
+				return undefined;
 		}
 	};
 
@@ -481,12 +483,17 @@
 			}
 
 			// 构造表头序号列
-			_table.theadTr.append($("<th>").addClass('seri').html(_table.o.seriText));
+			if (!_table.o.noSeri) {
+				_table.theadTr.append($("<th>").addClass('seri').html(_table.o.seriText));
+			}
 
 			// 构造表头
 			for (var fieldIndex = 0; fieldIndex < _table.o.fields.length; fieldIndex++) {
 				var fieldData = _table.o.fields[fieldIndex];
-				_table.theadTr.append($("<th>").css('width', fieldData.width || 'auto').html(fieldData.name));
+				_table.theadTr.append($("<th>").css({
+					width: fieldData.width || 'auto',
+					display: fieldData.hide ? 'none' : 'table-cell'
+				}).html(fieldData.name));
 			}
 
 			// 装入表头元素
@@ -638,9 +645,11 @@
 				}
 
 				// 构造序号列（如果存在统计生成的序列，则使用）
-				listData.sugarSeri = listData.sugarSeri || ((_table.o.page - 1) * _table.o.pageSize + parseInt(listIndex) + 1);
-				_list.tdSeri = $("<td>").addClass('seri').html(listData.sugarSeri);
-				_list.tr.append(_list.tdSeri);
+				if (!_table.o.noSeri) {
+					listData.sugarSeri = listData.sugarSeri || ((_table.o.page - 1) * _table.o.pageSize + parseInt(listIndex) + 1);
+					_list.tdSeri = $("<td>").addClass('seri').html(listData.sugarSeri);
+					_list.tr.append(_list.tdSeri);
+				}
 
 				// 生成单行数据
 				for (var fieldIndex = 0; fieldIndex < _table.o.fields.length; fieldIndex++) {
@@ -655,14 +664,11 @@
 							});
 
 							// 处理样式
-							_list.tdStyle = "";
-							if (typeof fieldData.bold !== "undefined") {
-								_list.tdStyle += "font-weight: bold;";
-							}
-							if (typeof fieldData.colors !== "undefined") {
-								_list.tdStyle += "color:" + fieldData.colors[listData[fieldData.id]];
-							}
-							_list.td.attr("style", _list.tdStyle);
+							_list.td.css({
+								fontWeight: fieldData.bold ? 'bold' : 'normal',
+								color: fieldData.colors ? fieldData.colors[listData[fieldData.id]] : 'unset',
+								display: fieldData.hide ? 'none' : 'table-cell'
+							});
 							_list.td.append(_genField('text', {
 								id: _table.id,
 								index: listIndex,
@@ -844,15 +850,19 @@
 						return function() {
 							var currentCheckbox = row.getElementsByTagName("input")[0] || {};
 							var currentCheckState = currentCheckbox.checked || false;
-							// 清空所有checkbox
-							var checkboxes = _table.tbody.find("input[sugartype=line_checkbox]");
-							for (var j = 0; j < checkboxes.length; j++) {
-								checkboxes[j].checked = false;
+
+							// 如果为单选模式，啧清空所有checkbox
+							if (!_table.o.multiCheck) {
+								var checkboxes = _table.tbody.find("input[sugartype=line_checkbox]");
+								for (var j = 0; j < checkboxes.length; j++) {
+									checkboxes[j].checked = false;
+								}
+								// 清空所有行样式
+								for (var j = 0; j < _tbody_rows.length; j++) {
+									_tbody_first.rows[j].className = "";
+								}
 							}
-							// 清空所有行样式
-							for (var j = 0; j < _tbody_rows.length; j++) {
-								_tbody_first.rows[j].className = "";
-							}
+
 							if (!currentCheckState) {
 								currentCheckbox.checked = true;
 								row.className = "info";
@@ -860,12 +870,19 @@
 									_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
 								}
 							} else {
+
 								// 隐藏左侧按钮
 								$(".btn-begin-hide").hide();
 								$(".btn-begin-hide").attr({
 									alt: '',
 									href: '#'
 								});
+
+								// 如果为多选模式，啧清空当前 checkbox 与当前行样式
+								if (_table.o.multiCheck) {
+									currentCheckbox.checked = false;
+									row.className = "";
+								}
 							}
 						};
 					};
@@ -912,6 +929,7 @@
 		 * @return {String} 如果只有一个匹配域，则返回该域的值
 		 */
 		getValue: function(opts) {
+			opts = opts || {};
 			var findStr = '[sugartype]';
 			if (typeof opts.id !== "undefined") {
 				findStr += '[sugarid=' + opts.id + ']';
@@ -922,6 +940,7 @@
 			if (this.find(findStr).length > 1) {
 				var values = [];
 				var value = {};
+				var tempValue = '';
 				var lineNum = $.fn.sugarTable.options[this.attr('id')].count;
 				for (var i = 0; i < lineNum; i++) {
 					value = {};
@@ -931,7 +950,10 @@
 						} else if (typeof opts.lineNum !== "undefined" && i !== (opts.lineNum - 1)) {
 							return;
 						} else {
-							value[el.attributes.sugarid.value] = _getValue(el);
+							tempValue = _getValue(el);
+							if (typeof tempValue !== "undefined") {
+								value[el.attributes.sugarid.value] = _getValue(el);
+							}
 						}
 					});
 					values.push(value);
@@ -939,6 +961,44 @@
 				return values;
 			} else if (this.find(findStr).length === 1) {
 				return _getValue(this.find(findStr)[0]);
+			} else {
+				return "";
+			}
+		},
+
+		/**
+		 * 获取整个表格内选中行的值
+		 * @param  {Object} opts 附加参数
+		 *                       id 		指定域的ID
+		 * @return {Array} 包含各列键值对的对象，结构：
+		 *         {line_num_1:{name1:value1_1,name2:value1_2},line_num_2:{name1:value2_1,name2:value2_2}}
+		 */
+		getSelectedRows: function(opts) {
+			opts = opts || {};
+			var findStr = '[sugartype]';
+			if (typeof opts.id !== "undefined") {
+				findStr += '[sugarid=' + opts.id + ']';
+			}
+			if (this.find('[sugartype=line_checkbox]:checked').length >= 1) {
+				var values = {};
+				var value = {};
+				var tempValue = '';
+				var $this = this;
+				this.find('[sugartype=line_checkbox]:checked').each(function(index1, el1) {
+					value = {};
+					$this.find('[sugartype][sugarline=' + el1.attributes.sugarline.value + ']').each(function(index2, el2) {
+						if (typeof opts.id !== "undefined" && el2.attributes.sugarid.value !== opts.id) {
+							return;
+						} else {
+							tempValue = _getValue(el2);
+							if (typeof tempValue !== "undefined") {
+								value[el2.attributes.sugarid.value] = tempValue;
+							}
+						}
+					});
+					values[el1.attributes.sugarline.value] = value;
+				});
+				return values;
 			} else {
 				return "";
 			}
