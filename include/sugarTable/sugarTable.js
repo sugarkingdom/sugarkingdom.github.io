@@ -811,7 +811,7 @@
 			if (!_table.o.noPaging) {
 				_table.o.pageDom.sugarPage({
 					page: _table.o.page,
-					pageSet: 2,
+					pageSet: 0,
 					count: _table.o.count,
 					totalPage: (_table.o.count / _table.o.pageSize) || 1,
 					onPage: function(event) {
