@@ -1,8 +1,10 @@
 /**
  * 表格组件
  * Required:
+ * 	base:
  * 		jQuery 1.12.4
  * 		bootstrap 3.3.7
+ * 		accounting
  * 		bootstrap select 1.12.2
  * 		awesome bootstrap checkbox 1.0.0-alpha.5
  * 		fancybox 3.2.1
@@ -72,6 +74,10 @@
 	 * 生成表格域（仅内部使用）
 	 * @param  {String} type  域类型
 	 * @param  {Object} opts  参数
+	 *                  opts.id	表格ID
+	 *                  opts.index	数据行数
+	 *                  opts.listData	表格数据
+	 *                  opts.fieldData	域格式
 	 * @return {String or Object}  域内容
 	 */
 	function _genField(type, opts) {
@@ -85,8 +91,7 @@
 
 			case 'text': // 文本
 
-				// 金额展示处理
-				if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney && typeof _temp.listData[_temp.fieldData.id] !== 'undefined') {
+				if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney && typeof _temp.listData[_temp.fieldData.id] !== 'undefined') { // 金额展示处理
 					_temp.text = accounting.formatMoney(_temp.listData[_temp.fieldData.id] || '', {
 						symbol: _temp.fieldData.moneySymbol || "$",
 						decimal: _temp.fieldData.moneyDecimal || ".",
@@ -94,28 +99,23 @@
 						precision: _temp.fieldData.moneyPrecision || 2,
 						format: _temp.fieldData.moneyFormat || "%s%v"
 					});
+				} else if (typeof _temp.fieldData.isDate !== "undefined" && _temp.fieldData.isDate && typeof _temp.listData[_temp.fieldData.id] !== 'undefined') { // 日期展示处理
+					_temp.text = (new Date(parseInt(_temp.listData[_temp.fieldData.id]))).Format(_temp.fieldData.format);
+				} else if (typeof _temp.fieldData.isStatus !== "undefined" && _temp.fieldData.isStatus && typeof _temp.listData[_temp.fieldData.id] !== 'undefined') { // 状态展示处理
+					_temp.text = _temp.fieldData.pairs[_temp.listData[_temp.fieldData.id]];
 				} else {
 					_temp.text = _temp.listData[_temp.fieldData.id] || '';
 				}
 				return _temp.text;
 
-			case 'object': // 对象
+			case 'object': // 对象 //// TO_TEST
 
+				// 将对象里的值提出
 				_temp.object = _temp.listData[_temp.fieldData.id] || {};
+				opts.listData[_temp.fieldData.id] = _temp.object[_temp.fieldData.key];
 
-				// 金额展示处理
-				if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney && typeof _temp.listData[_temp.fieldData.id] !== 'undefined') {
-					_temp.text = accounting.formatMoney(_temp.object[_temp.fieldData.key] || '', {
-						symbol: _temp.fieldData.moneySymbol || "$",
-						decimal: _temp.fieldData.moneyDecimal || ".",
-						thousand: _temp.fieldData.moneyThousand || ",",
-						precision: _temp.fieldData.moneyPrecision || 2,
-						format: _temp.fieldData.moneyFormat || "%s%v"
-					});
-				} else {
-					_temp.text = _temp.object[_temp.fieldData.key] || '';
-				}
-				return _temp.text;
+				// 赋值逻辑与文本域相同
+				return _genField('text', opts);
 
 			case 'input': // 输入框
 
@@ -770,9 +770,11 @@
 			this.append(_table.thead).append(_table.tbody);
 
 			// 渲染选择组件
-			$('[sugartype=select]').selectpicker({
-				container: 'body'
-			})
+			if ($('[sugartype=select]').length > 0) {
+				$('[sugartype=select]').selectpicker({
+					container: 'body'
+				})
+			}
 
 			// 渲染图标组件
 			$(".sugar-hoverpic").hover(function() {
@@ -1182,5 +1184,33 @@
 		//do the math then do a toFixed, could do a toPrecision also
 		var n = (f1 + f2).toFixed(fixed);
 		return +n;
+	}
+
+	// 对Date的扩展，将 Date 转化为指定格式的String
+	// 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
+	// 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
+	// 例子：
+	// (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
+	// (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18
+	Date.prototype.Format = function(fmt) { // author: meizz
+		var o = {
+			"M+": this.getMonth() + 1, // 月份
+			"d+": this.getDate(), // 日
+			"h+": this.getHours(), // 小时
+			"m+": this.getMinutes(), // 分
+			"s+": this.getSeconds(), // 秒
+			"q+": Math.floor((this.getMonth() + 3) / 3), // 季度
+			"S": this.getMilliseconds()
+			// 毫秒
+		};
+		if (/(y+)/.test(fmt)) {
+			fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+		}
+		for (var k in o) {
+			if (new RegExp("(" + k + ")").test(fmt)) {
+				fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+			}
+		}
+		return fmt;
 	}
 })(jQuery, window);
