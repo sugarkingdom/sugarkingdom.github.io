@@ -108,7 +108,7 @@
 				}
 				return _temp.text;
 
-			case 'object': // 对象 //// TO_TEST
+			case 'object': // 对象
 
 				// 将对象里的值提出
 				_temp.object = _temp.listData[_temp.fieldData.id] || {};
