@@ -641,7 +641,7 @@ $(function() {
 				searchHandler(p, tableData);
 			}
 		});
-	}
+	};
 	searchHandler("1", tableData);
 
 	$('#btnHideSelected').on('click', function(event) {
@@ -649,8 +649,8 @@ $(function() {
 			id: "id"
 		});
 		var arr = [];
-		for (var i in obj) {
-			arr.push(obj[i]);
+		for (var data in obj) {
+			arr.push(obj[data]);
 		}
 		console.info(arr);
 		var len = arr.length;
@@ -663,6 +663,11 @@ $(function() {
 				}
 			}
 		}
+		searchHandler("1", tableData);
+	});
+
+	$('#btnShowAll').on('click', function(event) {
+		size = 98;
 		searchHandler("1", tableData);
 	});
 });

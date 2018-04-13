@@ -1,7 +1,6 @@
 /**
  * 表格组件
  * Required:
- * 	base:
  * 		jQuery 1.12.4
  * 		bootstrap 3.3.7
  * 		accounting
@@ -9,9 +8,9 @@
  * 		awesome bootstrap checkbox 1.0.0-alpha.5
  * 		fancybox 3.2.1
  */
-(function($, window, undefined) {
+(function ($, window, undefined) {
 
-	$.fn.sugarTable = function(methodOrOptions) {
+	$.fn.sugarTable = function (methodOrOptions) {
 		if (methods[methodOrOptions]) {
 			return methods[methodOrOptions].apply(this, Array.prototype.slice.call(arguments, 1));
 		} else if (typeof methodOrOptions === 'object' || !methodOrOptions) {
@@ -68,7 +67,7 @@
 			default:
 				return undefined;
 		}
-	};
+	}
 
 	/**
 	 * 生成表格域（仅内部使用）
@@ -92,7 +91,8 @@
 			case 'text': // 文本
 
 				if (typeof _temp.fieldData.isMoney !== "undefined" && _temp.fieldData.isMoney && typeof _temp.listData[_temp.fieldData.id] !== 'undefined') { // 金额展示处理
-					_temp.text = accounting.formatMoney(_temp.listData[_temp.fieldData.id] || '', {
+					_temp.fieldData.moneyMultiplier = _temp.fieldData.moneyMultiplier || 1;
+					_temp.text = accounting.formatMoney(_temp.listData[_temp.fieldData.id] * _temp.fieldData.moneyMultiplier, {
 						symbol: _temp.fieldData.moneySymbol || "$",
 						decimal: _temp.fieldData.moneyDecimal || ".",
 						thousand: _temp.fieldData.moneyThousand || ",",
@@ -180,7 +180,7 @@
 
 				// 处理change事件，传递当前行数与change后值
 				if (typeof _temp.fieldData.changeHandler !== 'undefined') {
-					_temp.select.on('change', function(event) {
+					_temp.select.on('change', function (event) {
 						event.preventDefault();
 						this.data = {
 							lineNum: $(this).attr("sugarline"),
@@ -451,7 +451,7 @@
 		 * @param  {Object} options 参数
 		 * @return
 		 */
-		init: function(options) {
+		init: function (options) {
 			var _table = {};
 
 			// 表格元素ID
@@ -773,11 +773,11 @@
 			if ($('[sugartype=select]').length > 0) {
 				$('[sugartype=select]').selectpicker({
 					container: 'body'
-				})
+				});
 			}
 
 			// 渲染图标组件
-			$(".sugar-hoverpic").hover(function() {
+			$(".sugar-hoverpic").hover(function () {
 				if ($(".sugar-hoverpicbox").length == 0) {
 					$("body").append($("<div>").addClass('sugar-hoverpicbox dropdown-menu'));
 				}
@@ -785,10 +785,10 @@
 				$(".sugar-hoverpicbox").css("top", $(this).offset().top - 100);
 				$(".sugar-hoverpicbox").html('<img src="' + $.trim($(this).attr('href')) + '" />');
 				$(".sugar-hoverpicbox").stop(true, true).fadeIn(200);
-			}, function() {
+			}, function () {
 				$(".sugar-hoverpicbox").stop(true, true).fadeOut(200);
 			});
-			$(".sugar-hoverpic").mousemove(function(e) {
+			$(".sugar-hoverpic").mousemove(function (e) {
 				var Y = $(this).parent().offset().top;
 				var X = $(this).parent().offset().left;
 				$(".sugar-hoverpicbox").css({
@@ -816,7 +816,7 @@
 					pageSet: 0,
 					count: _table.o.count,
 					totalPage: (_table.o.count / _table.o.pageSize) || 1,
-					onPage: function(event) {
+					onPage: function (event) {
 						page = event.data.page;
 
 						// 查询完成后隐藏左侧按钮
@@ -836,59 +836,56 @@
 			if (!_table.o.noCheckbox) {
 				var _tbody_first = _table.tbody[0];
 				var _tbody_rows = _table.tbody.find("tr");
-				for (var i = 0; i < _tbody_rows.length; i++) {
-					var currentRow = _tbody_first.rows[i];
-					var currentCheckbox = currentRow.getElementsByTagName("input")[0] || {};
 
-					// 点击checkbox区域时，对checkbox反向处理，以便在rowClick中统一操作
-					var checkboxClickHandler = function(checkbox) {
-						return function() {
-							checkbox.checked = !checkbox.checked;
+				var currentCheckboxHandler = function () {
+					this.checked = !this.checked;
+				};
+				var currentRowHandler = function () {
+					var currentCheckbox = $(this).find("input")[0] || {};
+					var currentCheckState = currentCheckbox.checked || false;
+
+					// 如果为单选模式，啧清空所有checkbox
+					if (!_table.o.multiCheck) {
+						var checkboxes = _table.tbody.find("input[sugartype=line_checkbox]");
+						for (var j = 0; j < checkboxes.length; j++) {
+							checkboxes[j].checked = false;
+						}
+						// 清空所有行样式
+						for (var j = 0; j < _tbody_rows.length; j++) {
+							_tbody_first.rows[j].className = "";
 						}
 					}
-					currentCheckbox.onclick = checkboxClickHandler(currentCheckbox);
 
-					var rowClickHandler = function(row) {
-						return function() {
-							var currentCheckbox = row.getElementsByTagName("input")[0] || {};
-							var currentCheckState = currentCheckbox.checked || false;
+					if (!currentCheckState) {
+						currentCheckbox.checked = true;
+						this.className = "info";
+						if (typeof _table.o.checkHandler !== "undefined") {
+							_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
+						}
+					} else {
 
-							// 如果为单选模式，啧清空所有checkbox
-							if (!_table.o.multiCheck) {
-								var checkboxes = _table.tbody.find("input[sugartype=line_checkbox]");
-								for (var j = 0; j < checkboxes.length; j++) {
-									checkboxes[j].checked = false;
-								}
-								// 清空所有行样式
-								for (var j = 0; j < _tbody_rows.length; j++) {
-									_tbody_first.rows[j].className = "";
-								}
-							}
+						// 隐藏左侧按钮
+						$(".btn-begin-hide").hide();
+						$(".btn-begin-hide").attr({
+							alt: '',
+							href: '#'
+						});
 
-							if (!currentCheckState) {
-								currentCheckbox.checked = true;
-								row.className = "info";
-								if (typeof _table.o.checkHandler !== "undefined") {
-									_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
-								}
-							} else {
+						// 如果为多选模式，啧清空当前 checkbox 与当前行样式
+						if (_table.o.multiCheck) {
+							currentCheckbox.checked = false;
+							this.className = "";
+						}
+					}
+				};
+				for (var i = 0; i < _tbody_rows.length; i++) {
+					var currentRow = _tbody_first.rows[i];
+					var currentCheckbox = $(currentRow).find("input")[0] || {};
 
-								// 隐藏左侧按钮
-								$(".btn-begin-hide").hide();
-								$(".btn-begin-hide").attr({
-									alt: '',
-									href: '#'
-								});
-
-								// 如果为多选模式，啧清空当前 checkbox 与当前行样式
-								if (_table.o.multiCheck) {
-									currentCheckbox.checked = false;
-									row.className = "";
-								}
-							}
-						};
-					};
-					currentRow.onclick = rowClickHandler(currentRow);
+					// 点击checkbox区域时，对checkbox反向处理，以便在rowClick中统一操作
+					currentCheckbox.onclick = currentCheckboxHandler;
+					
+					currentRow.onclick = currentRowHandler;
 				}
 			}
 
@@ -907,13 +904,13 @@
 		 * @return {Array} 包含各列键值对的数组，结构：
 		 *         [0:{name1:value1_1,name2:value1_2},1:{name1:value2_1,name2:value2_2}]
 		 */
-		getValues: function() {
+		getValues: function () {
 			var values = [];
 			var value = {};
 			var lineNum = $.fn.sugarTable.options[this.attr('id')].count;
 			for (var i = 0; i < lineNum; i++) {
 				value = {};
-				this.find('[sugartype][sugarline=' + i + ']').each(function(index, el) {
+				this.find('[sugartype][sugarline=' + i + ']').each(function (index, el) {
 					value[el.attributes.sugarid.value] = _getValue(el);
 				});
 				values.push(value);
@@ -930,7 +927,7 @@
 		 *         [0:{name1:value1_1,name2:value1_2},1:{name1:value2_1,name2:value2_2}]
 		 * @return {String} 如果只有一个匹配域，则返回该域的值
 		 */
-		getValue: function(opts) {
+		getValue: function (opts) {
 			opts = opts || {};
 			var findStr = '[sugartype]';
 			if (typeof opts.id !== "undefined") {
@@ -946,7 +943,7 @@
 				var lineNum = $.fn.sugarTable.options[this.attr('id')].count;
 				for (var i = 0; i < lineNum; i++) {
 					value = {};
-					this.find('[sugartype][sugarline=' + i + ']').each(function(index, el) {
+					this.find('[sugartype][sugarline=' + i + ']').each(function (index, el) {
 						if (typeof opts.id !== "undefined" && el.attributes.sugarid.value !== opts.id) {
 							return;
 						} else if (typeof opts.lineNum !== "undefined" && i !== (opts.lineNum - 1)) {
@@ -975,7 +972,7 @@
 		 * @return {Array} 包含各列键值对的对象，结构：
 		 *         {line_num_1:{name1:value1_1,name2:value1_2},line_num_2:{name1:value2_1,name2:value2_2}}
 		 */
-		getSelectedRows: function(opts) {
+		getSelectedRows: function (opts) {
 			opts = opts || {};
 			var findStr = '[sugartype]';
 			if (typeof opts.id !== "undefined") {
@@ -986,9 +983,9 @@
 				var value = {};
 				var tempValue = '';
 				var $this = this;
-				this.find('[sugartype=line_checkbox]:checked').each(function(index1, el1) {
+				this.find('[sugartype=line_checkbox]:checked').each(function (index1, el1) {
 					value = {};
-					$this.find('[sugartype][sugarline=' + el1.attributes.sugarline.value + ']').each(function(index2, el2) {
+					$this.find('[sugartype][sugarline=' + el1.attributes.sugarline.value + ']').each(function (index2, el2) {
 						if (typeof opts.id !== "undefined" && el2.attributes.sugarid.value !== opts.id) {
 							return;
 						} else {
@@ -1013,7 +1010,7 @@
 	 * @param  {Object} options 参数
 	 * @return
 	 */
-	$.fn.sugarPage = function(options) {
+	$.fn.sugarPage = function (options) {
 		if (!this.length) {
 			return;
 		}
@@ -1023,7 +1020,7 @@
 				page: 0,
 				pageSet: 2,
 				totalPage: 1
-			}
+			};
 		}
 		options = $.extend(defaultOptions, options);
 		$.data(this[0], 'pageOptions', options);
@@ -1032,7 +1029,7 @@
 		var set = Math.ceil(parseFloat(options.pageSet));
 		var total = Math.ceil(parseFloat(options.totalPage));
 		var count = Math.ceil(parseFloat(options.count));
-		var hasEvent = typeof(options.onPage) == "function";
+		var hasEvent = typeof (options.onPage) == "function";
 
 		var $ul = $('<ul class="pagination"></ul>');
 		// var $pagesize = $('<input type="text">')
@@ -1065,7 +1062,7 @@
 					}, options.onPage);
 				}
 			} else {
-				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-step-backward"></a></li>')
+				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-step-backward"></a></li>');
 				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-backward"></i></a></li>');
 			}
 			if (page - set > 2) {
@@ -1141,7 +1138,7 @@
 					}, options.onPage);
 				}
 			} else {
-				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-forward"></i></a></li>')
+				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-forward"></i></a></li>');
 				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-step-forward"></i></a></li>');
 			}
 			if (parseInt(options.page) > total) {
@@ -1162,7 +1159,7 @@
 	 * @param {float} f1
 	 * @param {float} f2
 	 */
-	$.fn.sugarAddFloats = function(f1, f2) {
+	$.fn.sugarAddFloats = function (f1, f2) {
 		//Helper function to find the number of decimal places
 		function findDec(f1) {
 			function isInt(n) {
@@ -1170,7 +1167,8 @@
 					parseFloat(n) == parseInt(n, 10) && !isNaN(n);
 			}
 			var a = Math.abs(f1);
-			f1 = a, count = 1;
+			f1 = a;
+			var count = 1;
 			while (!isInt(f1) && isFinite(f1)) {
 				f1 = a * Math.pow(10, count++);
 			}
@@ -1184,7 +1182,7 @@
 		//do the math then do a toFixed, could do a toPrecision also
 		var n = (f1 + f2).toFixed(fixed);
 		return +n;
-	}
+	};
 
 	// 对Date的扩展，将 Date 转化为指定格式的String
 	// 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
@@ -1192,7 +1190,7 @@
 	// 例子：
 	// (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
 	// (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18
-	Date.prototype.Format = function(fmt) { // author: meizz
+	Date.prototype.Format = function (fmt) { // author: meizz
 		var o = {
 			"M+": this.getMonth() + 1, // 月份
 			"d+": this.getDate(), // 日
@@ -1212,5 +1210,5 @@
 			}
 		}
 		return fmt;
-	}
+	};
 })(jQuery, window);
