@@ -844,7 +844,7 @@
 					var currentCheckbox = $(this).find("input")[0] || {};
 					var currentCheckState = currentCheckbox.checked || false;
 
-					// 如果为单选模式，啧清空所有checkbox
+					// 如果为单选模式，则清空所有checkbox
 					if (!_table.o.multiCheck) {
 						var checkboxes = _table.tbody.find("input[sugartype=line_checkbox]");
 						for (var j = 0; j < checkboxes.length; j++) {
@@ -871,7 +871,7 @@
 							href: '#'
 						});
 
-						// 如果为多选模式，啧清空当前 checkbox 与当前行样式
+						// 如果为多选模式，则清空当前 checkbox 与当前行样式
 						if (_table.o.multiCheck) {
 							currentCheckbox.checked = false;
 							this.className = "";
