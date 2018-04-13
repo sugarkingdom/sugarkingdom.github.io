@@ -20,6 +20,7 @@
 		}
 	};
 
+	// 表格默认参数
 	$.fn.sugarTable.defaults = {
 		list: [], // 列表数据源
 		length: 0, // 生成列表行数
