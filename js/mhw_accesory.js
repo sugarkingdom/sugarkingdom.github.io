@@ -591,8 +591,8 @@ var tableData = [{
 var page = "1";
 var size = '8';
 
-$(function() {
-	var searchHandler = function(p, tableData) {
+$(function () {
+	var searchHandler = function (p, tableData) {
 		page = p || page;
 		$("#listData").sugarTable({
 			list: tableData,
@@ -637,14 +637,14 @@ $(function() {
 				type: "text",
 				name: "技能说明",
 			}],
-			searchHandler: function(p) {
+			searchHandler: function (p) {
 				searchHandler(p, tableData);
 			}
 		});
 	};
 	searchHandler("1", tableData);
 
-	$('#btnHideSelected').on('click', function(event) {
+	$('#btnHideSelected').on('click', function (event) {
 		var obj = $("#listData").sugarTable("getSelectedRows", {
 			id: "id"
 		});
@@ -666,8 +666,8 @@ $(function() {
 		searchHandler("1", tableData);
 	});
 
-	$('#btnShowAll').on('click', function(event) {
-		size = 98;
+	$('#btnShowAll').on('click', function (event) {
+		size = (size == 98) ? 8 : 98;
 		searchHandler("1", tableData);
 	});
 });
