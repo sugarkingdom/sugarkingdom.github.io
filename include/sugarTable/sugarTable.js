@@ -21,7 +21,7 @@
 	};
 
 	$.fn.sugarTable.defaults = {
-		o: {
+		o: { // 表参数
 			list: [], // 列表数据源
 			length: 0, // 生成列表行数
 			count: 0, // 列表计数
@@ -43,8 +43,20 @@
 			sumCalcGroup: [], // 统计计算的字段集合
 			needFinalSum: false, // 是否需要额外总计行
 			finalSumCalcGroup: [], // 总计计算的字段集合
+			checkHandler: function name(data) {
+				console.info("sugarTable checked!");
+			},
+			searchHandler: function name(data) {
+				console.info("sugarTable searched!");
+			},
+			rowGenHandler: function name(data) {
+				console.info("sugarTable row generated!");
+			},
+			tableGenHandler: function name(data) {
+				console.info("sugarTable table generated!");
+			},
 		},
-		field: {
+		field: { // 域参数
 			id: "",
 			type: "",
 			name: "",
@@ -68,7 +80,7 @@
 			optionId: "",
 			optionSplit: "",
 			changeHandler: function name(data) {
-				
+				console.info("Welcome to Sugar Kingdom!");
 			},
 			row: 5,
 			readonly: false,
@@ -1079,9 +1091,9 @@
 		var hasEvent = typeof (options.onPage) == "function";
 
 		var $ul = $('<ul class="pagination"></ul>');
+		var $li;
 		// var $pagesize = $('<input type="text">')
 		var $span = $('<span class="pageinfo"></span>');
-		var $li;
 		this.empty();
 		this.append($ul);
 		// this.append($pagesize);
