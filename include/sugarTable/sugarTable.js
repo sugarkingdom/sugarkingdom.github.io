@@ -3,10 +3,9 @@
  * Required:
  * 		jQuery 1.12.4
  * 		bootstrap 3.3.7
- * 		accounting
- * 		bootstrap select 1.12.2
- * 		awesome bootstrap checkbox 1.0.0-alpha.5
- * 		fancybox 3.2.1
+ * 		(option) accounting
+ * 		(option) bootstrap select 1.12.2
+ * 		(option) fancybox 3.2.1
  */
 (function ($, window, undefined) {
 
@@ -150,7 +149,8 @@
 			case 'input':
 				return el.value;
 			case 'select':
-				return $(el).selectpicker('val');
+				return el.value;
+				// return $(el).selectpicker('val');
 			case 'textarea':
 				return el.value;
 			case "modal": //// TODO
@@ -851,7 +851,7 @@
 
 				// 生成列表的每列时的额外处理
 				if (typeof _table.o.rowGenHandler !== "undefined") {
-					_table.o.rowGenHandler.call(this, listData);
+					_table.o.rowGenHandler.call(this, _table.listData);
 				}
 				_table.trArr.push(_list.tr);
 			}
@@ -861,11 +861,11 @@
 			this.append(_table.thead).append(_table.tbody);
 
 			// 渲染选择组件
-			if ($('[sugartype=select]').length > 0) {
-				$('[sugartype=select]').selectpicker({
-					container: 'body'
-				});
-			}
+			// if ($('[sugartype=select]').length > 0) {
+			// 	$('[sugartype=select]').selectpicker({
+			// 		container: 'body'
+			// 	});
+			// }
 
 			// 渲染图标组件
 			$(".sugar-hoverpic").hover(function () {
@@ -889,7 +889,7 @@
 			});
 
 			// 渲染图片组件
-			$('[data-fancybox="images"]').fancybox();
+			// $('[data-fancybox="images"]').fancybox();
 
 			// 查询完成后隐藏左侧按钮
 			if (!_table.o.noHideBtn) {

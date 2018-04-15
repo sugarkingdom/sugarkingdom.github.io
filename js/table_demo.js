@@ -72,7 +72,7 @@ var tableData3 = [{
 	money2: 1000,
 	money2Tag: "3",
 }, {
-	id: 3,
+	id: 4,
 	money1: 2000,
 	money1Tag: "2",
 	money2: 2000,
@@ -88,7 +88,7 @@ var size2 = '10';
 var page3 = "1";
 var size3 = '10';
 
-$(function() {
+$(function () {
 	$("#listData1").sugarTable({
 		list: tableData1,
 		count: tableData1.length,
@@ -128,7 +128,7 @@ $(function() {
 			optionType: 'text',
 			optionId: 'select1_options',
 			optionSplit: '#',
-			changeHandler: function(data) {
+			changeHandler: function (data) {
 				console.info(data);
 			}
 		}, {
@@ -139,6 +139,11 @@ $(function() {
 			optionType: 'array',
 			optionId: 'select2_options',
 		}],
+		tableGenHandler: function () {
+			// $('[sugartype=select]').selectpicker({
+			// 	container: 'body'
+			// });
+		}
 	});
 
 	// console.info($("#listData1").sugarTable("getValues"));
@@ -188,6 +193,8 @@ $(function() {
 		}],
 	});
 
+	console.info($("#listData1").sugarTable("getValues"));
+
 	// console.info($("#listData2").sugarTable("getValues"));
 
 	// console.info($("#listData2").sugarTable("getValue", {
@@ -226,8 +233,8 @@ $(function() {
 			id: "money1",
 			type: "text",
 			name: "金额1",
-			isMoney: true,
-			moneySymbol: "￥",
+			// isMoney: true,
+			// moneySymbol: "￥",
 		}, {
 			id: "money1Tag",
 			type: "text",
@@ -236,52 +243,12 @@ $(function() {
 			id: "money2",
 			type: "text",
 			name: "金额2",
-			isMoney: true,
-			moneySymbol: "￥",
+			// isMoney: true,
+			// moneySymbol: "￥",
 		}, {
 			id: "money2Tag",
 			type: "text",
 			name: "金额2标签",
 		}],
 	});
-
-	// genTableData({
-	// 	id: "listData",
-	// 	data: data.result.list,
-	// 	count: data.result.count,
-	// 	pageDom: $("#page"),
-	// 	page: page,
-	// 	pageSize: size,
-	// 	fields: [{
-	// 		id: "brandName",
-	// 		type: "text",
-	// 		name: "品牌"
-	// 	}, {
-	// 		id: "carName",
-	// 		type: "text",
-	// 		name: "车型"
-	// 		// }, {
-	// 		// 	id: "image",
-	// 		// 	type: "text",
-	// 		// 	name: "展示图片"
-	// 		// }, {
-	// 		// 	id: "remark",
-	// 		// 	type: "textarea",
-	// 		// 	readonly: true,
-	// 		// 	name: "备注"
-	// 	}],
-	// 	checkHandler: function(i) {
-	// 		var obj = data.result.list[i];
-	// 		$("#btnView").show();
-	// 		$("#btnEdit").show();
-	// 		$("#btnDel").show();
-	// 		$("#btnExport").show();
-	// 		$("#btnView").attr('href', 'carView.html?id=' + obj.id);
-	// 		$("#btnEdit").attr('href', 'carEdit.html?id=' + obj.id);
-	// 		$("#btnDel").attr('alt', obj.id);
-	// 	},
-	// 	searchHandler: function(p) {
-	// 		searchHandler(p);
-	// 	}
-	// });
 });
