@@ -21,7 +21,7 @@
 	};
 
 	$.fn.sugarTable.defaults = {
-		o: { // 表参数
+		table: { // 表参数
 			list: [], // 列表数据源
 			length: 0, // 生成列表行数
 			count: 0, // 列表计数
@@ -57,40 +57,80 @@
 			},
 		},
 		field: { // 域参数
-			id: "",
-			type: "",
-			name: "",
-			isMoney: false,
-			moneyMultiplier: 1,
-			moneySymbol: "$",
-			moneyDecimal: ".",
-			moneyThousand: ",",
-			moneyPrecision: 2,
-			moneyFormat: "%s%v",
-			isDate: false,
-			format: "",
-			isStatus: false,
-			pairs: {},
-			key: "",
-			isNumber: false,
-			decimalLength: 0,
-			allowMinus: false,
-			intLength: 5,
-			optionType: "",
-			optionId: "",
-			optionSplit: "",
-			changeHandler: function name(data) {
-				console.info("Welcome to Sugar Kingdom!");
+			text: { // 域类型-文本
+				id: "", // 域ID
+				type: "", // 域类型
+				name: "", // 域列名
+				isMoney: false, // 是否需要金额处理
+				moneyMultiplier: 1, // 金额默认缩放倍数
+				moneySymbol: "$", // 金额显示单位
+				moneyDecimal: ".", // 金额小数位分隔符
+				moneyThousand: ",", // 金额千位分隔符
+				moneyPrecision: 2, // 金额小数位数
+				moneyFormat: "%s%v", // 金额格式
+				isDate: false, // 是否需要日期处理
+				dateFormat: "yyyy年MM月dd日 hh:mm:ss", // 日期格式
+				isStatus: false, // 是否需要状态处理
+				pairs: {}, // 状态键值对
+				fontWeight: "normal",
+				color: "unset",
+				display: "table-cell",
 			},
-			row: 5,
-			readonly: false,
-			preset: "",
-			sexId: "",
-			sexOrder: [],
-			hoverImage: "",
-			prePath: "",
-			imagePath: "",
-			content: [],
+			object: { // 域类型-对象
+				id: "",
+				type: "",
+				name: "",
+				key: "", // 对象键ID
+			},
+			input: { // 域类型-输入框
+				id: "",
+				type: "",
+				name: "",
+				isNumber: false, // 是否需要纯数字处理
+				decimalLength: 0,
+				allowMinus: false,
+				intLength: 5,
+			},
+			select: { // 域类型-选择框
+				id: "",
+				type: "",
+				name: "",
+				optionType: "",
+				optionId: "",
+				optionSplit: "",
+				changeHandler: function name(data) {
+					console.info("Welcome to Sugar Kingdom!");
+				},
+			},
+			textarea: { // 域类型-文本框
+				id: "",
+				type: "",
+				name: "",
+				row: 5,
+				readonly: false,
+			},
+			modal: { // 域类型-弹出框
+				id: "",
+				type: "",
+				name: "",
+			},
+			icon: {
+				id: "",
+				type: "",
+				name: "",
+				preset: "",
+				sexId: "",
+				sexOrder: [],
+				hoverImage: "",
+				prePath: "",
+				imagePath: "",
+			},
+			mix: {
+				id: "",
+				type: "",
+				name: "",
+				content: [],
+			},
 		}
 	};
 
@@ -509,7 +549,7 @@
 			_table.id = this[0].id;
 
 			// 构造参数
-			_table.o = $.extend({}, $.fn.sugarTable.defaults.o, options || {});
+			_table.o = $.extend({}, $.fn.sugarTable.defaults.table, options || {});
 
 			// 表头元素
 			_table.thead = $('<thead>');
@@ -690,7 +730,7 @@
 						sugartype: 'line_checkbox',
 					});
 					_list.labelCheckbox = $("<label>").attr("for", _table.id + "_checkbox_" + _table.listIndex);
-					_list.divCheckbox = $("<div>").addClass("checkbox abc-checkbox abc-checkbox-primary").append(_list.inputCheckbox).append(_list.labelCheckbox);
+					_list.divCheckbox = $("<div>").addClass("checkbox checkbox-primary").append(_list.inputCheckbox).append(_list.labelCheckbox);
 					_list.tdCheckbox = $("<td>").addClass('sugar-checkbox').append(_list.divCheckbox);
 					_list.tr.append(_list.tdCheckbox);
 				}
@@ -718,7 +758,7 @@
 							_list.td.css({
 								fontWeight: _table.fieldData.bold ? 'bold' : 'normal',
 								color: _table.fieldData.colors ? _table.fieldData.colors[_table.listData[_table.fieldData.id]] : 'unset',
-								display: _table.fieldData.hide ? 'none' : 'table-cell'
+								display: _table.fieldData.display ? 'none' : 'table-cell'
 							});
 							_list.td.append(_genField('text', {
 								id: _table.id,
