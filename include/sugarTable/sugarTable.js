@@ -1,11 +1,13 @@
 /**
  * 表格组件
  * Required:
+ * 	base:
  * 		jQuery 1.12.4
  * 		bootstrap 3.3.7
- * 		(option) accounting
- * 		(option) bootstrap select 1.12.2
- * 		(option) fancybox 3.2.1
+ * 		accounting
+ * 		bootstrap select 1.12.2
+ * 		awesome bootstrap checkbox 1.0.0-alpha.5
+ * 		fancybox 3.2.1
  */
 (function ($, window, undefined) {
 
@@ -19,119 +21,27 @@
 		}
 	};
 
-	// 表格默认参数
 	$.fn.sugarTable.defaults = {
-		table: { // 表参数
-			list: [], // 列表数据源
-			length: 0, // 生成列表行数
-			count: 0, // 列表计数
-			isLocal: false, // 是否需要本地分页
-			pageDom: $("#page"), // 分页DOM
-			page: 1, // 页数
-			pageSet: 1, // 分页组件页码个数
-			pageSize: 10, // 每页数量
-			fields: [], // 列表列名称
-			seriText: "序号", // 序号显示文本
-			tableClass: "table table-bordered table-hover", // 列表样式
-			noSeri: false, // 是否需要序号列
-			noPaging: false, // 是否需要分页
-			noCheckbox: false, // 是否需要勾选框
-			multiCheck: false, // 是否为多选模式
-			noHideBtn: false, // 是否隐藏按钮
-			needSum: false, // 是否需要额外统计行
-			sumBaseGroup: [], // 统计基于的字段集合
-			sumCalcGroup: [], // 统计计算的字段集合
-			needFinalSum: false, // 是否需要额外总计行
-			finalSumCalcGroup: [], // 总计计算的字段集合
-			checkHandler: function name(data) {
-				console.info("sugarTable checked!");
-			},
-			searchHandler: function name(data) {
-				console.info("sugarTable searched!");
-			},
-			rowGenHandler: function name(data) {
-				console.info("sugarTable row generated!");
-			},
-			tableGenHandler: function name(data) {
-				console.info("sugarTable table generated!");
-			},
-		},
-		field: { // 域参数
-			text: { // 域类型-文本
-				id: "", // 域ID
-				type: "", // 域类型
-				name: "", // 域列名
-				isMoney: false, // 是否需要金额处理
-				moneyMultiplier: 1, // 金额默认缩放倍数
-				moneySymbol: "$", // 金额显示单位
-				moneyDecimal: ".", // 金额小数位分隔符
-				moneyThousand: ",", // 金额千位分隔符
-				moneyPrecision: 2, // 金额小数位数
-				moneyFormat: "%s%v", // 金额格式
-				isDate: false, // 是否需要日期处理
-				dateFormat: "yyyy年MM月dd日 hh:mm:ss", // 日期格式
-				isStatus: false, // 是否需要状态处理
-				pairs: {}, // 状态键值对
-				fontWeight: "normal",
-				color: "unset",
-				display: "table-cell",
-			},
-			object: { // 域类型-对象
-				id: "",
-				type: "",
-				name: "",
-				key: "", // 对象键ID
-			},
-			input: { // 域类型-输入框
-				id: "",
-				type: "",
-				name: "",
-				isNumber: false, // 是否需要纯数字处理
-				decimalLength: 0,
-				allowMinus: false,
-				intLength: 5,
-			},
-			select: { // 域类型-选择框
-				id: "",
-				type: "",
-				name: "",
-				optionType: "",
-				optionId: "",
-				optionSplit: "",
-				changeHandler: function name(data) {
-					console.info("Welcome to Sugar Kingdom!");
-				},
-			},
-			textarea: { // 域类型-文本框
-				id: "",
-				type: "",
-				name: "",
-				row: 5,
-				readonly: false,
-			},
-			modal: { // 域类型-弹出框
-				id: "",
-				type: "",
-				name: "",
-			},
-			icon: {
-				id: "",
-				type: "",
-				name: "",
-				preset: "",
-				sexId: "",
-				sexOrder: [],
-				hoverImage: "",
-				prePath: "",
-				imagePath: "",
-			},
-			mix: {
-				id: "",
-				type: "",
-				name: "",
-				content: [],
-			},
-		}
+		list: [], // 列表数据源
+		length: 0, // 生成列表行数
+		count: 0, // 列表计数
+		isLocal: false, // 是否需要本地分页
+		pageDom: $("#page"), // 分页DOM
+		page: 1, // 页数
+		pageSize: 10, // 每页数量
+		fields: [], // 列表列名称
+		seriText: "序号", // 序号显示文本
+		tableClass: "table table-bordered table-hover", // 列表样式
+		noSeri: false, // 是否需要序号列
+		noPaging: false, // 是否需要分页
+		noCheckbox: false, // 是否需要勾选框
+		multiCheck: false, // 是否为多选模式
+		noHideBtn: false, // 是否隐藏按钮
+		needSum: false, // 是否需要额外统计行
+		sumBaseGroup: [], // 统计基于的字段集合
+		sumCalcGroup: [], // 统计计算的字段集合
+		needFinalSum: false, // 是否需要额外总计行
+		finalSumCalcGroup: [], // 总计计算的字段集合
 	};
 
 	/**
@@ -150,8 +60,7 @@
 			case 'input':
 				return el.value;
 			case 'select':
-				return el.value;
-				// return $(el).selectpicker('val');
+				return $(el).selectpicker('val');
 			case 'textarea':
 				return el.value;
 			case "modal": //// TODO
@@ -550,7 +459,7 @@
 			_table.id = this[0].id;
 
 			// 构造参数
-			_table.o = $.extend({}, $.fn.sugarTable.defaults.table, options || {});
+			_table.o = $.extend({}, $.fn.sugarTable.defaults, options || {});
 
 			// 表头元素
 			_table.thead = $('<thead>');
@@ -580,12 +489,12 @@
 			}
 
 			// 构造表头
-			for (_table.fieldIndex = 0; _table.fieldIndex < _table.o.fields.length; _table.fieldIndex++) {
-				_table.fieldData = _table.o.fields[_table.fieldIndex];
+			for (var fieldIndex = 0; fieldIndex < _table.o.fields.length; fieldIndex++) {
+				var fieldData = _table.o.fields[fieldIndex];
 				_table.theadTr.append($("<th>").css({
-					width: _table.fieldData.width || 'auto',
-					display: _table.fieldData.hide ? 'none' : 'table-cell'
-				}).html(_table.fieldData.name));
+					width: fieldData.width || 'auto',
+					display: fieldData.hide ? 'none' : 'table-cell'
+				}).html(fieldData.name));
 			}
 
 			// 装入表头元素
@@ -613,22 +522,22 @@
 					_table.finalSumData = {};
 				}
 
-				for (_table.listIndex = 0; _table.listIndex < _table.o.list.length; _table.listIndex++) {
-					_table.listData = _table.o.list[_table.listIndex];
+				for (var listIndex = 0; listIndex < _table.o.list.length; listIndex++) {
+					var listData = _table.o.list[listIndex];
 
 					// 构造原始行号
-					_table.listData.sugarSeri = (_table.o.page - 1) * _table.o.pageSize + parseInt(_table.listIndex) + 1;
+					listData.sugarSeri = (_table.o.page - 1) * _table.o.pageSize + parseInt(listIndex) + 1;
 
 					if (_table.o.needSum) { // 需要额外统计行
 
 						// 拼装统计比较字段
 						_table.sumBaseStrB = "";
-						for (_table.baseIndex = 0; _table.baseIndex < _table.o.sumBaseGroup.length; _table.baseIndex++) {
-							_table.baseData = _table.o.sumBaseGroup[_table.baseIndex];
-							if (_table.baseData.type === 'text') { // 文本
-								_table.sumBaseStrB += _table.listData[_table.baseData.id];
-							} else if (_table.baseData.type === 'object') { // 对象
-								_table.sumBaseStrB += _table.listData[_table.baseData.id][_table.baseData.key];
+						for (var baseIndex = 0; baseIndex < _table.o.sumBaseGroup.length; baseIndex++) {
+							var baseData = _table.o.sumBaseGroup[baseIndex];
+							if (baseData.type === 'text') { // 文本
+								_table.sumBaseStrB += listData[baseData.id];
+							} else if (baseData.type === 'object') { // 对象
+								_table.sumBaseStrB += listData[baseData.id][baseData.key];
 							}
 						}
 
@@ -645,42 +554,42 @@
 						_table.sumBaseStrA = _table.sumBaseStrB;
 
 						// 记录统计计算字段
-						for (_table.calcIndex = 0; _table.calcIndex < _table.o.sumCalcGroup.length; _table.calcIndex++) {
-							_table.calcData = _table.o.sumCalcGroup[_table.calcIndex];
-							if (_table.calcData.type === 'text') { // 文本
-								_table.sumData[_table.calcData.id] = _table.sumData[_table.calcData.id] || 0;
-								_table.sumData[_table.calcData.id] =
-									$.fn.sugarAddFloats(_table.sumData[_table.calcData.id],
-										parseFloat(_table.listData[_table.calcData.id]));
-							} else if (_table.calcData.type === 'object') { // 对象
-								_table.sumData[_table.calcData.id] = _table.sumData[_table.calcData.id] || {};
-								_table.sumData[_table.calcData.id][_table.calcData.key] = _table.sumData[_table.calcData.id][_table.calcData.key] || 0;
-								_table.sumData[_table.calcData.id][_table.calcData.key] =
-									$.fn.sugarAddFloats(_table.sumData[_table.calcData.id][_table.calcData.key],
-										parseFloat(_table.listData[_table.calcData.id][_table.calcData.key]));
+						for (var calcIndex = 0; calcIndex < _table.o.sumCalcGroup.length; calcIndex++) {
+							var calcData = _table.o.sumCalcGroup[calcIndex];
+							if (calcData.type === 'text') { // 文本
+								_table.sumData[calcData.id] = _table.sumData[calcData.id] || 0;
+								_table.sumData[calcData.id] =
+									$.fn.sugarAddFloats(_table.sumData[calcData.id],
+										parseFloat(listData[calcData.id]));
+							} else if (calcData.type === 'object') { // 对象
+								_table.sumData[calcData.id] = _table.sumData[calcData.id] || {};
+								_table.sumData[calcData.id][calcData.key] = _table.sumData[calcData.id][calcData.key] || 0;
+								_table.sumData[calcData.id][calcData.key] =
+									$.fn.sugarAddFloats(_table.sumData[calcData.id][calcData.key],
+										parseFloat(listData[calcData.id][calcData.key]));
 							}
 						}
 
 						// 保存当前行数据
-						_table.afterSumList.push(_table.listData);
+						_table.afterSumList.push(listData);
 					}
 
 					if (_table.o.needFinalSum) { // 需要额外总计行
 
 						// 记录总计计算字段
-						for (_table.calcIndex = 0; _table.calcIndex < _table.o.finalSumCalcGroup.length; _table.calcIndex++) {
-							_table.calcData = _table.o.finalSumCalcGroup[_table.calcIndex];
-							if (_table.calcData.type === 'text') { // 文本
-								_table.finalSumData[_table.calcData.id] = _table.finalSumData[_table.calcData.id] || 0;
-								_table.finalSumData[_table.calcData.id] =
-									$.fn.sugarAddFloats(_table.finalSumData[_table.calcData.id],
-										parseFloat(_table.listData[_table.calcData.id]));
-							} else if (_table.calcData.type === 'object') { // 对象
-								_table.finalSumData[_table.calcData.id] = _table.finalSumData[_table.calcData.id] || {};
-								_table.finalSumData[_table.calcData.id][_table.calcData.key] = _table.finalSumData[_table.calcData.id][_table.calcData.key] || 0;
-								_table.finalSumData[_table.calcData.id][_table.calcData.key] =
-									$.fn.sugarAddFloats(_table.finalSumData[_table.calcData.id][_table.calcData.key],
-										parseFloat(_table.listData[_table.calcData.id][_table.calcData.key]));
+						for (var calcIndex = 0; calcIndex < _table.o.finalSumCalcGroup.length; calcIndex++) {
+							var calcData = _table.o.finalSumCalcGroup[calcIndex];
+							if (calcData.type === 'text') { // 文本
+								_table.finalSumData[calcData.id] = _table.finalSumData[calcData.id] || 0;
+								_table.finalSumData[calcData.id] =
+									$.fn.sugarAddFloats(_table.finalSumData[calcData.id],
+										parseFloat(listData[calcData.id]));
+							} else if (calcData.type === 'object') { // 对象
+								_table.finalSumData[calcData.id] = _table.finalSumData[calcData.id] || {};
+								_table.finalSumData[calcData.id][calcData.key] = _table.finalSumData[calcData.id][calcData.key] || 0;
+								_table.finalSumData[calcData.id][calcData.key] =
+									$.fn.sugarAddFloats(_table.finalSumData[calcData.id][calcData.key],
+										parseFloat(listData[calcData.id][calcData.key]));
 							}
 						}
 					}
@@ -716,132 +625,132 @@
 
 			// 生成列表数据
 			_table.trArr = [];
-			for (_table.listIndex = 0; _table.listIndex < _table.o.list.length; _table.listIndex++) {
-				_table.listData = _table.o.list[_table.listIndex];
+			for (var listIndex = 0; listIndex < _table.o.list.length; listIndex++) {
+				var listData = _table.o.list[listIndex];
 				var _list = {};
 				_list.tr = $("<tr>");
 
 				// 构造勾选框
 				if (!_table.o.noCheckbox) {
 					_list.inputCheckbox = $("<input type='checkbox'>").attr({
-						// id: _table.id + "_checkbox_" + _table.listIndex,
+						// id: _table.id + "_checkbox_" + listIndex,
 						class: "styled styled-primary",
-						sugarid: _table.listIndex,
-						sugarline: _table.listIndex,
+						sugarid: listIndex,
+						sugarline: listIndex,
 						sugartype: 'line_checkbox',
 					});
-					_list.labelCheckbox = $("<label>").attr("for", _table.id + "_checkbox_" + _table.listIndex);
-					_list.divCheckbox = $("<div>").addClass("checkbox checkbox-primary").append(_list.inputCheckbox).append(_list.labelCheckbox);
+					_list.labelCheckbox = $("<label>").attr("for", _table.id + "_checkbox_" + listIndex);
+					_list.divCheckbox = $("<div>").addClass("checkbox abc-checkbox abc-checkbox-primary").append(_list.inputCheckbox).append(_list.labelCheckbox);
 					_list.tdCheckbox = $("<td>").addClass('sugar-checkbox').append(_list.divCheckbox);
 					_list.tr.append(_list.tdCheckbox);
 				}
 
 				// 构造序号列（如果存在统计生成的序列，则使用）
 				if (!_table.o.noSeri) {
-					_table.listData.sugarSeri = _table.listData.sugarSeri || ((_table.o.page - 1) * _table.o.pageSize + parseInt(_table.listIndex) + 1);
-					_list.tdSeri = $("<td>").addClass('seri').html(_table.listData.sugarSeri);
+					listData.sugarSeri = listData.sugarSeri || ((_table.o.page - 1) * _table.o.pageSize + parseInt(listIndex) + 1);
+					_list.tdSeri = $("<td>").addClass('seri').html(listData.sugarSeri);
 					_list.tr.append(_list.tdSeri);
 				}
 
 				// 生成单行数据
-				for (_table.fieldIndex = 0; _table.fieldIndex < _table.o.fields.length; _table.fieldIndex++) {
-					_table.fieldData = _table.o.fields[_table.fieldIndex];
-					switch (_table.fieldData.type) {
+				for (var fieldIndex = 0; fieldIndex < _table.o.fields.length; fieldIndex++) {
+					var fieldData = _table.o.fields[fieldIndex];
+					switch (fieldData.type) {
 						case "text": // 文本
 							_list.td = $("<td>").attr({
-								// id: _table.id + '_' + _table.listIndex + '_text_' + _table.fieldData.id,
-								sugarline: _table.listIndex,
-								sugarid: _table.fieldData.id,
+								// id: _table.id + '_' + listIndex + '_text_' + fieldData.id,
+								sugarline: listIndex,
+								sugarid: fieldData.id,
 								sugartype: 'text',
 							});
 
 							// 处理样式
 							_list.td.css({
-								fontWeight: _table.fieldData.bold ? 'bold' : 'normal',
-								color: _table.fieldData.colors ? _table.fieldData.colors[_table.listData[_table.fieldData.id]] : 'unset',
-								display: _table.fieldData.display ? 'none' : 'table-cell'
+								fontWeight: fieldData.bold ? 'bold' : 'normal',
+								color: fieldData.colors ? fieldData.colors[listData[fieldData.id]] : 'unset',
+								display: fieldData.hide ? 'none' : 'table-cell'
 							});
 							_list.td.append(_genField('text', {
 								id: _table.id,
-								index: _table.listIndex,
-								listData: _table.listData,
-								fieldData: _table.fieldData
+								index: listIndex,
+								listData: listData,
+								fieldData: fieldData
 							}));
 							_list.tr.append(_list.td);
 							break;
 						case "object": // 对象
 							_list.td = $("<td>").attr({
-								// id: _table.id + '_' + _table.listIndex + '_object_' + _table.fieldData.id + '_' + _table.fieldData.key,
-								sugarline: _table.listIndex,
-								sugarid: _table.fieldData.id,
-								sugarkey: _table.fieldData.key,
+								// id: _table.id + '_' + listIndex + '_object_' + fieldData.id + '_' + fieldData.key,
+								sugarline: listIndex,
+								sugarid: fieldData.id,
+								sugarkey: fieldData.key,
 								sugartype: 'object',
 							});
 							_list.td.append(_genField('object', {
 								id: _table.id,
-								index: _table.listIndex,
-								listData: _table.listData,
-								fieldData: _table.fieldData
+								index: listIndex,
+								listData: listData,
+								fieldData: fieldData
 							}));
 							_list.tr.append(_list.td);
 							break;
 						case "input": // 输入框
 							_list.td = $("<td>").attr({
-								// id: _table.id + '_' + _table.listIndex + '_input_' + _table.fieldData.id,
+								// id: _table.id + '_' + listIndex + '_input_' + fieldData.id,
 							});
 							_list.td.append(_genField('input', {
 								id: _table.id,
-								index: _table.listIndex,
-								listData: _table.listData,
-								fieldData: _table.fieldData
+								index: listIndex,
+								listData: listData,
+								fieldData: fieldData
 							}));
 							_list.tr.append(_list.td);
 							break;
 						case "select": // 选择框
 							_list.td = $("<td>").attr({
-								// id: _table.id + '_' + _table.listIndex + '_select_' + _table.fieldData.id,
+								// id: _table.id + '_' + listIndex + '_select_' + fieldData.id,
 							});
 							_list.td.append(_genField('select', {
 								id: _table.id,
-								index: _table.listIndex,
-								listData: _table.listData,
-								fieldData: _table.fieldData
+								index: listIndex,
+								listData: listData,
+								fieldData: fieldData
 							}));
 							_list.tr.append(_list.td);
 							break;
 						case "textarea": // 文本输入框
 							_list.td = $("<td>").attr({
-								// id: _table.id + '_' + _table.listIndex + '_textarea_' + _table.fieldData.id,
+								// id: _table.id + '_' + listIndex + '_textarea_' + fieldData.id,
 							}).addClass('sugar-textarea');
 							_list.td.append(_genField('textarea', {
 								id: _table.id,
-								index: _table.listIndex,
-								listData: _table.listData,
-								fieldData: _table.fieldData
+								index: listIndex,
+								listData: listData,
+								fieldData: fieldData
 							}));
 							_list.tr.append(_list.td);
 							break;
 						case "modal": // 弹出框
 							_list.td = $("<td>").attr({
-								// id: _table.id + '_' + _table.listIndex + '_modal_' + _table.fieldData.id,
+								// id: _table.id + '_' + listIndex + '_modal_' + fieldData.id,
 							});
 							_list.td.append(_genField('modal', {
 								id: _table.id,
-								index: _table.listIndex,
-								listData: _table.listData,
-								fieldData: _table.fieldData
+								index: listIndex,
+								listData: listData,
+								fieldData: fieldData
 							}));
 							_list.tr.append(_list.td);
 							break;
 						case "mix": // 混合
 							_list.td = $("<td>").attr({
-								// id: _table.id + '_' + _table.listIndex + '_mix_' + _table.fieldData.id,
+								// id: _table.id + '_' + listIndex + '_mix_' + fieldData.id,
 							});
 							_list.td.append(_genField('mix', {
 								id: _table.id,
-								index: _table.listIndex,
-								listData: _table.listData,
-								fieldData: _table.fieldData
+								index: listIndex,
+								listData: listData,
+								fieldData: fieldData
 							}));
 							_list.tr.append(_list.td);
 							break;
@@ -852,7 +761,7 @@
 
 				// 生成列表的每列时的额外处理
 				if (typeof _table.o.rowGenHandler !== "undefined") {
-					_table.o.rowGenHandler.call(this, _table.listData);
+					_table.o.rowGenHandler.call(this, listData);
 				}
 				_table.trArr.push(_list.tr);
 			}
@@ -862,11 +771,11 @@
 			this.append(_table.thead).append(_table.tbody);
 
 			// 渲染选择组件
-			// if ($('[sugartype=select]').length > 0) {
-			// 	$('[sugartype=select]').selectpicker({
-			// 		container: 'body'
-			// 	});
-			// }
+			if ($('[sugartype=select]').length > 0) {
+				$('[sugartype=select]').selectpicker({
+					container: 'body'
+				});
+			}
 
 			// 渲染图标组件
 			$(".sugar-hoverpic").hover(function () {
@@ -890,7 +799,7 @@
 			});
 
 			// 渲染图片组件
-			// $('[data-fancybox="images"]').fancybox();
+			$('[data-fancybox="images"]').fancybox();
 
 			// 查询完成后隐藏左侧按钮
 			if (!_table.o.noHideBtn) {
@@ -905,7 +814,7 @@
 			if (!_table.o.noPaging) {
 				_table.o.pageDom.sugarPage({
 					page: _table.o.page,
-					pageSet: _table.o.pageSet,
+					pageSet: 0,
 					count: _table.o.count,
 					totalPage: (_table.o.count / _table.o.pageSize) || 1,
 					onPage: function (event) {
@@ -928,56 +837,59 @@
 			if (!_table.o.noCheckbox) {
 				var _tbody_first = _table.tbody[0];
 				var _tbody_rows = _table.tbody.find("tr");
-
-				var currentCheckboxHandler = function () {
-					this.checked = !this.checked;
-				};
-				var currentRowHandler = function () {
-					var currentCheckbox = $(this).find("input")[0] || {};
-					var currentCheckState = currentCheckbox.checked || false;
-
-					// 如果为单选模式，则清空所有checkbox
-					if (!_table.o.multiCheck) {
-						var checkboxes = _table.tbody.find("input[sugartype=line_checkbox]");
-						for (var checkboxIndex = 0; checkboxIndex < checkboxes.length; checkboxIndex++) {
-							checkboxes[checkboxIndex].checked = false;
-						}
-						// 清空所有行样式
-						for (var rowIndex = 0; rowIndex < _tbody_rows.length; rowIndex++) {
-							_tbody_first.rows[rowIndex].className = "";
-						}
-					}
-
-					if (!currentCheckState) {
-						currentCheckbox.checked = true;
-						this.className = "info";
-						if (typeof _table.o.checkHandler !== "undefined") {
-							_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
-						}
-					} else {
-
-						// 隐藏左侧按钮
-						$(".btn-begin-hide").hide();
-						$(".btn-begin-hide").attr({
-							alt: '',
-							href: '#'
-						});
-
-						// 如果为多选模式，则清空当前 checkbox 与当前行样式
-						if (_table.o.multiCheck) {
-							currentCheckbox.checked = false;
-							this.className = "";
-						}
-					}
-				};
 				for (var i = 0; i < _tbody_rows.length; i++) {
 					var currentRow = _tbody_first.rows[i];
-					var currentCheckbox = $(currentRow).find("input")[0] || {};
+					var currentCheckbox = currentRow.getElementsByTagName("input")[0] || {};
 
 					// 点击checkbox区域时，对checkbox反向处理，以便在rowClick中统一操作
-					currentCheckbox.onclick = currentCheckboxHandler;
+					var checkboxClickHandler = function (checkbox) {
+						return function () {
+							checkbox.checked = !checkbox.checked;
+						};
+					};
+					currentCheckbox.onclick = checkboxClickHandler(currentCheckbox);
 
-					currentRow.onclick = currentRowHandler;
+					var rowClickHandler = function (row) {
+						return function () {
+							var currentCheckbox = row.getElementsByTagName("input")[0] || {};
+							var currentCheckState = currentCheckbox.checked || false;
+
+							// 如果为单选模式，啧清空所有checkbox
+							if (!_table.o.multiCheck) {
+								var checkboxes = _table.tbody.find("input[sugartype=line_checkbox]");
+								for (var j = 0; j < checkboxes.length; j++) {
+									checkboxes[j].checked = false;
+								}
+								// 清空所有行样式
+								for (var j = 0; j < _tbody_rows.length; j++) {
+									_tbody_first.rows[j].className = "";
+								}
+							}
+
+							if (!currentCheckState) {
+								currentCheckbox.checked = true;
+								row.className = "info";
+								if (typeof _table.o.checkHandler !== "undefined") {
+									_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
+								}
+							} else {
+
+								// 隐藏左侧按钮
+								$(".btn-begin-hide").hide();
+								$(".btn-begin-hide").attr({
+									alt: '',
+									href: '#'
+								});
+
+								// 如果为多选模式，啧清空当前 checkbox 与当前行样式
+								if (_table.o.multiCheck) {
+									currentCheckbox.checked = false;
+									row.className = "";
+								}
+							}
+						};
+					};
+					currentRow.onclick = rowClickHandler(currentRow);
 				}
 			}
 
@@ -1000,14 +912,11 @@
 			var values = [];
 			var value = {};
 			var lineNum = $.fn.sugarTable.options[this.attr('id')].count;
-
-			var getFieldValue = function (index, el) {
-				value[el.attributes.sugarid.value] = _getValue(el);
-			};
-
 			for (var i = 0; i < lineNum; i++) {
 				value = {};
-				this.find('[sugartype!=line_checkbox][sugarline=' + i + ']').each(getFieldValue.bind());
+				this.find('[sugartype][sugarline=' + i + ']').each(function (index, el) {
+					value[el.attributes.sugarid.value] = _getValue(el);
+				});
 				values.push(value);
 			}
 			return values;
@@ -1024,7 +933,7 @@
 		 */
 		getValue: function (opts) {
 			opts = opts || {};
-			var findStr = '[sugartype!=line_checkbox]';
+			var findStr = '[sugartype]';
 			if (typeof opts.id !== "undefined") {
 				findStr += '[sugarid=' + opts.id + ']';
 			}
@@ -1036,23 +945,20 @@
 				var value = {};
 				var tempValue = '';
 				var lineNum = $.fn.sugarTable.options[this.attr('id')].count;
-
-				var getFieldValue = function (index, el) {
-					if (typeof opts.id !== "undefined" && el.attributes.sugarid.value !== opts.id) {
-						return;
-					} else if (typeof opts.lineNum !== "undefined" && i !== (opts.lineNum - 1)) {
-						return;
-					} else {
-						tempValue = _getValue(el);
-						if (typeof tempValue !== "undefined") {
-							value[el.attributes.sugarid.value] = _getValue(el);
-						}
-					}
-				};
-
 				for (var i = 0; i < lineNum; i++) {
 					value = {};
-					this.find('[sugartype!=line_checkbox][sugarline=' + i + ']').each(getFieldValue.bind());
+					this.find('[sugartype][sugarline=' + i + ']').each(function (index, el) {
+						if (typeof opts.id !== "undefined" && el.attributes.sugarid.value !== opts.id) {
+							return;
+						} else if (typeof opts.lineNum !== "undefined" && i !== (opts.lineNum - 1)) {
+							return;
+						} else {
+							tempValue = _getValue(el);
+							if (typeof tempValue !== "undefined") {
+								value[el.attributes.sugarid.value] = _getValue(el);
+							}
+						}
+					});
 					values.push(value);
 				}
 				return values;
@@ -1081,22 +987,20 @@
 				var value = {};
 				var tempValue = '';
 				var $this = this;
-				var getFieldValue = function (index, el) {
-					if (typeof opts.id !== "undefined" && el.attributes.sugarid.value !== opts.id) {
-						return;
-					} else {
-						tempValue = _getValue(el);
-						if (typeof tempValue !== "undefined") {
-							value[el.attributes.sugarid.value] = tempValue;
-						}
-					}
-				};
-				var getCheckedRows = function (index, el) {
+				this.find('[sugartype=line_checkbox]:checked').each(function (index1, el1) {
 					value = {};
-					$this.find('[sugartype][sugarline=' + el.attributes.sugarline.value + ']').each(getFieldValue.bind());
-					values[el.attributes.sugarline.value] = value;
-				};
-				this.find('[sugartype=line_checkbox]:checked').each(getCheckedRows.bind());
+					$this.find('[sugartype][sugarline=' + el1.attributes.sugarline.value + ']').each(function (index2, el2) {
+						if (typeof opts.id !== "undefined" && el2.attributes.sugarid.value !== opts.id) {
+							return;
+						} else {
+							tempValue = _getValue(el2);
+							if (typeof tempValue !== "undefined") {
+								value[el2.attributes.sugarid.value] = tempValue;
+							}
+						}
+					});
+					values[el1.attributes.sugarline.value] = value;
+				});
 				return values;
 			} else {
 				return "";
@@ -1118,7 +1022,7 @@
 		if (!defaultOptions) {
 			defaultOptions = {
 				page: 0,
-				pageSet: 1,
+				pageSet: 2,
 				totalPage: 1
 			};
 		}
@@ -1132,7 +1036,6 @@
 		var hasEvent = typeof (options.onPage) == "function";
 
 		var $ul = $('<ul class="pagination"></ul>');
-		var $li;
 		// var $pagesize = $('<input type="text">')
 		var $span = $('<span class="pageinfo"></span>');
 		this.empty();
@@ -1141,41 +1044,40 @@
 		this.append($span);
 		$span.text("第 " + page + " 页，共 " + total + " 页， " + count + " 条记录");
 		if (total > 0) {
-			// var $first = $('<li><a href="javascript:;"><i class="fa fa-step-backward"></i></a></li>');
+			var $first = $('<li><a href="javascript:;"><i class="fa fa-step-backward"></i></a></li>');
 			var $pre = $('<li><a href="javascript:;"><i class="fa fa-backward"></i></a></li>');
-			var i;
 			if (page <= 0) {
 				page = 1;
 			}
 			if (page > total) {
 				page = total; // 当前页数变更需要通知组件onPage
-				// $first.on("click", {
-				// 	page: page
-				// }, options.onPage);
+				$first.on("click", {
+					page: page
+				}, options.onPage);
 			}
 			if (page > 1) {
-				$ul.append($pre);
+				$ul.append($first).append($pre);
 				if (hasEvent) {
-					// $first.on("click", {
-					// 	page: 1
-					// }, options.onPage);
+					$first.on("click", {
+						page: 1
+					}, options.onPage);
 					$pre.on("click", {
 						page: page - 1
 					}, options.onPage);
 				}
 			} else {
-				// $ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-step-backward"></a></li>');
+				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-step-backward"></a></li>');
 				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-backward"></i></a></li>');
 			}
 			if (page - set > 2) {
-				$li = $('<li><a href="javascript:;">1</a></li>');
-				$ul.append($li);
+				var $li = $('<li><a href="javascript:;">1</a></li>');
+				$ul.append($li).append('<li><a href="javascript:;">...</a></li>');
 				if (hasEvent) {
 					$li.on("click", {
 						page: 1
 					}, options.onPage);
 				}
-				for (i = page - set; i < page; i++) {
+				for (var i = page - set; i < page; i++) {
 					$li = $('<li><a href="javascript:;">' + i + '</a></li>');
 					$ul.append($li);
 					if (hasEvent) {
@@ -1185,7 +1087,7 @@
 					}
 				}
 			} else {
-				for (i = 1; i < page; i++) {
+				for (var i = 1; i < page; i++) {
 					$li = $('<li><a href="javascript:;">' + i + '</a></li>');
 					$ul.append($li);
 					if (hasEvent) {
@@ -1198,7 +1100,8 @@
 			$ul.append('<li class="active"><a href="javascript:;">' + page + '</a></li>');
 
 			if (page + set < total - 1) {
-				for (i = page + 1; i <= (page + set); i++) {
+				var $li;
+				for (var i = page + 1; i <= (page + set); i++) {
 					$li = $('<li><a href="javascript:;">' + i + '</a></li>');
 					$ul.append($li);
 					if (hasEvent) {
@@ -1208,14 +1111,14 @@
 					}
 				}
 				$li = $('<li><a href="javascript:;">' + total + '</a></li>');
-				$ul.append($li);
+				$ul.append('<li><a href="javascript:;">...</a></li>').append($li);
 				if (hasEvent) {
 					$li.on("click", {
 						page: total
 					}, options.onPage);
 				}
 			} else {
-				for (i = page + 1; i <= total; i++) {
+				for (var i = page + 1; i <= total; i++) {
 					$li = $('<li><a href="javascript:;">' + i + '</a></li>');
 					$ul.append($li);
 					if (hasEvent) {
@@ -1228,19 +1131,19 @@
 
 			if (page < total) {
 				var $next = $('<li><a href="javascript:;"><i class="fa fa-forward"></i></a></li>');
-				// var $last = $('<li><a href="javascript:;"><i class="fa fa-step-forward"></i></a></li>');
-				$ul.append($next);
+				var $last = $('<li><a href="javascript:;"><i class="fa fa-step-forward"></i></a></li>');
+				$ul.append($next).append($last);
 				if (hasEvent) {
-					// $last.on("click", {
-					// 	page: total
-					// }, options.onPage);
+					$last.on("click", {
+						page: total
+					}, options.onPage);
 					$next.on("click", {
 						page: page + 1
 					}, options.onPage);
 				}
 			} else {
 				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-forward"></i></a></li>');
-				// $ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-step-forward"></i></a></li>');
+				$ul.append('<li class="disabled"><a href="javascript:;"><i class="fa fa-step-forward"></i></a></li>');
 			}
 			if (parseInt(options.page) > total) {
 				this.on("click", {
