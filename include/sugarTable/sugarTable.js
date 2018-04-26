@@ -33,9 +33,11 @@
 			fields: [], // 列表列名称
 			seriText: "序号", // 序号显示文本
 			tableClass: "table table-bordered table-hover", // 列表样式
+			noHeader: false, // 是否需要表头
 			noSeri: false, // 是否需要序号列
 			noPaging: false, // 是否需要分页
 			noCheckbox: false, // 是否需要勾选框
+			noRowClick: false, // 是否需要行勾选
 			multiCheck: false, // 是否为多选模式
 			noHideBtn: false, // 是否隐藏按钮
 			needSum: false, // 是否需要额外统计行
@@ -377,14 +379,16 @@
 
 			case 'table': // 表格
 				_temp.opts = $.extend({}, _temp.fieldData, {
-					list: _temp.listData[_temp.fieldData.id]
+					list: _temp.listData[_temp.fieldData.id],
+					noHeader: true,
+					noRowClick: true,
 				});
 
 				_temp.table = $("<table>").attr({
 					id: _temp.fieldData.id + "_table_" + _temp.index
 				}).sugarTable(_temp.opts);
 
-				return _temp.table[0].outerHTML;
+				return _temp.table;
 
 			default:
 				return '';
@@ -567,10 +571,10 @@
 			_table.o = $.extend({}, $.fn.sugarTable.defaults.table, options || {});
 
 			// 表头元素
-			_table.thead = $('<thead>');
+			_table.thead = $('<thead>').attr("sugartable", _table.id);
 
 			// 表格内容元素
-			_table.tbody = $('<tbody>');
+			_table.tbody = $('<tbody>').attr("sugartable", _table.id);
 
 			// 表格css
 			if (typeof this[0] !== "undefined") {
@@ -884,15 +888,17 @@
 				}
 
 				// 生成列表的每列时的额外处理
-				if (typeof _table.o.rowGenHandler !== "undefined") {
-					_table.o.rowGenHandler.call(this, _table.listData);
-				}
+				_table.o.rowGenHandler.call(this, _table.listData);
+
 				_table.trArr.push(_list.tr);
 			}
 
 			// 组装表格
 			_table.tbody.append(_table.trArr);
-			this.append(_table.thead).append(_table.tbody);
+			if (!_table.o.noHeader) {
+				this.append(_table.thead);
+			}
+			this.append(_table.tbody);
 
 			// 渲染选择组件
 			// if ($('[sugartype=select]').length > 0) {
@@ -959,70 +965,120 @@
 
 			// 处理选中事件
 			if (!_table.o.noCheckbox) {
-				var _tbody_first = _table.tbody[0];
-				var _tbody_rows = _table.tbody.find("tr[sugartable=" + _table.id + "]");
+				var currentCheckbox;
+				var rowIndex;
 
-				var currentCheckboxHandler = function (e) {
+				// 点击checkbox区域时，对checkbox反向处理，以便在rowClick/tdClick中统一操作
+				_table.checkboxHandler = function (e) {
 					e.currentTarget.checked = !e.currentTarget.checked;
 				};
-				var currentRowHandler = function (e) {
-					var currentCheckbox = $(e.currentTarget).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
-					var currentCheckState = currentCheckbox.checked || false;
 
-					// 如果为单选模式，则清空所有checkbox
-					if (!_table.o.multiCheck) {
-						var checkboxes = _table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]");
-						for (var checkboxIndex = 0; checkboxIndex < checkboxes.length; checkboxIndex++) {
-							checkboxes[checkboxIndex].checked = false;
-						}
-						// 清空所有行样式
-						for (var rowIndex = 0; rowIndex < _tbody_rows.length; rowIndex++) {
-							_tbody_first.rows[rowIndex].className = "";
-						}
-					}
+				if (!_table.o.noRowClick) {
 
-					if (!currentCheckState) {
-						currentCheckbox.checked = true;
-						e.currentTarget.className = "info";
-						if (typeof _table.o.checkHandler !== "undefined") {
+					// 行勾选
+					_table.rowClickHandler = function (e) {
+						var currentCheckbox = $(e.currentTarget).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
+						var currentCheckState = currentCheckbox.checked || false;
+
+						// 如果为单选模式，则清空所有checkbox
+						if (!_table.o.multiCheck) {
+							var checkboxes = _table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]");
+							for (var checkboxIndex = 0; checkboxIndex < checkboxes.length; checkboxIndex++) {
+								checkboxes[checkboxIndex].checked = false;
+							}
+							// 清空所有行样式
+							for (var rowIndex = 0; rowIndex < _table.tbody[0].rows.length; rowIndex++) {
+								_table.tbody[0].rows[rowIndex].className = "";
+							}
+						}
+
+						if (!currentCheckState) {
+							currentCheckbox.checked = true;
+							e.currentTarget.className = "info";
 							_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
-						}
-					} else {
+						} else {
 
-						// 隐藏左侧按钮
-						$(".btn-begin-hide").hide();
-						$(".btn-begin-hide").attr({
-							alt: '',
-							href: '#'
-						});
+							// 隐藏左侧按钮
+							$(".btn-begin-hide").hide();
+							$(".btn-begin-hide").attr({
+								alt: '',
+								href: '#'
+							});
 
-						if (typeof _table.o.uncheckHandler !== "undefined") {
 							_table.o.uncheckHandler.call(this);
-						}
 
-						// 如果为多选模式，则清空当前 checkbox 与当前行样式
-						if (_table.o.multiCheck) {
-							currentCheckbox.checked = false;
-							e.currentTarget.className = "";
+							// 如果为多选模式，则清空当前 checkbox 与当前行样式
+							if (_table.o.multiCheck) {
+								currentCheckbox.checked = false;
+								e.currentTarget.className = "";
+							}
 						}
+					};
+
+					for (rowIndex = 0; rowIndex < _table.tbody[0].rows.length; rowIndex++) {
+						_table.currentRow = _table.tbody[0].rows[rowIndex];
+						_table.currentRow.onclick = _table.rowClickHandler.bind();
+						_table.currentCheckbox = $(_table.currentRow).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
+						_table.currentCheckbox.onclick = _table.checkboxHandler.bind();
 					}
-				};
-				for (var i = 0; i < _tbody_rows.length; i++) {
-					var currentRow = _tbody_first.rows[i];
-					var currentCheckbox = $(currentRow).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
+				} else {
 
-					// 点击checkbox区域时，对checkbox反向处理，以便在rowClick中统一操作
-					currentCheckbox.onclick = currentCheckboxHandler.bind();
+					// 勾选框勾选，用于嵌套表格等
+					_table.tdClickHandler = function (e) {
+						var currentCheckbox = $(e.currentTarget).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
+						var currentCheckState = currentCheckbox.checked || false;
 
-					currentRow.onclick = currentRowHandler.bind();
+						// 如果为单选模式，则清空所有checkbox
+						if (!_table.o.multiCheck) {
+							var checkboxes = _table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]");
+							for (var checkboxIndex = 0; checkboxIndex < checkboxes.length; checkboxIndex++) {
+								checkboxes[checkboxIndex].checked = false;
+							}
+							// 清空所有行样式
+							for (var rowIndex = 0; rowIndex < _table.tbody[0].rows.length; rowIndex++) {
+								_table.tbody[0].rows[rowIndex].className = "";
+							}
+						}
+
+						if (!currentCheckState) {
+							currentCheckbox.checked = true;
+							$(e.currentTarget).parent()[0].className = "info";
+							if (typeof _table.o.checkHandler !== "undefined") {
+								_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
+							}
+						} else {
+
+							// 隐藏左侧按钮
+							$(".btn-begin-hide").hide();
+							$(".btn-begin-hide").attr({
+								alt: '',
+								href: '#'
+							});
+
+							if (typeof _table.o.uncheckHandler !== "undefined") {
+								_table.o.uncheckHandler.call(this);
+							}
+
+							// 如果为多选模式，则清空当前 checkbox 与当前行样式
+							if (_table.o.multiCheck) {
+								currentCheckbox.checked = false;
+								e.currentTarget.className = "";
+							}
+						}
+					};
+
+					for (rowIndex = 0; rowIndex < _table.tbody[0].rows.length; rowIndex++) {
+						_table.currentRow = _table.tbody[0].rows[rowIndex];
+						_table.currentTd = _table.currentRow.cells[0];
+						_table.currentTd.onclick = _table.tdClickHandler.bind();
+						_table.currentCheckbox = $(_table.currentRow).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
+						_table.currentCheckbox.onclick = _table.checkboxHandler.bind();
+					}
 				}
 			}
 
 			// 生成列表后的额外处理
-			if (typeof _table.o.tableGenHandler !== "undefined") {
-				_table.o.tableGenHandler.call(this);
-			}
-
+			_table.o.tableGenHandler.call(this);
 
 			// 保存参数到全局变量
 			$.fn.sugarTable.options = $.fn.sugarTable.options || {};

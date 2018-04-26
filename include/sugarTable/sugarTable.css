@@ -14,6 +14,7 @@
 	text-align: center;
 	width: 40px;
 	padding-left: 32px;
+	cursor: pointer;
 }
 
 .sugar-table .sugar-checkbox .checkbox {
@@ -145,10 +146,6 @@
 }
 
 .sugar-table td.sugar-textarea {
-	padding: 0;
-}
-
-.sugar-table td.sugar-table-table {
 	padding: 0;
 }
 
