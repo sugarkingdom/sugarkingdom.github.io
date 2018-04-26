@@ -312,6 +312,7 @@ $(function () {
 		page: page4,
 		pageSize: size4,
 		noRowClick: true,
+		multiCheck: true,
 		fields: [{
 		// 	id: "id",
 		// 	type: "text",
@@ -324,6 +325,7 @@ $(function () {
 			id: "children",
 			type: "table",
 			name: "children",
+			multiCheck: true,
 			fields: [{
 			// 	id: "id",
 			// 	type: "text",
@@ -336,6 +338,7 @@ $(function () {
 				id: "auths",
 				type: "table",
 				name: "auths",
+				multiCheck: true,
 				fields: [{
 				// 	id: "id",
 				// 	type: "text",
