@@ -378,6 +378,10 @@
 				return _temp.content;
 
 			case 'table': // 表格
+
+				_temp.content = [];
+				_temp.foldIcon = $("<i>").addClass("fa fa-fm fa-minus-square-o");
+
 				_temp.opts = $.extend({}, _temp.fieldData, {
 					list: _temp.listData[_temp.fieldData.id],
 					noHeader: true,
@@ -388,7 +392,22 @@
 					id: _temp.fieldData.id + "_table_" + _temp.index
 				}).sugarTable(_temp.opts);
 
-				return _temp.table;
+				_temp.foldIcon.on("click", function (e) {
+					if ($(e.currentTarget).hasClass("fa-minus-square-o")) {
+						_temp.table.hide();
+						$(e.currentTarget).removeClass("fa-minus-square-o");
+						$(e.currentTarget).addClass("fa-plus-square-o");
+					} else {
+						_temp.table.show();
+						$(e.currentTarget).removeClass("fa-plus-square-o");
+						$(e.currentTarget).addClass("fa-minus-square-o");
+					}
+				});
+
+				_temp.content.push(_temp.foldIcon);
+				_temp.content.push(_temp.table);
+
+				return _temp.content;
 
 			default:
 				return '';
@@ -1062,7 +1081,7 @@
 							// 如果为多选模式，则清空当前 checkbox 与当前行样式
 							if (_table.o.multiCheck) {
 								currentCheckbox.checked = false;
-								e.currentTarget.className = "";
+								$(e.currentTarget).parent()[0].className = "";
 							}
 						}
 					};

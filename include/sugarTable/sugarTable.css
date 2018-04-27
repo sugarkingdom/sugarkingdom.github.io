@@ -149,8 +149,20 @@
 	padding: 0;
 }
 
+.sugar-table td.sugar-table-table {
+	padding-left: 23px;
+	position: relative;
+}
+
 .sugar-table td.sugar-table-table .table {
 	margin-bottom: 0;
+}
+
+.sugar-table td.sugar-table-table i {
+	position: absolute;
+	top: calc(50% - 7px);
+	left: 6px;
+	cursor: pointer;
 }
 
 .sugar-table textarea {
