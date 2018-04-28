@@ -45,11 +45,11 @@
 			sumCalcGroup: [], // 统计计算的字段集合
 			needFinalSum: false, // 是否需要额外总计行
 			finalSumCalcGroup: [], // 总计计算的字段集合
-			checkHandler: function name(data) {
-				// console.log("sugarTable checked!");
+			checkHandler: function name(lineNum) {
+				console.log("sugarTable line " + lineNum + " checked!");
 			},
-			uncheckHandler: function name(data) {
-				// console.log("sugarTable unchecked!");
+			uncheckHandler: function name(lineNum) {
+				console.log("sugarTable line " + lineNum + " unchecked!");
 			},
 			searchHandler: function name(data) {
 				// console.log("sugarTable searched!");
@@ -142,7 +142,7 @@
 	/**
 	 * 获取域的值（仅内部使用）
 	 * @param  {DOM}  el
-	 * @return {String or Object}  域的值
+	 * @return 域的值
 	 */
 	function _getValue(el) {
 		switch (el.attributes.sugartype.value) {
@@ -167,6 +167,95 @@
 	}
 
 	/**
+	 * 点击checkbox区域时，对checkbox反向处理，以便在rowClick/tdClick中统一操作
+	 * @param {Object} _table 
+	 * @param {Event} e 
+	 */
+	function _checkboxHandler(_table, e) {
+		e.currentTarget.checked = !e.currentTarget.checked;
+	}
+
+	/**
+	 * 行勾选
+	 * @param {Object} _table 
+	 * @param {Event} e 
+	 */
+	function _rowClickHandler(_table, e) {
+		var checkbox = $(e.currentTarget).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]");
+		var checkState = checkbox.prop("checked") || false;
+
+		// 如果为单选模式，则清空所有checkbox与所有行样式
+		if (!_table.o.multiCheck) {
+			_table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]").attr("checked", false);
+			_table.tbody.find("tr[sugartable=" + _table.id + "]").removeClass();
+		}
+
+		if (!checkState) {
+			checkbox.prop("checked", true);
+			e.currentTarget.className = "info";
+			_table.o.checkHandler.call(this, checkbox.attr("sugarline"));
+		} else {
+
+			// 隐藏左侧按钮
+			$(".btn-begin-hide").hide();
+			$(".btn-begin-hide").attr({
+				alt: '',
+				href: '#'
+			});
+
+			_table.o.uncheckHandler.call(this, checkbox.attr("sugarline"));
+
+			// 如果为多选模式，则清空当前 checkbox 与当前行样式
+			if (_table.o.multiCheck) {
+				checkbox.prop("checked", false);
+				$(e.currentTarget).removeClass();
+			}
+		}
+	}
+
+	/**
+	 * 勾选框勾选，用于嵌套表格等
+	 * @param {Object} _table 
+	 * @param {Event} e 
+	 */
+	function _tdClickHandler(_table, e) {
+		var currentCheckbox = $(e.currentTarget).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
+		var currentCheckState = currentCheckbox.checked || false;
+
+		// 如果为单选模式，则清空所有checkbox与所有行样式
+		if (!_table.o.multiCheck) {
+			_table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]").attr("checked", false);
+			_table.tbody.find("tr[sugartable=" + _table.id + "]").removeClass();
+		}
+
+		if (!currentCheckState) {
+			currentCheckbox.checked = true;
+			$(e.currentTarget).parent()[0].className = "info";
+			if (typeof _table.o.checkHandler !== "undefined") {
+				_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
+			}
+		} else {
+
+			// 隐藏左侧按钮
+			$(".btn-begin-hide").hide();
+			$(".btn-begin-hide").attr({
+				alt: '',
+				href: '#'
+			});
+
+			if (typeof _table.o.uncheckHandler !== "undefined") {
+				_table.o.uncheckHandler.call(this, currentCheckbox.attributes.sugarline.value);
+			}
+
+			// 如果为多选模式，则清空当前 checkbox 与当前行样式
+			if (_table.o.multiCheck) {
+				currentCheckbox.checked = false;
+				$(e.currentTarget).parent()[0].className = "";
+			}
+		}
+	}
+
+	/**
 	 * 生成表格域（仅内部使用）
 	 * @param  {String} type  域类型
 	 * @param  {Object} opts  参数
@@ -174,7 +263,7 @@
 	 *                  opts.index	数据行数
 	 *                  opts.listData	表格数据
 	 *                  opts.fieldData	域格式
-	 * @return {String or Object}  域内容
+	 * @return 域内容
 	 */
 	function _genField(type, opts) {
 		var _temp = {};
@@ -266,10 +355,10 @@
 						selected: '',
 						value: ''
 					}));
-					for (var k = 0; k < _temp.o_list.length; k++) {
+					for (var oIndex = 0; oIndex < _temp.o_list.length; oIndex++) {
 						_temp.options.push($('<option>').attr({
-							value: _temp.o_list[k]
-						}).text(_temp.o_list[k]));
+							value: _temp.o_list[oIndex]
+						}).text(_temp.o_list[oIndex]));
 					}
 					_temp.select.append(_temp.options);
 				}
@@ -578,55 +667,55 @@
 		/**
 		 * 初始化组件
 		 * @param  {Object} options 参数
-		 * @return
+		 * @return 表格的jQuery对象
 		 */
 		init: function (options) {
 			var _table = {};
 
 			// 表格元素ID
-			_table.id = this[0].id;
+			_table.id = this.attr("id");
 
 			// 构造参数
 			_table.o = $.extend({}, $.fn.sugarTable.defaults.table, options || {});
 
-			// 表头元素
-			_table.thead = $('<thead>').attr("sugartable", _table.id);
-
-			// 表格内容元素
-			_table.tbody = $('<tbody>').attr("sugartable", _table.id);
-
 			// 表格css
-			if (typeof this[0] !== "undefined") {
-				this[0].className = _table.o.tableClass + ' sugar-table';
-			}
+			this.removeClass();
+			this.addClass(_table.o.tableClass + ' sugar-table');
 
 			// 清空表格
 			this.empty();
 
-			// 生成表头
-			_table.theadTr = $("<tr>").attr("sugartable", _table.id);
+			if (!_table.o.noHeader) {
 
-			// 构造勾选框
-			if (!_table.o.noCheckbox) {
-				_table.theadTr.append($("<th>").attr("sugartable", _table.id));
+				// 表头元素
+				_table.thead = $('<thead>').attr("sugartable", _table.id);
+
+				// 生成表头
+				_table.theadTr = $("<tr>").attr("sugartable", _table.id);
+
+				// 构造勾选框
+				if (!_table.o.noCheckbox) {
+					_table.theadTr.append($("<th>").attr("sugartable", _table.id));
+				}
+
+				// 构造表头序号列
+				if (!_table.o.noSeri) {
+					_table.theadTr.append($("<th>").attr("sugartable", _table.id).addClass('seri').html(_table.o.seriText));
+				}
+
+				// 构造表头
+				for (_table.fieldIndex = 0; _table.fieldIndex < _table.o.fields.length; _table.fieldIndex++) {
+					_table.fieldData = _table.o.fields[_table.fieldIndex];
+					_table.theadTr.append($("<th>").attr("sugartable", _table.id).css({
+						width: _table.fieldData.width || 'auto',
+						display: _table.fieldData.hide ? 'none' : 'table-cell'
+					}).html(_table.fieldData.name));
+				}
+
+				// 装入表头元素
+				_table.thead.append(_table.theadTr);
+				this.append(_table.thead);
 			}
-
-			// 构造表头序号列
-			if (!_table.o.noSeri) {
-				_table.theadTr.append($("<th>").attr("sugartable", _table.id).addClass('seri').html(_table.o.seriText));
-			}
-
-			// 构造表头
-			for (_table.fieldIndex = 0; _table.fieldIndex < _table.o.fields.length; _table.fieldIndex++) {
-				_table.fieldData = _table.o.fields[_table.fieldIndex];
-				_table.theadTr.append($("<th>").attr("sugartable", _table.id).css({
-					width: _table.fieldData.width || 'auto',
-					display: _table.fieldData.hide ? 'none' : 'table-cell'
-				}).html(_table.fieldData.name));
-			}
-
-			// 装入表头元素
-			_table.thead.append(_table.theadTr);
 
 			// 如果需要本地分页，处理列表数据
 			if (_table.o.isLocal) {
@@ -776,7 +865,10 @@
 					});
 					_list.labelCheckbox = $("<label>").attr("for", _table.id + "_checkbox_" + _table.listIndex);
 					_list.divCheckbox = $("<div>").addClass("checkbox checkbox-primary").append(_list.inputCheckbox).append(_list.labelCheckbox);
-					_list.tdCheckbox = $("<td>").addClass('sugar-checkbox').append(_list.divCheckbox);
+					_list.tdCheckbox = $("<td>").attr({
+						sugartable: _table.id,
+						sugartype: "td_checkbox"
+					}).addClass('sugar-checkbox').append(_list.divCheckbox);
 					_list.tr.append(_list.tdCheckbox);
 				}
 
@@ -912,11 +1004,11 @@
 				_table.trArr.push(_list.tr);
 			}
 
+			// 表格内容元素
+			_table.tbody = $('<tbody>').attr("sugartable", _table.id);
+
 			// 组装表格
 			_table.tbody.append(_table.trArr);
-			if (!_table.o.noHeader) {
-				this.append(_table.thead);
-			}
 			this.append(_table.tbody);
 
 			// 渲染选择组件
@@ -984,115 +1076,12 @@
 
 			// 处理选中事件
 			if (!_table.o.noCheckbox) {
-				var currentCheckbox;
-				var rowIndex;
-
-				// 点击checkbox区域时，对checkbox反向处理，以便在rowClick/tdClick中统一操作
-				_table.checkboxHandler = function (e) {
-					e.currentTarget.checked = !e.currentTarget.checked;
-				};
-
 				if (!_table.o.noRowClick) {
-
-					// 行勾选
-					_table.rowClickHandler = function (e) {
-						var currentCheckbox = $(e.currentTarget).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
-						var currentCheckState = currentCheckbox.checked || false;
-
-						// 如果为单选模式，则清空所有checkbox
-						if (!_table.o.multiCheck) {
-							var checkboxes = _table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]");
-							for (var checkboxIndex = 0; checkboxIndex < checkboxes.length; checkboxIndex++) {
-								checkboxes[checkboxIndex].checked = false;
-							}
-							// 清空所有行样式
-							for (var rowIndex = 0; rowIndex < _table.tbody[0].rows.length; rowIndex++) {
-								_table.tbody[0].rows[rowIndex].className = "";
-							}
-						}
-
-						if (!currentCheckState) {
-							currentCheckbox.checked = true;
-							e.currentTarget.className = "info";
-							_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
-						} else {
-
-							// 隐藏左侧按钮
-							$(".btn-begin-hide").hide();
-							$(".btn-begin-hide").attr({
-								alt: '',
-								href: '#'
-							});
-
-							_table.o.uncheckHandler.call(this);
-
-							// 如果为多选模式，则清空当前 checkbox 与当前行样式
-							if (_table.o.multiCheck) {
-								currentCheckbox.checked = false;
-								e.currentTarget.className = "";
-							}
-						}
-					};
-
-					for (rowIndex = 0; rowIndex < _table.tbody[0].rows.length; rowIndex++) {
-						_table.currentRow = _table.tbody[0].rows[rowIndex];
-						_table.currentRow.onclick = _table.rowClickHandler.bind();
-						_table.currentCheckbox = $(_table.currentRow).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
-						_table.currentCheckbox.onclick = _table.checkboxHandler.bind();
-					}
+					_table.tbody.find("tr[sugartable=" + _table.id + "]").on("click", _rowClickHandler.bind(this, _table));
+					_table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]").on("click", _checkboxHandler.bind(this, _table));
 				} else {
-
-					// 勾选框勾选，用于嵌套表格等
-					_table.tdClickHandler = function (e) {
-						var currentCheckbox = $(e.currentTarget).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
-						var currentCheckState = currentCheckbox.checked || false;
-
-						// 如果为单选模式，则清空所有checkbox
-						if (!_table.o.multiCheck) {
-							var checkboxes = _table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]");
-							for (var checkboxIndex = 0; checkboxIndex < checkboxes.length; checkboxIndex++) {
-								checkboxes[checkboxIndex].checked = false;
-							}
-							// 清空所有行样式
-							for (var rowIndex = 0; rowIndex < _table.tbody[0].rows.length; rowIndex++) {
-								_table.tbody[0].rows[rowIndex].className = "";
-							}
-						}
-
-						if (!currentCheckState) {
-							currentCheckbox.checked = true;
-							$(e.currentTarget).parent()[0].className = "info";
-							if (typeof _table.o.checkHandler !== "undefined") {
-								_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
-							}
-						} else {
-
-							// 隐藏左侧按钮
-							$(".btn-begin-hide").hide();
-							$(".btn-begin-hide").attr({
-								alt: '',
-								href: '#'
-							});
-
-							if (typeof _table.o.uncheckHandler !== "undefined") {
-								_table.o.uncheckHandler.call(this);
-							}
-
-							// 如果为多选模式，则清空当前 checkbox 与当前行样式
-							if (_table.o.multiCheck) {
-								currentCheckbox.checked = false;
-								$(e.currentTarget).parent()[0].className = "";
-							}
-						}
-					};
-
-					for (rowIndex = 0; rowIndex < _table.tbody[0].rows.length; rowIndex++) {
-						_table.currentRow = _table.tbody[0].rows[rowIndex];
-						_table.currentTd = _table.currentRow.cells[0];
-						_table.currentTd.onclick = _table.tdClickHandler.bind();
-						_table.currentCheckbox = $(_table.currentRow).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
-						_table.currentCheckbox.onclick = _table.checkboxHandler.bind();
-					}
+					_table.tbody.find("td[sugartype=td_checkbox][sugartable=" + _table.id + "]").on("click", _tdClickHandler.bind(this, _table));
+					_table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]").on("click", _checkboxHandler.bind(this, _table));
 				}
 			}
 
