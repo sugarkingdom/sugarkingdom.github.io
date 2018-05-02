@@ -145,20 +145,20 @@
 	 * @return 域的值
 	 */
 	function _getValue(el) {
-		switch (el.attributes.sugartype.value) {
+		switch ($(el).attr("sugartype")) {
 			case 'text':
-				return el.innerText;
+				return $(el).text();
 			case 'object':
 				var object = {};
-				object[el.attributes.sugarkey.value] = el.innerText;
+				object[$(el).attr("sugarkey")] = $(el).text();
 				return object;
 			case 'input':
-				return el.value;
+				return $(el).val();
 			case 'select':
-				return el.value;
+				return $(el).val();
 				// return $(el).selectpicker('val');
 			case 'textarea':
-				return el.value;
+				return $(el).val();
 			case "modal": //// TODO
 				return '';
 			default:
@@ -167,90 +167,76 @@
 	}
 
 	/**
-	 * 点击checkbox区域时，对checkbox反向处理，以便在rowClick/tdClick中统一操作
-	 * @param {Object} _table 
-	 * @param {Event} e 
+	 * 改变域的值（仅内部使用）
+	 * @param {DOM} el 
+	 * @param {String} value 
 	 */
-	function _checkboxHandler(_table, e) {
-		e.currentTarget.checked = !e.currentTarget.checked;
+	function _setValue(el, value) {
+		switch ($(el).attr("sugartype")) {
+			case 'text':
+				$(el).text(value);
+				break;
+			case 'object':
+				$(el).text(value);
+				break;
+			case 'input':
+				$(el).val(value);
+				break;
+			case 'select':
+				$(el).val(value);
+				// $(el).selectpicker('val', value);
+				break;
+			case 'textarea':
+				$(el).val(value);
+				break;
+			case "modal": //// TODO
+				break;
+			default:
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * 点击checkbox区域时，对checkbox反向处理，以便在rowClick/tdClick中统一操作
+	 */
+	function _checkboxHandler(id, lineNum) {
+		var checkbox = $("input[sugartable=" + id + "][sugarline=" + lineNum + "][sugartype=line_checkbox]");
+		checkbox.prop("checked", !checkbox.prop("checked"));
 	}
 
 	/**
 	 * 行勾选
-	 * @param {Object} _table 
-	 * @param {Event} e 
 	 */
-	function _rowClickHandler(_table, e) {
-		var checkbox = $(e.currentTarget).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]");
-		var checkState = checkbox.prop("checked") || false;
+	function _rowCheckHandler(id, lineNum, opts) {
+		var checkbox = $("input[sugartable=" + id + "][sugarline=" + lineNum + "][sugartype=line_checkbox]");
+		var checkState = checkbox.prop("checked");
 
 		// 如果为单选模式，则清空所有checkbox与所有行样式
-		if (!_table.o.multiCheck) {
-			_table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]").attr("checked", false);
-			_table.tbody.find("tr[sugartable=" + _table.id + "]").removeClass();
+		if (!opts.multiCheck) {
+			$("input[sugartable=" + id + "][sugartype=line_checkbox]").prop("checked", false);
+			$("tr[sugartable=" + id + "]").removeClass();
 		}
 
 		if (!checkState) {
 			checkbox.prop("checked", true);
-			e.currentTarget.className = "info";
-			_table.o.checkHandler.call(this, checkbox.attr("sugarline"));
+			$("tr[sugartable=" + id + "][sugarline=" + lineNum + "]").addClass("info");
+			opts.checkHandler.call(this, checkbox.attr("sugarline"));
 		} else {
 
-			// 隐藏左侧按钮
+			// 隐藏左侧按钮 //// TODO
 			$(".btn-begin-hide").hide();
 			$(".btn-begin-hide").attr({
 				alt: '',
 				href: '#'
 			});
 
-			_table.o.uncheckHandler.call(this, checkbox.attr("sugarline"));
+			opts.uncheckHandler.call(this, checkbox.attr("sugarline"));
 
 			// 如果为多选模式，则清空当前 checkbox 与当前行样式
-			if (_table.o.multiCheck) {
+			if (opts.multiCheck) {
 				checkbox.prop("checked", false);
-				$(e.currentTarget).removeClass();
-			}
-		}
-	}
-
-	/**
-	 * 勾选框勾选，用于嵌套表格等
-	 * @param {Object} _table 
-	 * @param {Event} e 
-	 */
-	function _tdClickHandler(_table, e) {
-		var currentCheckbox = $(e.currentTarget).find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]")[0] || {};
-		var currentCheckState = currentCheckbox.checked || false;
-
-		// 如果为单选模式，则清空所有checkbox与所有行样式
-		if (!_table.o.multiCheck) {
-			_table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]").attr("checked", false);
-			_table.tbody.find("tr[sugartable=" + _table.id + "]").removeClass();
-		}
-
-		if (!currentCheckState) {
-			currentCheckbox.checked = true;
-			$(e.currentTarget).parent()[0].className = "info";
-			if (typeof _table.o.checkHandler !== "undefined") {
-				_table.o.checkHandler.call(this, currentCheckbox.attributes.sugarline.value);
-			}
-		} else {
-
-			// 隐藏左侧按钮
-			$(".btn-begin-hide").hide();
-			$(".btn-begin-hide").attr({
-				alt: '',
-				href: '#'
-			});
-
-			if (typeof _table.o.uncheckHandler !== "undefined") {
-				_table.o.uncheckHandler.call(this, currentCheckbox.attributes.sugarline.value);
-			}
-
-			// 如果为多选模式，则清空当前 checkbox 与当前行样式
-			if (_table.o.multiCheck) {
-				currentCheckbox.checked = false;
-				$(e.currentTarget).parent()[0].className = "";
+				$("tr[sugartable=" + id + "][sugarline=" + lineNum + "]").removeClass();
 			}
 		}
 	}
@@ -308,6 +294,7 @@
 				_temp.input = $('<input>').addClass('form-control').attr({
 					// id: _temp.id + '_input_' + _temp.index + '_' + _temp.fieldData.id,
 					type: 'text',
+					sugartable: _temp.id,
 					sugarline: _temp.index,
 					sugarid: _temp.fieldData.id,
 					sugartype: 'input',
@@ -332,6 +319,7 @@
 
 				_temp.select = $('<select>').addClass('form-control').attr({
 					// id: _temp.id + '_select_' + _temp.index + '_' + _temp.fieldData.id,
+					sugartable: _temp.id,
 					sugarline: _temp.index,
 					sugarid: _temp.fieldData.id,
 					sugartype: 'select',
@@ -382,6 +370,7 @@
 				_temp.textarea = $("<textarea>").addClass("from-control").attr({
 					// id: id + '_textarea_' + index + '_' + fieldData.id,
 					rows: _temp.fieldData.row || 5,
+					sugartable: _temp.id,
 					sugarline: _temp.index,
 					sugarid: _temp.fieldData.id,
 					sugartype: 'textarea',
@@ -478,7 +467,7 @@
 				});
 
 				_temp.table = $("<table>").attr({
-					id: _temp.fieldData.id + "_table_" + _temp.index
+					id: _temp.id + "_" + _temp.fieldData.id + "_table_" + _temp.index
 				}).sugarTable(_temp.opts);
 
 				_temp.foldIcon.on("click", function (e) {
@@ -501,165 +490,6 @@
 			default:
 				return '';
 		}
-	}
-
-	/**
-	 * 数字输入限制（仅内部使用）
-	 * 已知问题：右键菜单粘贴无效
-	 *
-	 * @param textbox	DOM
-	 * @param opts	选项：
-	 * 			decimalLength	小数点后位数，默认为0
-	 * 			allowMinus		允许负数，默认为false
-	 * 			intLength		小数点前位数，默认为5
-	 */
-	function _toNumberInput(textbox, opts) {
-		opts = $.extend(true, {
-			decimalLength: 0,
-			allowMinus: false,
-			intLength: 5
-		}, opts);
-		// called when key is pressed
-		// in keydown, we get the keyCode
-		// in keyup, we get the input.value (including the charactor we've just typed
-		textbox.on("keydown", function _OnNumericInputKeyDown(e) {
-			var key = e.which || e.keyCode; // http://keycode.info/
-
-			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
-				// alphabet
-				key >= 65 && key <= 90 ||
-				// spacebar
-				key == 32) {
-				e.preventDefault();
-				return false;
-			}
-
-			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
-				// numbers
-				// key >= 48 && key <= 57 ||
-				// Numeric keypad
-				// key >= 96 && key <= 105 ||
-
-				// allow: Ctrl+A
-				(e.keyCode == 65 && e.ctrlKey === true) ||
-				// allow: Ctrl+C
-				(key == 67 && e.ctrlKey === true) ||
-				// Allow: Ctrl+X
-				(key == 88 && e.ctrlKey === true) ||
-
-				// allow: home, end, left, right
-				(key >= 35 && key <= 39) ||
-				// Backspace and Tab and Enter
-				key == 8 || key == 9 || key == 13 ||
-				// Del and Ins
-				key == 46 || key == 45) {
-				return true;
-			}
-
-			var v = this.value; // v can be null, in case textbox is number and does not valid
-
-			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
-				// numbers
-				key >= 48 && key <= 57 ||
-				// Numeric keypad
-				key >= 96 && key <= 105) {
-				if (parseInt(v).toString().length > opts.intLength - 1 && v.slice(-1) != '.') {
-					return false;
-				}
-			}
-
-			// if minus, dash
-			if (key == 109 || key == 189) {
-				if (!opts.allowMinus) {
-					return false;
-				}
-				// if already has -, ignore the new one
-				if (v[0] === '-') {
-					// console.log('return, already has - in the beginning');
-					return false;
-				}
-			}
-
-			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
-				// comma, period and numpad.dot
-				key == 190 || key == 188 || key == 110) {
-				if (opts.decimalLength === 0) {
-					return false;
-				}
-				// console.log('already having comma, period, dot', key);
-				if (/[\.]/.test(v)) {
-					// console.log('return, already has . somewhere');
-					return false;
-				}
-			}
-		});
-
-		textbox.on("keyup", function _OnNumericInputKeyUp(e) {
-			var key = e.which || e.keyCode; // http://keycode.info/
-
-			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
-				// alphabet
-				key >= 65 && key <= 90 ||
-				// spacebar
-				key == 32) {
-				e.preventDefault();
-				return false;
-			}
-
-			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
-				// numbers
-				// key >= 48 && key <= 57 ||
-				// Numeric keypad
-				// key >= 96 && key <= 105 ||
-
-				// allow: Ctrl+A
-				(e.keyCode == 65 && e.ctrlKey === true) ||
-				// allow: Ctrl+C
-				(key == 67 && e.ctrlKey === true) ||
-				// Allow: Ctrl+X
-				(key == 88 && e.ctrlKey === true) ||
-
-				// allow: home, end, left, right
-				(key >= 35 && key <= 39) ||
-				// Backspace and Tab and Enter
-				key == 8 || key == 9 || key == 13 ||
-				// Del and Ins
-				key == 46 || key == 45) {
-				return true;
-			}
-
-			var v = this.value;
-			// if minus, dash
-			if (key == 109 || key == 189) {
-				if (!opts.allowMinus) {
-					return false;
-				}
-				// if already has -, ignore the new one
-				if (v[0] === '-') {
-					// console.log('return, already has - in the beginning');
-					return false;
-				}
-			}
-
-			if (v) {
-				// this replace also remove the -, we add it again if needed
-				if (opts.decimalLength === 0) {
-					v = (v[0] === '-' ? '-' : '') + v.replace(/[^0-9]/g, '');
-				} else {
-					v = (v[0] === '-' ? '-' : '') + v.replace(/[^0-9\.]/g, '');
-					if (v !== '.' &&
-						v.split('.')[1].length > opts.decimalLength) {
-						v = parseFloat(v).toFixed(opts.decimalLength);
-					}
-				}
-
-				// remove all decimalSeparator that have other decimalSeparator following. After this processing, only the last decimalSeparator is kept.
-				// v = v.replace(/\.(?=(.*)\.)+/g, '');
-
-				//console.log(this.value, v);
-				this.value = v; // update value only if we changed it
-			}
-		});
 	}
 
 	var methods = {
@@ -741,7 +571,7 @@
 					// 统计行数据
 					_table.sumData = {};
 
-					// 统计行数据
+					// 总计行数据
 					_table.finalSumData = {};
 				}
 
@@ -846,12 +676,21 @@
 				_table.o.list = _table.afterSumList;
 			}
 
+			// 保存列表数据到全局变量
+			$.fn.sugarTable.list = $.fn.sugarTable.list || [];
+			$.fn.sugarTable.list[_table.id] = _table.o.list;
+
 			// 生成列表数据
 			_table.trArr = [];
+			_table.checkboxArr = [];
+			_table.tdCheckboxArr = [];
 			for (_table.listIndex = 0; _table.listIndex < _table.o.list.length; _table.listIndex++) {
 				_table.listData = _table.o.list[_table.listIndex];
 				var _list = {};
-				_list.tr = $("<tr>").attr("sugartable", _table.id);
+				_list.tr = $("<tr>").attr({
+					sugartable: _table.id,
+					sugarline: _table.listIndex
+				});
 
 				// 构造勾选框
 				if (!_table.o.noCheckbox) {
@@ -867,9 +706,14 @@
 					_list.divCheckbox = $("<div>").addClass("checkbox checkbox-primary").append(_list.inputCheckbox).append(_list.labelCheckbox);
 					_list.tdCheckbox = $("<td>").attr({
 						sugartable: _table.id,
+						sugarline: _table.listIndex,
 						sugartype: "td_checkbox"
 					}).addClass('sugar-checkbox').append(_list.divCheckbox);
 					_list.tr.append(_list.tdCheckbox);
+
+					// 用于选中事件绑定
+					_table.checkboxArr.push(_list.inputCheckbox);
+					_table.tdCheckboxArr.push(_list.tdCheckbox);
 				}
 
 				// 构造序号列（如果存在统计生成的序列，则使用）
@@ -886,6 +730,7 @@
 						case "text": // 文本
 							_list.td = $("<td>").attr({
 								// id: _table.id + '_' + _table.listIndex + '_text_' + _table.fieldData.id,
+								sugartable: _table.id,
 								sugarline: _table.listIndex,
 								sugarid: _table.fieldData.id,
 								sugartype: 'text',
@@ -908,6 +753,7 @@
 						case "object": // 对象
 							_list.td = $("<td>").attr({
 								// id: _table.id + '_' + _table.listIndex + '_object_' + _table.fieldData.id + '_' + _table.fieldData.key,
+								sugartable: _table.id,
 								sugarline: _table.listIndex,
 								sugarid: _table.fieldData.id,
 								sugarkey: _table.fieldData.key,
@@ -1076,12 +922,31 @@
 
 			// 处理选中事件
 			if (!_table.o.noCheckbox) {
+				var checkboxHandler = function (e) {
+					_checkboxHandler(_table.id, $(e.currentTarget).attr("sugarline"));
+				};
+				var rowCheckHandler = function (e) {
+					_rowCheckHandler(_table.id, $(e.currentTarget).attr("sugarline"), {
+						multiCheck: _table.o.multiCheck,
+						checkHandler: _table.o.checkHandler,
+						uncheckHandler: _table.o.uncheckHandler
+					});
+				};
+				for (_table.checkIndex = 0; _table.checkIndex < _table.checkboxArr.length; _table.checkIndex++) {
+					_table.checkbox = _table.checkboxArr[_table.checkIndex];
+					_table.checkbox.on("click", checkboxHandler.bind(this));
+				}
+				
 				if (!_table.o.noRowClick) {
-					_table.tbody.find("tr[sugartable=" + _table.id + "]").on("click", _rowClickHandler.bind(this, _table));
-					_table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]").on("click", _checkboxHandler.bind(this, _table));
+					for (_table.checkIndex = 0; _table.checkIndex < _table.trArr.length; _table.checkIndex++) {
+						_table.tr = _table.trArr[_table.checkIndex];
+						_table.tr.on("click", rowCheckHandler.bind(this));
+					}
 				} else {
-					_table.tbody.find("td[sugartype=td_checkbox][sugartable=" + _table.id + "]").on("click", _tdClickHandler.bind(this, _table));
-					_table.tbody.find("input[sugartable=" + _table.id + "][sugartype=line_checkbox]").on("click", _checkboxHandler.bind(this, _table));
+					for (_table.checkIndex = 0; _table.checkIndex < _table.tdCheckboxArr.length; _table.checkIndex++) {
+						_table.tdCheckbox = _table.tdCheckboxArr[_table.checkIndex];
+						_table.tdCheckbox.on("click", rowCheckHandler.bind(this));
+					}
 				}
 			}
 
@@ -1101,69 +966,35 @@
 		 *         [0:{name1:value1_1,name2:value1_2},1:{name1:value2_1,name2:value2_2}]
 		 */
 		getValues: function () {
-			var values = [];
-			var value = {};
-			var lineNum = $.fn.sugarTable.options[this.attr('id')].count;
-
-			var getFieldValue = function (index, el) {
-				value[el.attributes.sugarid.value] = _getValue(el);
-			};
-
-			for (var i = 0; i < lineNum; i++) {
-				value = {};
-				this.find('[sugartype!=line_checkbox][sugarline=' + i + ']').each(getFieldValue.bind());
-				values.push(value);
-			}
-			return values;
+			var list =  $.fn.sugarTable.list[this.attr('id')];
+			return list;
 		},
 
 		/**
 		 * 获取整个表格内指定域的值
 		 * @param  {Object} opts 附加参数
+		 *                       lineNum  	指定表格行数，从0开始
 		 *                       id 		指定域的ID
-		 *                       lineNum  	指定表格行数，从1开始
 		 * @return {Array} 包含各列键值对的数组，结构：
 		 *         [0:{name1:value1_1,name2:value1_2},1:{name1:value2_1,name2:value2_2}]
 		 * @return {String} 如果只有一个匹配域，则返回该域的值
 		 */
 		getValue: function (opts) {
-			opts = opts || {};
-			var findStr = '[sugartype!=line_checkbox]';
-			if (typeof opts.id !== "undefined") {
-				findStr += '[sugarid=' + opts.id + ']';
-			}
-			if (typeof opts.lineNum !== "undefined") {
-				findStr += '[sugarline=' + (opts.lineNum - 1) + ']';
-			}
-			if (this.find(findStr).length > 1) {
-				var values = [];
-				var value = {};
-				var tempValue = '';
-				var lineNum = $.fn.sugarTable.options[this.attr('id')].count;
-
-				var getFieldValue = function (index, el) {
-					if (typeof opts.id !== "undefined" && el.attributes.sugarid.value !== opts.id) {
-						return;
-					} else if (typeof opts.lineNum !== "undefined" && i !== (opts.lineNum - 1)) {
-						return;
-					} else {
-						tempValue = _getValue(el);
-						if (typeof tempValue !== "undefined") {
-							value[el.attributes.sugarid.value] = _getValue(el);
-						}
-					}
-				};
-
-				for (var i = 0; i < lineNum; i++) {
-					value = {};
-					this.find('[sugartype!=line_checkbox][sugarline=' + i + ']').each(getFieldValue.bind());
-					values.push(value);
+			var list =  $.fn.sugarTable.list[this.attr('id')];
+			if (typeof opts.lineNum !== "undefined" && typeof opts.id !== "undefined") {
+				return list[opts.lineNum][opts.id];
+			} else if (typeof opts.lineNum !== "undefined") {
+				return list[opts.lineNum];
+			} else if (typeof opts.id !== "undefined") {
+				var results = [];
+				for (var i = 0; i < list.length; i++) {
+					var result = {};
+					result[opts.id] = list[i][opts.id];
+					results.push(result);
 				}
-				return values;
-			} else if (this.find(findStr).length === 1) {
-				return _getValue(this.find(findStr)[0]);
+				return results;
 			} else {
-				return "";
+				return list;
 			}
 		},
 
@@ -1176,38 +1007,218 @@
 		 */
 		getSelectedRows: function (opts) {
 			opts = opts || {};
-			var findStr = '[sugartype]';
+			var findStr = '[sugartable=' + this.attr('id') + '][sugartype]';
 			if (typeof opts.id !== "undefined") {
 				findStr += '[sugarid=' + opts.id + ']';
 			}
-			if (this.find('[sugartype=line_checkbox]:checked').length >= 1) {
+			if (this.find('[sugartable=' + this.attr('id') + '][sugartype=line_checkbox]:checked').length >= 1) {
 				var values = {};
 				var value = {};
 				var tempValue = '';
 				var $this = this;
 				var getFieldValue = function (index, el) {
-					if (typeof opts.id !== "undefined" && el.attributes.sugarid.value !== opts.id) {
+					if (typeof opts.id !== "undefined" && $(el).attr("sugarid") !== opts.id) {
 						return;
 					} else {
 						tempValue = _getValue(el);
 						if (typeof tempValue !== "undefined") {
-							value[el.attributes.sugarid.value] = tempValue;
+							value[$(el).attr("sugarid")] = tempValue;
 						}
 					}
 				};
 				var getCheckedRows = function (index, el) {
 					value = {};
-					$this.find('[sugartype][sugarline=' + el.attributes.sugarline.value + ']').each(getFieldValue.bind());
-					values[el.attributes.sugarline.value] = value;
+					$this.find('[sugartable=' + $this.attr('id') + '][sugartype][sugarline=' + $(el).attr("sugarline") + ']').each(getFieldValue.bind());
+					values[$(el).attr("sugarline")] = value;
 				};
-				this.find('[sugartype=line_checkbox]:checked').each(getCheckedRows.bind());
+				this.find('[sugartable=' + this.attr('id') + '][sugartype=line_checkbox]:checked').each(getCheckedRows.bind());
 				return values;
 			} else {
 				return "";
 			}
 		},
+
+		/**
+		 * 改变域的值
+		 * @param  {Object} opts 参数
+		 *                       id 	指定域的ID
+		 * 						 lineNum 指定表格行数，从1开始
+		 *                       value	值
+		 * @return {DOM} 表格DOM对象
+		 */
+		setValue: function (opts) {
+			var dom = this.find('[sugartable=' + this.attr('id') + '][sugarline=' + opts.lineNum + '][sugarid=' + opts.id + ']');
+			if (dom.length !== 1) {
+				return false;
+			} else {
+				return _setValue(dom[0], opts.value);
+			}
+		},
 	};
 
+
+	/**
+	 * 内部工具方法
+	 */
+
+	/**
+	 * 数字输入限制（仅内部使用）
+	 * 已知问题：右键菜单粘贴无效
+	 *
+	 * @param textbox	DOM
+	 * @param opts	选项：
+	 * 			decimalLength	小数点后位数，默认为0
+	 * 			allowMinus		允许负数，默认为false
+	 * 			intLength		小数点前位数，默认为5
+	 */
+	function _toNumberInput(textbox, opts) {
+		opts = $.extend(true, {
+			decimalLength: 0,
+			allowMinus: false,
+			intLength: 5
+		}, opts);
+		// called when key is pressed
+		// in keydown, we get the keyCode
+		// in keyup, we get the input.value (including the charactor we've just typed
+		textbox.on("keydown", function _OnNumericInputKeyDown(e) {
+			var key = e.which || e.keyCode; // http://keycode.info/
+
+			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
+				// alphabet
+				key >= 65 && key <= 90 ||
+				// spacebar
+				key == 32) {
+				e.preventDefault();
+				return false;
+			}
+
+			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
+				// numbers
+				// key >= 48 && key <= 57 ||
+				// Numeric keypad
+				// key >= 96 && key <= 105 ||
+
+				// allow: Ctrl+A
+				(e.keyCode == 65 && e.ctrlKey === true) ||
+				// allow: Ctrl+C
+				(key == 67 && e.ctrlKey === true) ||
+				// Allow: Ctrl+X
+				(key == 88 && e.ctrlKey === true) ||
+
+				// allow: home, end, left, right
+				(key >= 35 && key <= 39) ||
+				// Backspace and Tab and Enter
+				key == 8 || key == 9 || key == 13 ||
+				// Del and Ins
+				key == 46 || key == 45) {
+				return true;
+			}
+
+			var v = this.value; // v can be null, in case textbox is number and does not valid
+
+			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
+				// numbers
+				key >= 48 && key <= 57 ||
+				// Numeric keypad
+				key >= 96 && key <= 105) {
+				if (parseInt(v).toString().length > opts.intLength - 1 && v.slice(-1) != '.') {
+					return false;
+				}
+			}
+
+			// if minus, dash
+			if (key == 109 || key == 189) {
+				if (!opts.allowMinus) {
+					return false;
+				}
+				// if already has -, ignore the new one
+				if (v[0] === '-') {
+					// console.log('return, already has - in the beginning');
+					return false;
+				}
+			}
+
+			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
+				// comma, period and numpad.dot
+				key == 190 || key == 188 || key == 110) {
+				if (opts.decimalLength === 0) {
+					return false;
+				}
+				// console.log('already having comma, period, dot', key);
+				if (/[\.]/.test(v)) {
+					// console.log('return, already has . somewhere');
+					return false;
+				}
+			}
+		});
+
+		textbox.on("keyup", function _OnNumericInputKeyUp(e) {
+			var key = e.which || e.keyCode; // http://keycode.info/
+
+			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
+				// alphabet
+				key >= 65 && key <= 90 ||
+				// spacebar
+				key == 32) {
+				e.preventDefault();
+				return false;
+			}
+
+			if (!e.shiftKey && !e.altKey && !e.ctrlKey &&
+				// numbers
+				// key >= 48 && key <= 57 ||
+				// Numeric keypad
+				// key >= 96 && key <= 105 ||
+
+				// allow: Ctrl+A
+				(e.keyCode == 65 && e.ctrlKey === true) ||
+				// allow: Ctrl+C
+				(key == 67 && e.ctrlKey === true) ||
+				// Allow: Ctrl+X
+				(key == 88 && e.ctrlKey === true) ||
+
+				// allow: home, end, left, right
+				(key >= 35 && key <= 39) ||
+				// Backspace and Tab and Enter
+				key == 8 || key == 9 || key == 13 ||
+				// Del and Ins
+				key == 46 || key == 45) {
+				return true;
+			}
+
+			var v = this.value;
+			// if minus, dash
+			if (key == 109 || key == 189) {
+				if (!opts.allowMinus) {
+					return false;
+				}
+				// if already has -, ignore the new one
+				if (v[0] === '-') {
+					// console.log('return, already has - in the beginning');
+					return false;
+				}
+			}
+
+			if (v) {
+				// this replace also remove the -, we add it again if needed
+				if (opts.decimalLength === 0) {
+					v = (v[0] === '-' ? '-' : '') + v.replace(/[^0-9]/g, '');
+				} else {
+					v = (v[0] === '-' ? '-' : '') + v.replace(/[^0-9\.]/g, '');
+					if (v !== '.' &&
+						v.split('.')[1].length > opts.decimalLength) {
+						v = parseFloat(v).toFixed(opts.decimalLength);
+					}
+				}
+
+				// remove all decimalSeparator that have other decimalSeparator following. After this processing, only the last decimalSeparator is kept.
+				// v = v.replace(/\.(?=(.*)\.)+/g, '');
+
+				//console.log(this.value, v);
+				this.value = v; // update value only if we changed it
+			}
+		});
+	}
 
 	/**
 	 * 分页组件

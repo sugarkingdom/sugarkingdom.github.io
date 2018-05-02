@@ -1,146 +1,52 @@
-var tableData1 = [{
-	id: 1,
-	text1: '1_1 文本内容',
-	object1: {
-		key1: "1_2 对象内容"
-	},
-	input1: '1_3 输入框',
-	input2: '1_4 输入框',
-	select1: '1_5 选择框 01',
-	select1_options: '1_5 选择框 01#1_5 选择框 02#1_5 选择框 03',
-	select2: '1_6 选择框 03',
-	select2_options: ['1_6 选择框 01', '1_6 选择框 02', '1_6 选择框 03'],
-}, {
-	id: 2,
-	text1: '2_1 文本内容',
-	object1: {
-		key1: "2_2 对象内容"
-	},
-	input1: '2_3 输入框',
-	input2: '2_4 输入框',
-	select1: '2_5 选择框 02',
-	select1_options: '2_5 选择框 01#2_5 选择框 02#2_5 选择框 03',
-	select2: '2_6 选择框 02',
-	select2_options: ['2_6 选择框 01', '2_6 选择框 02', '2_6 选择框 03'],
-}, {
-	id: 3,
-	text1: '3_1 文本内容',
-	object1: {
-		key1: "3_2 对象内容"
-	},
-	input1: '3_3 输入框',
-	input2: '3_4 输入框',
-	select1: '3_5 选择框 03',
-	select1_options: '3_5 选择框 01#3_5 选择框 02#3_5 选择框 03',
-	select2: '3_6 选择框 01',
-	select2_options: ['3_6 选择框 01', '3_6 选择框 02', '3_6 选择框 03'],
-}];
+$(function () {
+	genTable1();
+	genTable2();
+	genTable3();
+	genTable4();
+});
 
-var tableData2 = [{
-	id: 1,
-	textarea1: '1_1 文本框内容 01\n1_1 文本框内容 02\n1_1 文本内容 03',
-	sex: 1,
-	headImgUrl: "01.png"
-}, {
-	id: 2,
-	textarea1: '2_1 文本框内容 01\n2_1 文本框内容 02\n2_1 文本内容 03',
-	sex: 2,
-	headImgUrl: "02.png"
-}, {
-	id: 3,
-	textarea1: '3_1 文本框内容 01\n3_1 文本框内容 02\n3_1 文本内容 03',
-	sex: 3,
-	headImgUrl: "03.png"
-}];
-
-var tableData3 = [{
-	id: 1,
-	money1: 1000,
-	money1Tag: "1",
-	money2: 3000,
-	money2Tag: "2",
-}, {
-	id: 2,
-	money1: 2000,
-	money1Tag: "1",
-	money2: 2000,
-	money2Tag: "3",
-}, {
-	id: 3,
-	money1: 3000,
-	money1Tag: "2",
-	money2: 1000,
-	money2Tag: "3",
-}, {
-	id: 4,
-	money1: 2000,
-	money1Tag: "2",
-	money2: 2000,
-	money2Tag: "3",
-}];
-
-var tableData4 = [{
-	id: 1,
-	text: "menu1",
-	children: [{
+function genTable1() {
+	var tableData1 = [{
 		id: 1,
-		text: "child1",
-		auths: [{
-			id: 1,
-			text: "auth1"
-		}, {
-			id: 2,
-			text: "auth2"
-		}, {
-			id: 3,
-			text: "auth3"
-		}]
-	}],
-}, {
-	id: 2,
-	text: "menu2",
-	children: [{
+		text1: '1_1 文本内容',
+		object1: {
+			key1: "1_2 对象内容"
+		},
+		input1: '1_3 输入框',
+		input2: '1_4 输入框',
+		select1: '1_5 选择框 01',
+		select1_options: '1_5 选择框 01#1_5 选择框 02#1_5 选择框 03',
+		select2: '1_6 选择框 03',
+		select2_options: ['1_6 选择框 01', '1_6 选择框 02', '1_6 选择框 03'],
+	}, {
 		id: 2,
-		text: "child2",
-		auths: [{
-			id: 4,
-			text: "auth4"
-		}, {
-			id: 5,
-			text: "auth5"
-		}, {
-			id: 6,
-			text: "auth6"
-		}]
+		text1: '2_1 文本内容',
+		object1: {
+			key1: "2_2 对象内容"
+		},
+		input1: '2_3 输入框',
+		input2: '2_4 输入框',
+		select1: '2_5 选择框 02',
+		select1_options: '2_5 选择框 01#2_5 选择框 02#2_5 选择框 03',
+		select2: '2_6 选择框 02',
+		select2_options: ['2_6 选择框 01', '2_6 选择框 02', '2_6 选择框 03'],
 	}, {
 		id: 3,
-		text: "child3",
-		auths: [{
-			id: 7,
-			text: "auth7"
-		}, {
-			id: 8,
-			text: "auth8"
-		}, {
-			id: 9,
-			text: "auth9"
-		}]
-	}],
-}];
+		text1: '3_1 文本内容',
+		object1: {
+			key1: "3_2 对象内容"
+		},
+		input1: '3_3 输入框',
+		input2: '3_4 输入框',
+		select1: '3_5 选择框 03',
+		select1_options: '3_5 选择框 01#3_5 选择框 02#3_5 选择框 03',
+		select2: '3_6 选择框 01',
+		select2_options: ['3_6 选择框 01', '3_6 选择框 02', '3_6 选择框 03'],
+	}];
 
-var page1 = "1";
-var size1 = '10';
+	var page1 = "1";
+	var size1 = '10';
 
-var page2 = "1";
-var size2 = '10';
-
-var page3 = "1";
-var size3 = '10';
-
-var page4 = "1";
-var size4 = '10';
-
-$(function () {
 	$("#listData1").sugarTable({
 		list: tableData1,
 		count: tableData1.length,
@@ -192,18 +98,52 @@ $(function () {
 			optionId: 'select2_options',
 		}],
 		tableGenHandler: function () {
+			$("#listData1").sugarTable("setValue", {
+				id: "input2",
+				lineNum: 2,
+				value: "3_4 输入框 alter"
+			});
 			// $('[sugartype=select]').selectpicker({
 			// 	container: 'body'
 			// });
-		}
+		},
+		checkHandler: function (lineNum) {
+			$("#listData1").sugarTable("setValue", {
+				id: "input2",
+				lineNum: 2,
+				value: lineNum
+			});
+		},
 	});
 
 	console.info($("#listData1").sugarTable("getValues"));
 
 	console.info($("#listData1").sugarTable("getValue", {
 		id: "select2",
-		lineNum: 3
+		lineNum: 2
 	}));
+}
+
+function genTable2() {
+	var tableData2 = [{
+		id: 1,
+		textarea1: '1_1 文本框内容 01\n1_1 文本框内容 02\n1_1 文本内容 03',
+		sex: 1,
+		headImgUrl: "01.png"
+	}, {
+		id: 2,
+		textarea1: '2_1 文本框内容 01\n2_1 文本框内容 02\n2_1 文本内容 03',
+		sex: 2,
+		headImgUrl: "02.png"
+	}, {
+		id: 3,
+		textarea1: '3_1 文本框内容 01\n3_1 文本框内容 02\n3_1 文本内容 03',
+		sex: 3,
+		headImgUrl: "03.png"
+	}];
+
+	var page2 = "1";
+	var size2 = '10';
 
 	$("#listData2").sugarTable({
 		list: tableData2,
@@ -245,14 +185,43 @@ $(function () {
 		}],
 	});
 
-	console.info($("#listData1").sugarTable("getValues"));
-
 	console.info($("#listData2").sugarTable("getValues"));
 
 	console.info($("#listData2").sugarTable("getValue", {
 		id: "textarea1",
-		lineNum: 3
+		lineNum: 2
 	}));
+}
+
+function genTable3() {
+	var tableData3 = [{
+		id: 1,
+		money1: 1000,
+		money1Tag: "1",
+		money2: 3000,
+		money2Tag: "2",
+	}, {
+		id: 2,
+		money1: 2000,
+		money1Tag: "1",
+		money2: 2000,
+		money2Tag: "3",
+	}, {
+		id: 3,
+		money1: 3000,
+		money1Tag: "2",
+		money2: 1000,
+		money2Tag: "3",
+	}, {
+		id: 4,
+		money1: 2000,
+		money1Tag: "2",
+		money2: 2000,
+		money2Tag: "3",
+	}];
+
+	var page3 = "1";
+	var size3 = '10';
 
 	$("#listData3").sugarTable({
 		list: tableData3,
@@ -304,6 +273,62 @@ $(function () {
 		}],
 	});
 
+	console.info($("#listData3").sugarTable("getValues"));
+}
+
+function genTable4() {
+	var tableData4 = [{
+		id: 1,
+		text: "menu1",
+		children: [{
+			id: 1,
+			text: "child1",
+			auths: [{
+				id: 1,
+				text: "auth1"
+			}, {
+				id: 2,
+				text: "auth2"
+			}, {
+				id: 3,
+				text: "auth3"
+			}]
+		}],
+	}, {
+		id: 2,
+		text: "menu2",
+		children: [{
+			id: 2,
+			text: "child2",
+			auths: [{
+				id: 4,
+				text: "auth4"
+			}, {
+				id: 5,
+				text: "auth5"
+			}, {
+				id: 6,
+				text: "auth6"
+			}]
+		}, {
+			id: 3,
+			text: "child3",
+			auths: [{
+				id: 7,
+				text: "auth7"
+			}, {
+				id: 8,
+				text: "auth8"
+			}, {
+				id: 9,
+				text: "auth9"
+			}]
+		}],
+	}];
+
+	var page4 = "1";
+	var size4 = '10';
+
 	$("#listData4").sugarTable({
 		list: tableData4,
 		count: tableData4.length,
@@ -313,10 +338,10 @@ $(function () {
 		noRowClick: true,
 		multiCheck: true,
 		fields: [{
-		// 	id: "id",
-		// 	type: "text",
-		// 	name: "ID"
-		// }, {
+			// 	id: "id",
+			// 	type: "text",
+			// 	name: "ID"
+			// }, {
 			id: "text",
 			type: "text",
 			name: "menu",
@@ -326,10 +351,10 @@ $(function () {
 			name: "children",
 			multiCheck: true,
 			fields: [{
-			// 	id: "id",
-			// 	type: "text",
-			// 	name: "ID"
-			// }, {
+				// 	id: "id",
+				// 	type: "text",
+				// 	name: "ID"
+				// }, {
 				id: "text",
 				type: "text",
 				name: "children",
@@ -339,15 +364,19 @@ $(function () {
 				name: "auths",
 				multiCheck: true,
 				fields: [{
-				// 	id: "id",
-				// 	type: "text",
-				// 	name: "ID"
-				// }, {
+					// 	id: "id",
+					// 	type: "text",
+					// 	name: "ID"
+					// }, {
 					id: "text",
 					type: "text",
 					name: "auth",
 				}],
 			}],
 		}],
+		checkHandler: function (lineNum) {
+			console.info($("#listData4").sugarTable("getSelectedRows"));
+		}
 	});
-});
+	console.info($("#listData4").sugarTable("getValues"));
+}
