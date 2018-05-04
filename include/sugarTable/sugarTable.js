@@ -33,6 +33,7 @@
 			fields: [], // 列表列名称
 			seriText: "序号", // 序号显示文本
 			tableClass: "table table-bordered table-hover", // 列表样式
+			parentTable: "", // 上级表格
 			noHeader: false, // 是否需要表头
 			noSeri: false, // 是否需要序号列
 			noPaging: false, // 是否需要分页
@@ -161,6 +162,8 @@
 				return $(el).val();
 			case "modal": //// TODO
 				return '';
+			case "table": //// TODO
+				return $(el).sugarTable("getValues");
 			default:
 				return undefined;
 		}
@@ -172,6 +175,7 @@
 	 * @param {String} value 
 	 */
 	function _setValue(el, value) {
+		_updateValue(el, value);
 		switch ($(el).attr("sugartype")) {
 			case 'text':
 				$(el).text(value);
@@ -197,6 +201,14 @@
 		return true;
 	}
 
+	function _updateValue(el, value) {
+		var tableId = $(el).attr("sugartable");
+		var lineNum = $(el).attr("sugarline");
+		var eleId = $(el).attr("sugarid");
+		$.fn.sugarTable.list[tableId][lineNum][eleId] = value;
+		console.info("table " + tableId + " line " + lineNum + " id " + eleId + " changed!");
+	}
+
 	/**
 	 * 点击checkbox区域时，对checkbox反向处理，以便在rowClick/tdClick中统一操作
 	 */
@@ -208,11 +220,12 @@
 	/**
 	 * 行勾选
 	 */
-	function _rowCheckHandler(id, lineNum, opts) {
-		var checkbox = $("input[sugartable=" + id + "][sugarline=" + lineNum + "][sugartype=line_checkbox]");
+	function _rowCheckHandler(id, opts) {
+		var checkbox = $("input[sugartable=" + id + "][sugarline=" + opts.lineNum + "][sugartype=line_checkbox]");
 		var checkState = checkbox.prop("checked");
 
 		// 如果为单选模式，则清空所有checkbox与所有行样式
+		opts.multiCheck = opts.multiCheck || false;
 		if (!opts.multiCheck) {
 			$("input[sugartable=" + id + "][sugartype=line_checkbox]").prop("checked", false);
 			$("tr[sugartable=" + id + "]").removeClass();
@@ -220,7 +233,8 @@
 
 		if (!checkState) {
 			checkbox.prop("checked", true);
-			$("tr[sugartable=" + id + "][sugarline=" + lineNum + "]").addClass("info");
+			$("tr[sugartable=" + id + "][sugarline=" + opts.lineNum + "]").addClass("info");
+			opts.checkHandler = opts.checkHandler || function () {};
 			opts.checkHandler.call(this, checkbox.attr("sugarline"));
 		} else {
 
@@ -231,12 +245,13 @@
 				href: '#'
 			});
 
+			opts.uncheckHandler = opts.uncheckHandler || function () {};
 			opts.uncheckHandler.call(this, checkbox.attr("sugarline"));
 
 			// 如果为多选模式，则清空当前 checkbox 与当前行样式
 			if (opts.multiCheck) {
 				checkbox.prop("checked", false);
-				$("tr[sugartable=" + id + "][sugarline=" + lineNum + "]").removeClass();
+				$("tr[sugartable=" + id + "][sugarline=" + opts.lineNum + "]").removeClass();
 			}
 		}
 	}
@@ -311,6 +326,22 @@
 					});
 				}
 
+				// 处理change事件，传递当前行数与change后值
+				_temp.input.on('change', function (event) {
+					event.preventDefault();
+					var data = {
+						lineNum: $(this).attr("sugarline"),
+						value: $(this).val(),
+					};
+
+					// 更新全局列表数据
+					_updateValue(this, $(this).val());
+
+					if (typeof _temp.fieldData.changeHandler !== 'undefined') {
+						_temp.fieldData.changeHandler.call(this, data);
+					}
+				});
+
 				// 赋值逻辑与文本域相同
 				_temp.input.val(_genField('text', opts));
 				return _temp.input;
@@ -353,16 +384,20 @@
 				_temp.select.val(_temp.listData[_temp.fieldData.id] || "");
 
 				// 处理change事件，传递当前行数与change后值
-				if (typeof _temp.fieldData.changeHandler !== 'undefined') {
-					_temp.select.on('change', function (event) {
-						event.preventDefault();
-						this.data = {
-							lineNum: $(this).attr("sugarline"),
-							value: $(this).val(),
-						};
-						_temp.fieldData.changeHandler.call(this, this.data);
-					});
-				}
+				_temp.select.on('change', function (event) {
+					event.preventDefault();
+					var data = {
+						lineNum: $(this).attr("sugarline"),
+						value: $(this).val(),
+					};
+
+					// 更新全局列表数据
+					_updateValue(this, $(this).val());
+
+					if (typeof _temp.fieldData.changeHandler !== 'undefined') {
+						_temp.fieldData.changeHandler.call(this, data);
+					}
+				});
 				return _temp.select;
 
 			case 'textarea': // 文本框
@@ -375,6 +410,22 @@
 					sugarid: _temp.fieldData.id,
 					sugartype: 'textarea',
 					readonly: _temp.fieldData.readonly || false,
+				});
+
+				// 处理change事件，传递当前行数与change后值
+				_temp.textarea.on('change', function (event) {
+					event.preventDefault();
+					var data = {
+						lineNum: $(this).attr("sugarline"),
+						value: $(this).val(),
+					};
+
+					// 更新全局列表数据
+					_updateValue(this, $(this).val());
+
+					if (typeof _temp.fieldData.changeHandler !== 'undefined') {
+						_temp.fieldData.changeHandler.call(this, data);
+					}
 				});
 
 				// 赋值逻辑与文本域相同
@@ -461,13 +512,18 @@
 				_temp.foldIcon = $("<i>").addClass("fa fa-fm fa-minus-square-o");
 
 				_temp.opts = $.extend({}, _temp.fieldData, {
+					parentTable: _temp.id,
 					list: _temp.listData[_temp.fieldData.id],
 					noHeader: true,
 					noRowClick: true,
 				});
 
 				_temp.table = $("<table>").attr({
-					id: _temp.id + "_" + _temp.fieldData.id + "_table_" + _temp.index
+					id: _temp.id + "_" + _temp.fieldData.id + "_table_" + _temp.index,
+					sugartable: _temp.id,
+					sugarline: _temp.index,
+					sugarid: _temp.fieldData.id,
+					sugartype: 'table',
 				}).sugarTable(_temp.opts);
 
 				_temp.foldIcon.on("click", function (e) {
@@ -550,12 +606,6 @@
 			// 如果需要本地分页，处理列表数据
 			if (_table.o.isLocal) {
 				_table.o.list = _table.o.list.slice((_table.o.page - 1) * _table.o.pageSize, _table.o.page * _table.o.pageSize);
-			}
-
-			// 清除原始行号
-			for (_table.listIndex = 0; _table.listIndex < _table.o.list.length; _table.listIndex++) {
-				_table.listData = _table.o.list[_table.listIndex];
-				delete _table.listData.sugar_seri;
 			}
 
 			// 如果需要统计或总计，处理列表数据
@@ -676,9 +726,11 @@
 				_table.o.list = _table.afterSumList;
 			}
 
-			// 保存列表数据到全局变量
+			// 保存参数到全局变量
 			$.fn.sugarTable.list = $.fn.sugarTable.list || [];
 			$.fn.sugarTable.list[_table.id] = _table.o.list;
+			$.fn.sugarTable.options = $.fn.sugarTable.options || {};
+			$.fn.sugarTable.options[_table.id] = options;
 
 			// 生成列表数据
 			_table.trArr = [];
@@ -716,11 +768,12 @@
 					_table.tdCheckboxArr.push(_list.tdCheckbox);
 				}
 
-				// 构造序号列（如果存在统计生成的序列，则使用）
+				// 构造序号列并清除列表数据内行号（如果存在统计生成的序列，则使用）
 				if (!_table.o.noSeri) {
 					_table.listData.sugar_seri = _table.listData.sugar_seri || ((_table.o.page - 1) * _table.o.pageSize + parseInt(_table.listIndex) + 1);
 					_list.tdSeri = $("<td>").addClass('seri').html(_table.listData.sugar_seri);
 					_list.tr.append(_list.tdSeri);
+					delete _table.listData.sugar_seri;
 				}
 
 				// 生成单行数据
@@ -831,6 +884,7 @@
 							_list.td = $("<td>").attr({
 								// id: _table.id + '_' + _table.listIndex + '_table_' + _table.fieldData.id,
 							}).addClass('sugar-table-table');
+
 							_list.td.append(_genField('table', {
 								id: _table.id,
 								index: _table.listIndex,
@@ -926,7 +980,8 @@
 					_checkboxHandler(_table.id, $(e.currentTarget).attr("sugarline"));
 				};
 				var rowCheckHandler = function (e) {
-					_rowCheckHandler(_table.id, $(e.currentTarget).attr("sugarline"), {
+					_rowCheckHandler(_table.id, {
+						lineNum: $(e.currentTarget).attr("sugarline"),
 						multiCheck: _table.o.multiCheck,
 						checkHandler: _table.o.checkHandler,
 						uncheckHandler: _table.o.uncheckHandler
@@ -936,7 +991,7 @@
 					_table.checkbox = _table.checkboxArr[_table.checkIndex];
 					_table.checkbox.on("click", checkboxHandler.bind(this));
 				}
-				
+
 				if (!_table.o.noRowClick) {
 					for (_table.checkIndex = 0; _table.checkIndex < _table.trArr.length; _table.checkIndex++) {
 						_table.tr = _table.trArr[_table.checkIndex];
@@ -953,10 +1008,6 @@
 			// 生成列表后的额外处理
 			_table.o.tableGenHandler.call(this);
 
-			// 保存参数到全局变量
-			$.fn.sugarTable.options = $.fn.sugarTable.options || {};
-			$.fn.sugarTable.options[_table.id] = options;
-
 			return this;
 		},
 
@@ -966,7 +1017,7 @@
 		 *         [0:{name1:value1_1,name2:value1_2},1:{name1:value2_1,name2:value2_2}]
 		 */
 		getValues: function () {
-			var list =  $.fn.sugarTable.list[this.attr('id')];
+			var list = $.fn.sugarTable.list[this.attr('id')];
 			return list;
 		},
 
@@ -980,7 +1031,8 @@
 		 * @return {String} 如果只有一个匹配域，则返回该域的值
 		 */
 		getValue: function (opts) {
-			var list =  $.fn.sugarTable.list[this.attr('id')];
+			opts = opts || {};
+			var list = $.fn.sugarTable.list[this.attr('id')];
 			if (typeof opts.lineNum !== "undefined" && typeof opts.id !== "undefined") {
 				return list[opts.lineNum][opts.id];
 			} else if (typeof opts.lineNum !== "undefined") {
@@ -1007,35 +1059,23 @@
 		 */
 		getSelectedRows: function (opts) {
 			opts = opts || {};
-			var findStr = '[sugartable=' + this.attr('id') + '][sugartype]';
-			if (typeof opts.id !== "undefined") {
-				findStr += '[sugarid=' + opts.id + ']';
+			var list = $.fn.sugarTable.list[this.attr("id")];
+			var selectedCheckboxes = $("[sugartable=" + this.attr("id") + "][sugartype=line_checkbox]:checked");
+			var selectedRowArr = [];
+			selectedCheckboxes.each(function (index, el) {
+				selectedRowArr.push($(el).attr("sugarline"));
+			});
+			var results = [];
+			for (var i = 0; i < selectedRowArr.length; i++) {
+				results.push(list[selectedRowArr[i]]);
 			}
-			if (this.find('[sugartable=' + this.attr('id') + '][sugartype=line_checkbox]:checked').length >= 1) {
-				var values = {};
-				var value = {};
-				var tempValue = '';
-				var $this = this;
-				var getFieldValue = function (index, el) {
-					if (typeof opts.id !== "undefined" && $(el).attr("sugarid") !== opts.id) {
-						return;
-					} else {
-						tempValue = _getValue(el);
-						if (typeof tempValue !== "undefined") {
-							value[$(el).attr("sugarid")] = tempValue;
-						}
-					}
-				};
-				var getCheckedRows = function (index, el) {
-					value = {};
-					$this.find('[sugartable=' + $this.attr('id') + '][sugartype][sugarline=' + $(el).attr("sugarline") + ']').each(getFieldValue.bind());
-					values[$(el).attr("sugarline")] = value;
-				};
-				this.find('[sugartable=' + this.attr('id') + '][sugartype=line_checkbox]:checked').each(getCheckedRows.bind());
-				return values;
-			} else {
-				return "";
-			}
+			return results;
+		},
+
+		selectRow: function (opts) {
+			opts = opts || {};
+			_rowCheckHandler(this.attr("id"), opts);
+			return this;
 		},
 
 		/**
@@ -1047,11 +1087,13 @@
 		 * @return {DOM} 表格DOM对象
 		 */
 		setValue: function (opts) {
-			var dom = this.find('[sugartable=' + this.attr('id') + '][sugarline=' + opts.lineNum + '][sugarid=' + opts.id + ']');
+			opts = opts || {};
+			var dom = $('[sugartable=' + this.attr('id') + '][sugarline=' + opts.lineNum + '][sugarid=' + opts.id + ']');
 			if (dom.length !== 1) {
 				return false;
 			} else {
-				return _setValue(dom[0], opts.value);
+				_setValue(dom[0], opts.value);
+				return this;
 			}
 		},
 	};

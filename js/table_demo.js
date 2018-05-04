@@ -374,6 +374,12 @@ function genTable4() {
 				}],
 			}],
 		}],
+		tableGenHandler: function () {	
+			$("#listData4").sugarTable("selectRow", {
+				lineNum: 1,
+				multiCheck: true
+			});
+		},
 		checkHandler: function (lineNum) {
 			console.info($("#listData4").sugarTable("getSelectedRows"));
 		}
