@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="适配国服内容的FF14钓鱼时钟" />
+    <meta name="author" content="Carbuncle Plushy (Balmung)" />
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <title>FFX|V Fish Tracker App</title>
+
+    <link rel="stylesheet" href="css/semantic.css" />
+
+    <script src="js/lib/jquery.min.js"></script>
+    <script src="js/lib/underscore-min.js"></script>
+    <script src="js/lib/doT.min.js"></script>
+    <script src="js/lib/moment.js"></script>
+    <script src="js/lib/zh-cn.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>-->
+    <script src="js/lib/twix.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.28.5/date_fns.min.js"></script>-->
+    <script src="js/lib/date_fns.min.js"></script>
+    <script src="js/lib/dateFns.js"></script>
+    <script src="js/lib/semantic.min.js"></script>
+    <script src="js/lib/rxjs.umd.min.js"></script>
+    <script src="js/lib/clipboard.min.js"></script>
+    <link rel="stylesheet" href="public/images/sprite.css?5.1_20191029_1847" />
+    <link rel="stylesheet" href="css/semantic_ui_overrides.css" />
+    <link rel="stylesheet" href="css/overlay.css" />
+    <link rel="stylesheet" href="css/dark_overlay.css" />
+
+    <!-- Localization Support script -->
+    <script type="text/javascript" src="js/app/localization.js"></script>
+
+    <!-- Include the data -->
+    <script
+      type="text/javascript"
+      src="js/app/data.js?5.1_20191109_1142"
+    ></script>
+
+    <!--
+      - Scripts
+      - * NOTE: The order is somewhat important. Care must be taken to avoid
+      -   circular dependencies.  Where it cannot be avoided, defer references
+      -   to other classes until an initialization method can be called safely.
+      -->
+    <script type="text/javascript" src="js/app/time.js"></script>
+    <script type="text/javascript" src="js/app/fish.js"></script>
+    <script type="text/javascript" src="js/app/weather.js"></script>
+    <script type="text/javascript" src="js/app/fishwatcher.js"></script>
+    <script type="text/javascript" src="js/app/sorters.js"></script>
+
+    <!--
+      - SUPER IMPORTANT!!!!!!
+      - The remaining scripts are for view and layout logic. Due to document load
+      - order, THEY MUST COME AFTER THE TEMPLATES ARE DEFINED!!!
+      - Loading these scripts before will prevent templates from loading
+      - correctly!
+    -->
+
+    <!--
+      - Site Templates
+      - All of the HTML widgets are built using doT and SemanticUI. In order to
+      - prevent excessive load requests, the templates are stored in individual
+      - <script> elements. This is where the bulk of the HTML lives.
+      -->
+    <script id="fish-table-template" type="text/html;x-dot-template">
+      <table id="fishes" class="ui selectable striped very basic very compact unstackable table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>种类</th>
+            <th>状态</th>
+            <th>位置</th>
+            <th>条件</th>
+            <th>钓饵</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </script>
+
+    <script id="fish-template" type="text/html;x-dot-template">
+      <tr class="fish-entry{{?it.isCatchable}} fish-active{{?}}{{?it.isCaught || false}} fish-caught{{?}}{{?it.isPinned || false}} fish-pinned{{?}}{{?it.isUpSoon}} fish-bin-15{{?}}" data-id="{{=it.id}}">
+        <!-- Buttons to marking fish as caught or pinned, etc -->
+        <td class="collapsing">
+          <div class="ui middle aligned vertical mini very compact icon buttons">
+            <div class="ui button fishCaught {{?it.isCaught || false}}green{{?}}">
+              <i class="checkmark icon"></i>
+            </div>
+            <div class="ui button fishPinned {{?it.isPinned || false}}red{{?}}">
+              <i class="pin icon"></i>
+            </div>
+          </div>
+          <div class="ui middle aligned fish-icon sprite-icon sprite-icon-fish_n_tackle-{{=it.data.icon}}"></div>
+        </td>
+        <td>
+          <div class="ui middle aligned" style="display: inline-block;">
+            <span><a class="fish-name" target="_blank" href="https://cn.ff14angler.com/index.php?search={{=it.data.name}}">{{=it.data.name}}</a></span><br/>
+            <div class="ui tiny circular label">{{=it.data.patch}}</div>
+            <!-- check if fish can be put into the aquarium -->
+            {{?it.data.aquarium !== null}}
+              <div class="ui middle aligned sprite-icon sprite-icon-aquarium"
+                   data-tooltip="等级{{=it.data.aquarium.size}}{{?it.data.aquarium.water == "saltwater"}}海水{{?}}{{?it.data.aquarium.water == "freshwater"}}淡水{{?}}水族箱" data-position="right center" data-variation="mini"></div>
+            {{?}}
+            {{?it.data.folklore !== null}}
+              <div class="ui middle aligned sprite-icon sprite-icon-folklore"
+                   data-tooltip="{{=__p(DATA.FOLKLORE[it.data.folklore],'name')}}" data-position="right center" data-variation="mini"></div>
+            {{?}}
+            {{?it.data.collectable === true}}
+              <div class="ui middle aligned sprite-icon sprite-icon-collectable"
+                   data-tooltip="收藏品" data-position="right center" data-variation="mini"></div>
+            {{?}}
+          </div>
+        </td>
+        <!-- Availability -->
+        <td>
+          {{?it.data.alwaysAvailable && it.data.dataMissing !== false}}
+            {{?it.data.dataMissing.timeRestricted}}
+              <i class="question circle outline icon"></i> 未知
+            {{??}}
+              常驻
+            {{?}}
+          {{??it.data.alwaysAvailable && it.data.dataMissing === false}}
+            常驻
+          {{??!it.data.alwaysAvailable}}
+            {{?it.data.dataMissing !== false}}
+              <i class="exclamation triangle icon" title="Unknown/Incomplete"></i>
+            {{?}}
+            <span class="fish-availability-current" data-val="{{=it.availability.current.date}}" data-tooltip="{{var d = it.availability.current.date; if (d) { out += moment(d).calendar(); } }}">
+              {{=it.availability.current.duration}}
+            </span><br/>
+            <span style="font-size: smaller">
+              <i class="upcoming-windows-button calendar icon"></i>
+              <span style="white-space: nowrap !important">
+                <b>窗口期:</b>&nbsp;<span class="fish-availability-uptime">{{=(it.uptime * 100.0).toFixed(1)}}</span>%
+              </span>
+              <span style="white-space: nowrap !important">
+                <b>下一次:</b>&nbsp;<span class="fish-availability-upcoming" data-val="{{=it.availability.upcoming.date}}" data-prevclose="{{=it.availability.upcoming.prevdate}}" data-tooltip="{{var d = it.availability.upcoming.date; if (d) { out += moment(d).calendar(); } }}">{{=it.availability.upcoming.downtime}}</span>
+              </span>
+            </span>
+            <div class="ui popup upcoming-windows"></div>
+          {{?}}
+        </td>
+        <!-- Location -->
+        <td>
+          <a href="http://garlandtools.org/db/#{{?it.data.location.spearfishing}}node{{??}}fishing{{?}}/{{=it.data.location.id}}"
+             target="cp_gt" class="location-name">{{=it.data.location.name}}</a><br/>
+          <span style="font-size: smaller" class="zone-name">{{=it.data.location.zoneName}}</span>
+        </td>
+        <!-- Conditions -->
+        <td>
+          <!-- Weather -->
+          {{?it.data.dataMissing !== false}}
+            {{?it.data.dataMissing.weatherRestricted}}
+              <i class="cloud icon"></i> Weather Restricted
+              {{?it.data.conditions.weatherSet.length > 0}}
+                <i class="exclamation triangle icon" title="Unknown/Incomplete"></i>
+              {{?}}
+            {{?}}
+          {{?}}
+          {{?it.data.conditions.previousWeatherSet.length > 0}}
+            {{~it.data.conditions.previousWeatherSet :weather:windex}}
+              <div class="ui middle aligned weather-icon sprite-icon sprite-icon-weather-{{=weather.icon}}"
+                  title="{{=__p(weather,'name')}}"
+                  data-prevWeatherIdx="{{=windex}}"></div>
+            {{~}}
+            <i class="arrow right icon"></i>
+          {{?}}
+          {{~it.data.conditions.weatherSet :weather:windex}}
+            <div class="ui middle aligned weather-icon sprite-icon sprite-icon-weather-{{=weather.icon}}"
+                title="{{=__p(weather,'name')}}"
+                data-currWeatherIdx="{{=windex}}"></div>
+          {{~}}
+          <br/>
+          {{?it.data.dataMissing !== false}}
+            {{?it.data.dataMissing.timeRestricted}}
+              <i class="clock icon"></i> Time Restricted
+              {{? it.data.startHour !== 0 || it.data.endHour !== 24 }}
+                <i class="exclamation triangle icon" title="Unknown/Incomplete"></i>
+                {{=it.data.startHour + ' - ' + it.data.endHour}}
+              {{?}}
+            {{?}}
+          {{??}}
+            <i class="wait icon"></i>&nbsp;
+            {{? it.data.startHour === 0 && it.data.endHour === 24}}
+              全天
+            {{??}}
+              {{=it.data.startHour.toString().replace(".5", ":30") + ' - ' + it.data.endHour.toString().replace(".5", ":30")}}
+            {{?}}
+          {{?}}
+        </td>
+        <!-- Requirements and Bait -->
+        <td>
+          {{?it.data.dataMissing !== false}}
+            <i class="question circle outline icon" title="Unknown/Incomplete"></i>
+          {{?}}
+          <!-- Put Fishers intuition if fish has at least 1 predetor -->
+          {{?it.data.bait.hasPredators}}
+            <div class="ui middle aligned status-icon sprite-icon sprite-icon-status-intuition" title="捕鱼人之识"></div>
+          {{?}}
+          <!-- Put fishEyes if fishEyes is not false and if true enter fishEyesDuration()  -->
+          {{?it.data.fishEyes !== false}}
+            <div class="ui middle aligned status-icon sprite-icon sprite-icon-status-fish_eyes{{?it.data.fishEyes !== true}} has-duration{{?}}" title="鱼眼">
+              {{?it.data.fishEyes !== true}}
+                <span>{{=it.fishEyesDuration}}</span>
+              {{?}}
+            </div>
+          {{?}}
+          {{?it.data.snagging}}
+            <div class="ui middle aligned status-icon sprite-icon sprite-icon-status-snagging" title="钓组"></div>
+          {{?}}
+          {{?it.data.gig}}
+            <div class="ui middle aligned bait-icon sprite-icon sprite-icon-action-{{=it.data.gig.toLowerCase()}}_gig" title="{{={'Small': '小型', 'Normal': '中型', 'Large': '大型'}[it.data.gig]}}渔叉尖"></div>
+          {{?}}
+          <span class="bait-span">
+            {{~it.bait :item:idx}}
+              {{?idx == 0}}
+                <a href="https://ff14.huijiwiki.com/wiki/物品:{{=item.name}}" target="cp_gt">
+              {{??}}
+                <div class="bait-badge-container">
+                  {{?item.hookset}}
+                    <div class="ui middle aligned bait-icon hookset-modifier-icon sprite-icon sprite-icon-action-{{=item.hookset.toLowerCase()}}_hookset"
+                        title="{{={'Powerful': '强力', 'Precision': '精准'}[item.hookset]}}提钩"></div>
+                  {{?}}
+                  {{?item.tug}}
+                    <div class="tug-indicator {{=item.tug}}-tug-indicator" title="{{={'light': '轻', 'medium': '中', 'heavy': '鱼王'}[item.tug]}}杆">
+                      {{={'light': '!', 'medium': '!!', 'heavy': '!!!'}[item.tug]}}
+                    </div>
+                  {{?}}
+                </div>
+                </span> <!-- bait-span -->
+                <i class="arrow right icon"></i>
+                <span class="bait-span">
+              {{?}}
+              <div class="ui middle aligned bait-icon sprite-icon sprite-icon-fish_n_tackle-{{=item.icon}}" title="{{=item.name}}" data-baitIdx="{{=idx}}"></div>
+              {{?idx == 0}}
+                </a>
+              {{?}}
+            {{~}}
+            <div class="bait-badge-container">
+              {{?it.data.hookset}}
+            <div class="ui middle aligned bait-icon hookset-modifier-icon sprite-icon sprite-icon-action-{{=it.data.hookset.toLowerCase()}}_hookset" title="{{={'Powerful': '强力', 'Precision': '精准'}[it.data.hookset]}}提钩"></div>
+              {{?}}
+              {{?it.data.tug}}
+                <div class="tug-indicator {{=it.data.tug}}-tug-indicator" title="{{={'light': '轻', 'medium': '中', 'heavy': '鱼王'}[it.data.tug]}}杆">
+                  {{={'light': '!', 'medium': '!!', 'heavy': '!!!'}[it.data.tug]}}
+                </div>
+              {{?}}
+            </div>
+          </span> <!-- bait span -->
+        </td>
+      </tr>
+    </script>
+
+    <script id="fish-intuition-template" type="text/html;x-dot-template">
+         <tr class="fish-intuition-row fish-entry{{?it.isCatchable}} fish-active{{?}}" data-id="{{=it.id}}" data-intuitionFor="{{=it.intuitionFor.id}}">
+           <td class="collapsing right aligned">
+             <div class="intuition-count">{{=it.intuitionCount}}</div>
+             <div class="ui middle aligned fish-icon sprite-icon sprite-icon-fish_n_tackle-{{=it.data.icon}}"></div>
+           </td>
+           <td>
+             <div class="ui middle aligned" style="display: inline-block;"><a class="fish-name" target="_blank" href="https://ff14angler.com/index.php?lang=cn&search={{=it.data.name}}">{{=it.data.name}}</a></div>
+           </td>
+           <!-- Availability -->
+           <td>
+             {{?it.data.alwaysAvailable && it.data.dataMissing !== false}}
+               {{?it.data.dataMissing.timeRestricted}}
+                 <i class="question circle outline icon"></i> Unknown
+               {{??}}
+                 常驻
+               {{?}}
+             {{??it.data.alwaysAvailable && it.data.dataMissing === false}}
+               常驻
+             {{??!it.data.alwaysAvailable}}
+               {{?it.data.dataMissing !== false}}
+                 <i class="exclamation triangle icon" title="Unknown/Incomplete"></i>
+               {{?}}
+               <span class="fish-availability-current" data-val="{{=it.availability.current.date}}" data-tooltip="{{var d = it.availability.current.date; if (d) { out += moment(d).calendar(); } }}">
+                 {{=it.availability.current.duration}}
+               </span>
+             {{?}}
+           </td>
+           <td>
+             {{?!it.data.alwaysAvailable}}
+               <span style="font-size: smaller">
+                 <span style="white-space: nowrap !important">
+                   <b>窗口期:</b>&nbsp;<span class="fish-availability-uptime">{{=(it.uptime * 100.0).toFixed(1)}}</span>%
+                 </span>
+                 <span style="white-space: nowrap !important">
+                   <b>下一次:</b>&nbsp;<span class="fish-availability-upcoming" data-val="{{=it.availability.upcoming.date}}" data-prevclose="{{=it.availability.upcoming.prevdate}}" data-tooltip="{{var d = it.availability.upcoming.date; if (d) { out += moment(d).calendar(); } }}">{{=it.availability.upcoming.downtime}}</span>
+                 </span>
+               </span>
+             {{?}}
+           </td>
+           <td>
+             {{?it.data.dataMissing !== false}}
+               {{?it.data.dataMissing.weatherRestricted}}
+                 <i class="cloud icon"></i> Weather Restricted
+                 {{?it.data.conditions.weatherSet.length > 0}}
+                   <i class="exclamation triangle icon" title="Unknown/Incomplete"></i>
+                 {{?}}
+               {{?}}
+             {{?}}
+             {{?it.data.conditions.previousWeatherSet.length > 0}}
+               {{~it.data.conditions.previousWeatherSet :weather:windex}}
+                 <div class="ui middle aligned weather-icon sprite-icon sprite-icon-weather-{{=weather.icon}}"
+                     title="{{=__p(weather,'name')}}"
+                     data-prevWeatherIdx="{{=windex}}"></div>
+               {{~}}
+               <i class="arrow right icon"></i>
+             {{?}}
+             {{~it.data.conditions.weatherSet :weather:windex}}
+               <div class="ui middle aligned weather-icon sprite-icon sprite-icon-weather-{{=weather.icon}}"
+                   title="{{=__p(weather,'name')}}"
+                   data-currWeatherIdx="{{=windex}}"></div>
+             {{~}}
+             <br/>
+             {{?it.data.dataMissing !== false}}
+               {{?it.data.dataMissing.timeRestricted}}
+                 <i class="clock icon"></i> Time Restricted
+                 {{? it.data.startHour !== 0 || it.data.endHour !== 24 }}
+                   <i class="exclamation triangle icon" title="Unknown/Incomplete"></i>
+                   {{=it.data.startHour + ' - ' + it.data.endHour}}
+                 {{?}}
+               {{?}}
+             {{??}}
+               <i class="wait icon"></i>&nbsp;
+               {{? it.data.startHour === 0 && it.data.endHour === 24}}
+                 全天
+               {{??}}
+                 {{=it.data.startHour + ' - ' + it.data.endHour}}
+               {{?}}
+             {{?}}
+           </td>
+           <!-- Bait -->
+           <td>
+             {{?it.data.dataMissing !== false}}
+               <i class="question circle outline icon" title="Unknown/Incomplete"></i>
+             {{?}}
+             {{?it.data.fishEyes !== false}}
+               <div class="ui middle aligned status-icon sprite-icon sprite-icon-status-fish_eyes{{?it.data.fishEyes !== true}} has-duration{{?}}" title="鱼眼">
+                 {{?it.data.fishEyes !== true}}
+                   <span>{{=it.fishEyesDuration}}</span>
+                 {{?}}
+               </div>
+             {{?}}
+             {{?it.data.snagging}}
+               <div class="ui middle aligned status-icon sprite-icon sprite-icon-status-snagging" title="钓组"></div>
+             {{?}}
+             {{?it.data.gig}}
+               <div class="ui middle aligned bait-icon sprite-icon sprite-icon-action-{{=it.data.gig.toLowerCase()}}_gig" title="{{={'Small': '小型', 'Normal': '中型', 'Large': '大型'}[it.data.gig]}}渔叉尖"></div>
+             {{?}}
+             <span class="bait-span">
+             {{~it.bait :item:idx}}
+               {{?idx == 0}}
+                 <a href="https://ff14.huijiwiki.com/wiki/物品:{{=item.name}}" target="cp_gt">
+               {{??}}
+      <div class="bait-badge-container">
+                 {{?item.hookset}}
+                   <div class="ui middle aligned bait-icon hookset-modifier-icon sprite-icon sprite-icon-action-{{=item.hookset.toLowerCase()}}_hookset"
+                        title="{{={'Powerful': '强力', 'Precision': '精准'}[item.hookset]}}提钩"></div>
+                 {{?}}
+        {{?item.tug}}
+                       <div class="tug-indicator {{=item.tug}}-tug-indicator" title="{{={'light': '轻', 'medium': '中', 'heavy': '鱼王'}[item.tug]}}杆">
+                         {{={'light': '!', 'medium': '!!', 'heavy': '!!!'}[item.tug]}}
+                       </div>
+                 {{?}}
+      </div>
+                 </span> <!-- bait span -->
+                 <i class="arrow right icon"></i>
+                 <span class="bait-span">
+               {{?}}
+               <div class="ui middle aligned bait-icon sprite-icon sprite-icon-fish_n_tackle-{{=item.icon}}" title="{{=item.name}}" data-baitIdx="{{=idx}}"></div>
+               {{?idx == 0}}
+                 </a>
+               {{?}}
+             {{~}}
+       <div class="bait-badge-container">
+                 {{?it.data.hookset}}
+                   <div class="ui middle aligned bait-icon hookset-modifier-icon sprite-icon sprite-icon-action-{{=it.data.hookset.toLowerCase()}}_hookset"
+                        title="{{={'Powerful': '强力', 'Precision': '精准'}[it.data.hookset]}}提钩"></div>
+                 {{?}}
+        {{?it.data.tug}}
+                       <div class="tug-indicator {{=it.data.tug}}-tug-indicator" title="{{={'light': '轻', 'medium': '中', 'heavy': '鱼王'}[it.data.tug]}}杆">
+                         {{={'light': '!', 'medium': '!!', 'heavy': '!!!'}[it.data.tug]}}
+                       </div>
+                 {{?}}
+      </div>
+             </span> <!-- bait span -->
+           </td>
+         </tr>
+    </script>
+
+    <script id="table-section-divider-template" type="text/html;x-dot-template">
+      <tr class="section-divider">
+        <td colspan="6">{{=it.text}}</td>
+      </tr>
+    </script>
+
+    <script id="upcoming-windows-template" type="text/html;x-dot-template">
+      <div class="upcoming-windows-popup">
+        <div>
+          <b>窗口期</b>
+        </div>
+        <div>
+          <b>时长</b>
+        </div>
+        <div>
+          <b>休眠期</b>
+        </div>
+        {{~it.availability.upcomingWindows :nextWindow:idx}}
+          <div style="white-space: nowrap;">
+            <b>{{=moment(nextWindow.start).calendar()}}</b>
+          </div>
+          <div style="white-space: nowrap;">
+            {{=nextWindow.duration}}
+          </div>
+          <div style="white-space: nowrap;">
+            {{=nextWindow.downtime}}
+          </div>
+        {{~}}
+      </div>
+    </script>
+
+    <!-- At last, we can load the layout and view model code. -->
+    <script type="text/javascript" src="js/app/layout.js"></script>
+    <!-- NOTE: The ViewModel should be the last script loaded. -->
+    <script type="text/javascript" src="js/app/viewmodel.js"></script>
+
+    <script type="text/javascript">
+      $(() => {
+        // Display appropriate messages depending on if the site was loaded via http or https.
+        var $https_message = $("#https_message");
+        var $transition_message = $("#transition_message");
+
+        if (document.location.protocol == "http:") {
+          // Display the secure mode announcement.
+          $https_message.removeClass("hidden");
+        } else {
+          // Check if the user got here via the non-secure version (by clicking the link).
+          if (
+            document.referrer == "http://" + document.location.host + "/" &&
+            !localStorage.completed
+          ) {
+            // There's nothing in the local storage, and they came from the unsecure version.
+            // Let's display a helpful message so they can complete the import process.
+            $transition_message.removeClass("hidden");
+            $transition_message.find(".close").on("click", function () {
+              $(this).closest(".message").transition("fade");
+            });
+          }
+        }
+      });
+    </script>
+
+    <script type="text/javascript">
+      $(() => {
+        // Document is ready, initialize the view model now.
+        ViewModel.initialize();
+        // There shouldn't be anything more to do.  Any logic controling the
+        // display belongs in the ViewModel or Layout classes.
+        // DO NOT ADD CODE AFTER THIS POINT!!!
+      });
+    </script>
+  </head>
+  <body>
+    <div id="topmenu" class="ui text top fixed menu">
+      <div class="ui container">
+        <div class="header item">FFX|V Fish Tracker App</div>
+        <div class="right item">
+          <b>艾欧泽亚时间:</b>&nbsp;<span id="eorzeaClock">##:##</span
+          >&nbsp;(<span id="earthClock">#########</span>)
+          <div id="theme-toogle" class="ui toggle checkbox">
+            <input type="checkbox" name="theme-button" id="theme-button" />
+            <label></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ui main container">
+      <h1>FFX|V Fish Tracker App 汉化版</h1>
+      <p>
+        钓鱼时钟，请支持工具的原作者。<a
+          href="https://ff14fish.carbuncleplushy.com"
+          >原版地址</a
+        >
+        <a
+          target="#top"
+          href="https://github.com/icykoneko/ff14-fish-tracker-app"
+          >GitHub</a
+        >
+      </p>
+      <p>
+        鼠标悬停在时间上将会显示具体时间，鱼饵与提钩等图标上将会显示文字说明。此外，点击窗口期左侧的图标可以显示最近10次窗口期与冷却期。
+      </p>
+      <div id="export-settings-modal" class="ui tiny modal">
+        <div class="header">导出设置</div>
+        <div class="content">
+          <div class="ui form">
+            <p>请复制以下内容并保存</p>
+            <div class="field">
+              <textarea
+                rows="8"
+                id="export-settings-data"
+                style="font-family: monospace;"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div
+            id="export-settings-copy"
+            class="ui labeled icon button"
+            data-clipboard-target="#export-settings-data"
+          >
+            <i class="copy icon"></i>
+            复制至剪贴板
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal for importing settings (checklist and filters, etc.) -->
+      <div id="import-settings-modal" class="ui tiny modal">
+        <div class="header">导入设置</div>
+        <div class="content">
+          <div class="ui form">
+            <p>
+              从其他地方导入标记设置，可以导入Fish Tracker
+              App的设置，也可以单纯只导入格式如"[1, 2, 3]"的标记鱼ID列表。
+            </p>
+            <div class="field">
+              <label>导入内容</label>
+              <textarea
+                rows="8"
+                id="import-settings-data"
+                style="font-family: monospace;"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <div id="import-settings-load" class="ui approve button">导入</div>
+        </div>
+      </div>
+      <h2>设置:</h2>
+      <div class="ui vertically padded grid">
+        <div class="row" style="padding-top: 0.25rem; padding-bottom: 0.25rem;">
+          <div class="column">显示:</div>
+          <div class="fifteen wide column">
+            <div class="ui mini very compact buttons" id="filterCompletion">
+              <button class="ui active button" data-filter="all">全部</button>
+              <button class="ui button" data-filter="caught">已标记</button>
+              <button class="ui button" data-filter="uncaught">未标记</button>
+            </div>
+            <div class="ui very compact buttons" id="checklist">
+              <div
+                class="ui icon button"
+                data-action="import"
+                data-tooltip="导入设置"
+              >
+                <i class="upload icon"></i>
+              </div>
+              <div
+                class="ui icon button"
+                data-action="export"
+                data-tooltip="导出设置"
+              >
+                <i class="download icon"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="row"
+          id="filterPatch"
+          style="padding-top: 0.25rem; padding-bottom: 0.25rem;"
+        >
+          <div class="column">版本:</div>
+          <div class="fifteen wide column">
+            <div class="ui vertically padded stacked grid">
+              <div class="ui mini very compact buttons">
+                <div
+                  class="ui active primary patch-set button"
+                  style="width: 12.5em;"
+                  data-filter="2"
+                >
+                  重生之境 (2.x)
+                </div>
+                <div class="ui active button" data-filter="2">2.0</div>
+                <div class="ui active button" data-filter="2.1">2.1</div>
+                <div class="ui active button" data-filter="2.2">2.2</div>
+                <div class="ui active button" data-filter="2.3">2.3</div>
+                <div class="ui active button" data-filter="2.4">2.4</div>
+                <div class="ui active button" data-filter="2.5">2.5</div>
+              </div>
+              <div class="ui mini very compact buttons">
+                <div
+                  class="ui active primary patch-set button"
+                  style="width: 12.5em;"
+                  data-filter="3"
+                >
+                  苍穹之禁城 (3.x)
+                </div>
+                <div class="ui active button" data-filter="3">3.0</div>
+                <div class="ui active button" data-filter="3.1">3.1</div>
+                <div class="ui active button" data-filter="3.2">3.2</div>
+                <div class="ui active button" data-filter="3.3">3.3</div>
+                <div class="ui active button" data-filter="3.4">3.4</div>
+                <div class="ui active button" data-filter="3.5">3.5</div>
+              </div>
+              <div class="ui mini very compact buttons">
+                <div
+                  class="ui active primary patch-set button"
+                  style="width: 12.5em;"
+                  data-filter="4"
+                >
+                  红莲之狂潮 (4.x)
+                </div>
+                <div class="ui active button" data-filter="4">4.0</div>
+                <div class="ui active button" data-filter="4.1">4.1</div>
+                <div class="ui active button" data-filter="4.2">4.2</div>
+                <div class="ui active button" data-filter="4.3">4.3</div>
+                <div class="ui active button" data-filter="4.4">4.4</div>
+                <div class="ui active button" data-filter="4.5">4.5</div>
+              </div>
+              <div class="ui mini very compact buttons">
+                <div
+                  class="ui active primary patch-set button"
+                  style="width: 12.5em;"
+                  data-filter="5"
+                >
+                  暗影之逆焰 (5.x)
+                </div>
+                <div class="ui active button" data-filter="5">5.0</div>
+                <div class="ui active button" data-filter="5.1">5.1</div>
+                <div class="ui button" data-filter="5.2">5.2</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="row"
+          id="sorting"
+          style="padding-top: 0.25rem; padding-bottom: 0.25rem;"
+        >
+          <div class="column">优先显示:</div>
+          <div class="six wide column" id="sortingType">
+            <div class="inline fields">
+              <div class="field" style="float: left; margin-right: 1rem;">
+                <div class="ui radio checked checkbox">
+                  <input
+                    type="radio"
+                    name="sortingType"
+                    checked="checked"
+                    class="hidden"
+                    value="windowPeriods"
+                  />
+                  <label title="窗口期临近的鱼会更加靠前">窗口期临近的鱼</label>
+                </div>
+              </div>
+              <div class="field" style="float: left;">
+                <div class="ui radio checkbox">
+                  <input
+                    type="radio"
+                    name="sortingType"
+                    class="hidden"
+                    value="overallRarity"
+                  />
+                  <label title="未来一段日子里出勤率较低的鱼会更加靠前"
+                    >稀有度高的鱼</label
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Display the list of fish -->
+      <div id="fish-table-container">
+        <div class="ui active dimmer">
+          <div class="ui indeterminate text loader">加载中...</div>
+        </div>
+      </div>
+
+      <div class="ui container">
+        <p>
+          FINAL FANTASY is a registered trademark of Square Enix Holdings Co.,
+          Ltd.<br />
+          FINAL FANTASY XIV © 2010 - 2019 SQUARE ENIX CO., LTD. All Rights
+          Reserved.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
