@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MHRS怪物弱点</title>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      #app {
+        height: 100%;
+      }
+      .container {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+      }
+      img {
+        display: block;
+      }
+      .monster_name {
+        display: flex;
+        white-space: nowrap;
+      }
+      .monster_name.chs {
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .monster_name.jpn,
+      .monster_name.eng {
+        font-size: 10px;
+      }
+      .filter_btn {
+        display: block;
+        cursor: pointer;
+        min-width: 48px;
+        height: 48px;
+        font-weight: bold;
+        font-size: 24px;
+        line-height: 48px;
+        border: 0;
+        transition: background 0.3s;
+      }
+      .container.dark {
+        background-color: black;
+        color: grey;
+      }
+      .container.dark .filter_btn {
+        background-color: black;
+        color: grey;
+      }
+      .container.dark .filter_btn.active {
+        background-color: grey;
+        color: white;
+      }
+      .container.light {
+        color: #212121;
+      }
+      .container.light .filter_btn {
+        background: #e2e2e2;
+        color: #212121;
+      }
+      .container.light .filter_btn:hover {
+        background: #dcdcdc;
+      }
+      .container.light .filter_btn.active {
+        background: #999999;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" style="display: none">
+      <div class="container" :class="opts.theme">
+        <div>
+          <div style="display: flex; overflow-x: auto; overflow-y: hidden">
+            <div style="display: flex">
+              <button
+                type="button"
+                class="filter_btn"
+                :class="{
+                  active: opts.activeWeak == ''
+                }"
+                @click="setOpts('activeWeak', '')"
+              >
+                全
+              </button>
+              <template v-for="(label, value) in weaks" :key="value">
+                <button
+                  type="button"
+                  class="filter_btn"
+                  :class="[value, {
+                    active: opts.activeWeak == value
+                  }]"
+                  @click="setOpts('activeWeak', value)"
+                >
+                  <img
+                    :src="label"
+                    :alt="value"
+                    style="width: 24px; height: auto; margin: auto"
+                  />
+                </button>
+              </template>
+            </div>
+            <div style="display: flex; margin-left: 24px">
+              <button
+                type="button"
+                class="filter_btn"
+                @click="setOpts('templateNum_'+opts.gridAutoFlow, +opts['templateNum_' + opts.gridAutoFlow] - 1)"
+              >
+                一
+              </button>
+              <button type="button" class="filter_btn" disabled>
+                <template v-if="opts.gridAutoFlow == 'row'">
+                  {{ opts.templateNum_row }}
+                </template>
+                <template v-if="opts.gridAutoFlow == 'column'">
+                  {{ opts.templateNum_column }}
+                </template>
+              </button>
+              <button
+                type="button"
+                class="filter_btn"
+                @click="setOpts('templateNum_'+opts.gridAutoFlow, +opts['templateNum_' + opts.gridAutoFlow] + 1)"
+              >
+                十
+              </button>
+            </div>
+            <div style="display: flex; margin-left: 24px">
+              <button
+                type="button"
+                class="filter_btn"
+                :class="{
+                  active: opts.gridAutoFlow == 'column'
+                }"
+                @click="setOpts('gridAutoFlow', 'column')"
+              >
+                &#129047;
+              </button>
+              <button
+                type="button"
+                class="filter_btn"
+                :class="{
+                  active: opts.gridAutoFlow == 'row'
+                }"
+                @click="setOpts('gridAutoFlow', 'row')"
+              >
+                &#129046;
+              </button>
+            </div>
+            <div style="display: flex; margin-left: 24px">
+              <button
+                type="button"
+                class="filter_btn"
+                :class="{
+                  active: opts.theme == 'dark'
+                }"
+                @click="setOpts('theme', 'dark')"
+              >
+                &#9790;
+              </button>
+              <button
+                type="button"
+                class="filter_btn"
+                :class="{
+                  active: opts.theme == 'light'
+                }"
+                @click="setOpts('theme', 'light')"
+              >
+                &#9728;
+              </button>
+            </div>
+            <div style="display: flex; margin-left: 24px; flex-shrink: 0">
+              <button
+                type="button"
+                class="filter_btn"
+                :class="{
+                  active: opts.abnormal == true
+                }"
+                @click="setOpts('abnormal', !opts.abnormal)"
+              >
+                仅显示非怪异化怪物
+              </button>
+            </div>
+          </div>
+        </div>
+        <div
+          style="
+            width: 100%;
+            overflow: auto;
+            display: grid;
+            grid-auto-rows: min-content;
+            grid-auto-columns: min-content;
+          "
+          :style="[`grid-auto-flow: ${opts.gridAutoFlow};`, 
+          (opts.gridAutoFlow == 'row') ?  `grid-template-columns: repeat(${opts.templateNum_row}, min-content);` : '',
+          (opts.gridAutoFlow == 'column') ?  `grid-template-rows: repeat(${opts.templateNum_column}, min-content);` : '']"
+        >
+          <template v-for="(monster, index) in monsterList" :key="index">
+            <div
+              style="display: flex; margin-bottom: 3px"
+              v-if="(opts.activeWeak == '' || opts.activeWeak == monster.weak) && (!opts.abnormal || !monster.abnormal)"
+            >
+              <div style="position: relative">
+                <img
+                  :src="monster.img"
+                  :alt="monster.name_chs"
+                  style="width: 48px; height: 48px; float: left"
+                />
+                <img
+                  :src="weaks[monster.weak]"
+                  :alt="monster.weak"
+                  style="
+                    width: 24px;
+                    height: 24px;
+                    object-fit: contain;
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                  "
+                />
+              </div>
+              <div>
+                <div class="monster_name chs" :class="monster.weak">
+                  {{ monster.name_chs }}
+                </div>
+                <div class="monster_name jpn">{{ monster.name_jpn }}</div>
+                <div class="monster_name eng">{{ monster.name_eng }}</div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="js/vue.global.prod.js"></script>
+  <script>
+    // https://proudyan-oss.oss-cn-shanghai.aliyuncs.com/upload/mhrs/
+    // https://cdn.jsdelivr.net/npm/vue@3.3.7/dist/vue.global.prod.js
+    const { createApp, ref } = Vue;
+    createApp({
+      setup() {
+        document.getElementById("app").style = "";
+        const monsterList = ref([
+          {
+            img: "icons/em098_00.png",
+            name_chs: "镰鼬龙王",
+            name_jpn: "オサイズチ",
+            name_eng: "Great Izuchi",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em054_00.png",
+            name_chs: "眠狗龙王",
+            name_jpn: "ドスバギィ",
+            name_eng: "Great Baggi",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em107_00.png",
+            name_chs: "搔鸟",
+            name_jpn: "クルルヤック",
+            name_eng: "Kulu-Ya-Ku",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em059_00.png",
+            name_chs: "毒狗龙王",
+            name_jpn: "ドスフロギィ",
+            name_eng: "Great Wroggi",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em060_00.png",
+            name_chs: "青熊兽",
+            name_jpn: "アオアシラ",
+            name_eng: "Arzuros",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em061_00.png",
+            name_chs: "白兔兽",
+            name_jpn: "ウルクスス",
+            name_eng: "Lagombi",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em062_00.png",
+            name_chs: "赤甲兽",
+            name_jpn: "ラングロトラ",
+            name_eng: "Volvidon",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em091_00.png",
+            name_chs: "伞鸟",
+            name_jpn: "アケノシルム",
+            name_eng: "Aknosom",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em047_00.png",
+            name_chs: "水兽",
+            name_jpn: "ロアルドロス",
+            name_eng: "Royal Ludroth",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em044_00.png",
+            name_chs: "土砂龙",
+            name_jpn: "ボルボロス",
+            name_eng: "Barroth",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em019_00.png",
+            name_chs: "大名盾蟹",
+            name_jpn: "ダイミョウザザミ",
+            name_eng: "Daimyo Hermitaur",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em003_00.png",
+            name_chs: "奇怪龙",
+            name_jpn: "フルフル",
+            name_eng: "Khezu",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em092_00.png",
+            name_chs: "河童蛙",
+            name_jpn: "ヨツミワドウ",
+            name_eng: "Tetranadon",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em090_00.png",
+            name_chs: "天狗兽",
+            name_jpn: "ビシュテンゴ",
+            name_eng: "Bishaten",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em090_01.png",
+            name_chs: "绯天狗兽",
+            name_jpn: "ビシュテンゴ亜種",
+            name_eng: "Blood Orange Bishaten",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em102_00.png",
+            name_chs: "毒妖鸟",
+            name_jpn: "プケプケ",
+            name_eng: "Pukei-Pukei",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em108_00.png",
+            name_chs: "泥鱼龙",
+            name_jpn: "ジュラトドス",
+            name_eng: "Jyuratodus",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em004_00.png",
+            name_chs: "岩龙",
+            name_jpn: "バサルモス",
+            name_eng: "Basarios",
+            weak: "dragon",
+            abnormal: true,
+          },
+          {
+            img: "icons/em093_00.png",
+            name_chs: "人鱼龙",
+            name_jpn: "イソネミクニ",
+            name_eng: "Somnacanth",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em093_01.png",
+            name_chs: "冰人鱼龙",
+            name_jpn: "イソネミクニ亜種",
+            name_eng: "Aurora Somnacanth",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em001_00.png",
+            name_chs: "雌火龙",
+            name_jpn: "リオレイア",
+            name_eng: "Rathian",
+            weak: "dragon",
+            abnormal: true,
+          },
+          {
+            img: "icons/em001_02.png",
+            name_chs: "金火龙",
+            name_jpn: "リオレイア希少種",
+            name_eng: "Gold Rathian",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em042_00.png",
+            name_chs: "冰牙龙",
+            name_jpn: "ベリオロス",
+            name_eng: "Barioth",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em109_00.png",
+            name_chs: "飞雷龙",
+            name_jpn: "トビカガチ",
+            name_eng: "Tobi-Kadachi",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em089_00.png",
+            name_chs: "怨虎龙",
+            name_jpn: "マガイマガド",
+            name_eng: "Magnamalo",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em089_05.png",
+            name_chs: "嗟怨震天怨虎龙",
+            name_jpn: "怨嗟響めくマガイマガド",
+            name_eng: "Scorned Magnamalo",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em100_00.png",
+            name_chs: "蛮颚龙",
+            name_jpn: "アンジャナフ",
+            name_eng: "Anjanath",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em037_00.png",
+            name_chs: "迅龙",
+            name_jpn: "ナルガクルガ",
+            name_eng: "Nargacuga",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em037_02.png",
+            name_chs: "月迅龙",
+            name_jpn: "ナルガクルガ希少種",
+            name_eng: "Lucent Nargacuga",
+            weak: "ice",
+            abnormal: false,
+          },
+          {
+            img: "icons/em082_00.png",
+            name_chs: "泡狐龙",
+            name_jpn: "タマミツネ",
+            name_eng: "Mizutsune",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em082_02.png",
+            name_chs: "焰狐龙",
+            name_jpn: "タマミツネ希少種",
+            name_eng: "Violet Mizutsune",
+            weak: "ice",
+            abnormal: false,
+          },
+          {
+            img: "icons/em097_00.png",
+            name_chs: "雪鬼兽",
+            name_jpn: "ゴシャハギ",
+            name_eng: "Goss Harag",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em134_00.png",
+            name_chs: "刚缠兽",
+            name_jpn: "ガランゴルム",
+            name_eng: "Garangolm",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em020_00.png",
+            name_chs: "将军镰蟹",
+            name_jpn: "ショウグンギザミ",
+            name_eng: "Shogun Ceanataur",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em002_00.png",
+            name_chs: "火龙",
+            name_jpn: "リオレウス",
+            name_eng: "Rathalos",
+            weak: "dragon",
+            abnormal: true,
+          },
+          {
+            img: "icons/em002_02.png",
+            name_chs: "银火龙",
+            name_jpn: "リオレウス希少種",
+            name_eng: "Silver Rathalos",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em095_00.png",
+            name_chs: "泥翁龙",
+            name_jpn: "オロミドロ",
+            name_eng: "Almudron",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em095_01.png",
+            name_chs: "熔翁龙",
+            name_jpn: "オロミドロ亜種",
+            name_eng: "Magma Almudron",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em057_00.png",
+            name_chs: "雷狼龙",
+            name_jpn: "ジンオウガ",
+            name_eng: "Zinogre",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em133_00.png",
+            name_chs: "冰狼龙",
+            name_jpn: "ルナガロン",
+            name_eng: "Lunagaron",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em081_00.png",
+            name_chs: "电龙",
+            name_jpn: "ライゼクス",
+            name_eng: "Astalos",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em136_00.png",
+            name_chs: "棘龙",
+            name_jpn: "エスピナス",
+            name_eng: "Espinas",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em136_01.png",
+            name_chs: "棘茶龙",
+            name_jpn: "エスピナス亜種",
+            name_eng: "Flaming Espinas",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em071_00.png",
+            name_chs: "黑蚀龙",
+            name_jpn: "ゴア・マガラ",
+            name_eng: "Gore Magala",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em071_05.png",
+            name_chs: "混沌黑蚀龙",
+            name_jpn: "渾沌に呻くゴア・マガラ",
+            name_eng: "Chaotic Gore Magala",
+            weak: "dragon",
+            abnormal: true,
+          },
+          {
+            img: "icons/em077_00.png",
+            name_chs: "千刃龙",
+            name_jpn: "セルレギオス",
+            name_eng: "Seregios",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em032_00.png",
+            name_chs: "轰龙",
+            name_jpn: "ティガレックス",
+            name_eng: "Tigrex",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em007_00.png",
+            name_chs: "角龙",
+            name_jpn: "ディアブロス",
+            name_eng: "Diablos",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em094_00.png",
+            name_chs: "妃蜘蛛",
+            name_jpn: "ヤツカダキ",
+            name_eng: "Rakna-Kadaki",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em094_01.png",
+            name_chs: "炽妃蜘蛛",
+            name_jpn: "ヤツカダキ亜種",
+            name_eng: "Pyre Rakna-Kadaki",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em024_00.png",
+            name_chs: "钢龙",
+            name_jpn: "クシャルダオラ",
+            name_eng: "Kushala Daora",
+            weak: "thunder",
+            abnormal: false,
+          },
+          {
+            img: "icons/em024_08.png",
+            name_chs: "怪异克服钢龙",
+            name_jpn: "傀異克服クシャルダオラ",
+            name_eng: "Risen Kushala Daora",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em025_00.png",
+            name_chs: "霞龙",
+            name_jpn: "オオナズチ",
+            name_eng: "Chameleos",
+            weak: "fire",
+            abnormal: false,
+          },
+          {
+            img: "icons/em025_08.png",
+            name_chs: "怪异克服霞龙",
+            name_jpn: "傀異克服オオナズチ",
+            name_eng: "Risen Chameleos",
+            weak: "fire",
+            abnormal: true,
+          },
+          {
+            img: "icons/em027_00.png",
+            name_chs: "炎王龙",
+            name_jpn: "テオ・テスカトル",
+            name_eng: "Teostra",
+            weak: "water",
+            abnormal: false,
+          },
+          {
+            img: "icons/em027_08.png",
+            name_chs: "怪异克服炎王龙",
+            name_jpn: "傀異克服テオ・テスカトル",
+            name_eng: "Risen Teostra",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em132_00.png",
+            name_chs: "爵银龙",
+            name_jpn: "メル・ゼナ",
+            name_eng: "Malzeno",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em132_05.png",
+            name_chs: "原初形态爵银龙",
+            name_jpn: "原初を刻むメル・ゼナ",
+            name_eng: "Primordial Malzeno",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em072_00.png",
+            name_chs: "天廻龙",
+            name_jpn: "シャガルマガラ",
+            name_eng: "Shagaru Magala",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em072_08.png",
+            name_chs: "怪异克服天廻龙",
+            name_jpn: "傀異克服シャガルマガラ",
+            name_eng: "Risen Shagaru Magala",
+            weak: "dragon",
+            abnormal: true,
+          },
+          {
+            img: "icons/em124_00.png",
+            name_chs: "冰呪龙",
+            name_jpn: "イヴェルカーナ",
+            name_eng: "Velkhana",
+            weak: "fire",
+            abnormal: false,
+          },
+          {
+            img: "icons/em023_00.png",
+            name_chs: "金狮子",
+            name_jpn: "ラージャン",
+            name_eng: "Rajang",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em023_05.png",
+            name_chs: "激昂金狮子",
+            name_jpn: "激昂したラージャン",
+            name_eng: "Furious Rajang",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em118_00.png",
+            name_chs: "爆鳞龙",
+            name_jpn: "バゼルギウス",
+            name_eng: "Bazelgeuse",
+            weak: "thunder",
+            abnormal: true,
+          },
+          {
+            img: "icons/em118_05.png",
+            name_chs: "红莲爆鳞龙",
+            name_jpn: "紅蓮滾るバゼルギウス",
+            name_eng: "Seething Bazelgeuse",
+            weak: "ice",
+            abnormal: true,
+          },
+          {
+            img: "icons/em096_00.png",
+            name_chs: "风神龙",
+            name_jpn: "イブシマキヒコ",
+            name_eng: "Wind Serpent Ibushi",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em099_00.png",
+            name_chs: "雷神龙",
+            name_jpn: "ナルハタタヒメ",
+            name_eng: "Thunder Serpent Narwa",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em099_05.png",
+            name_chs: "百龙渊源雷神龙",
+            name_jpn: "百竜ノ淵源ナルハタタヒメ",
+            name_eng: "Narwa the Allmother",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em086_05.png",
+            name_chs: "神秘红光天彗龙",
+            name_jpn: "奇しき赫耀のバルファルク",
+            name_eng: "Crimson Glow Valstrax",
+            weak: "water",
+            abnormal: false,
+          },
+          {
+            img: "icons/em086_08.png",
+            name_chs: "怪异克服天彗龙",
+            name_jpn: "傀異克服バルファルク",
+            name_eng: "Risen Crimson Glow Valstrax",
+            weak: "water",
+            abnormal: true,
+          },
+          {
+            img: "icons/em135_00.png",
+            name_chs: "冥渊龙",
+            name_jpn: "ガイアデルム",
+            name_eng: "Gaismagorm",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em058_00.png",
+            name_chs: "岚龙",
+            name_jpn: "アマツマガツチ",
+            name_eng: "Amatsu",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em060_07.png",
+            name_chs: "霸主・青熊兽",
+            name_jpn: "ヌシ・アオアシラ",
+            name_eng: "Apex Arzuros",
+            weak: "ice",
+            abnormal: false,
+          },
+          {
+            img: "icons/em001_07.png",
+            name_chs: "霸主・雌火龙",
+            name_jpn: "ヌシ・リオレイア",
+            name_eng: "Apex Rathian",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em082_07.png",
+            name_chs: "霸主・泡狐龙",
+            name_jpn: "ヌシ・タマミツネ",
+            name_eng: "Apex Mizutsune",
+            weak: "thunder",
+            abnormal: false,
+          },
+          {
+            img: "icons/em002_07.png",
+            name_chs: "霸主・火龙",
+            name_jpn: "ヌシ・リオレウス",
+            name_eng: "Apex Rathalos",
+            weak: "dragon",
+            abnormal: false,
+          },
+          {
+            img: "icons/em007_07.png",
+            name_chs: "霸主・角龙",
+            name_jpn: "ヌシ・ディアブロス",
+            name_eng: "Apex Diablos",
+            weak: "ice",
+            abnormal: false,
+          },
+          {
+            img: "icons/em057_07.png",
+            name_chs: "霸主・雷狼龙",
+            name_jpn: "ヌシ・ジンオウガ",
+            name_eng: "Apex Zinogre",
+            weak: "ice",
+            abnormal: false,
+          },
+        ]);
+        const weaks = ref({
+          fire: "icons/blight/fire.png",
+          water: "icons/blight/water.png",
+          thunder: "icons/blight/thunder.png",
+          ice: "icons/blight/ice.png",
+          dragon: "icons/blight/dragon.png",
+        });
+        const defaultOpts = {
+          activeWeak: "",
+          gridAutoFlow: "column", // row column
+          templateNum_row: 5,
+          templateNum_column: 15,
+          theme: "dark", // dark light
+        };
+        const opts = ref(
+          window.localStorage.getItem("opts")
+            ? {
+                ...defaultOpts,
+                ...JSON.parse(window.localStorage.getItem("opts")),
+              }
+            : defaultOpts
+        );
+        const setOpts = (key, val) => {
+          opts.value[key] = val;
+          window.localStorage.setItem("opts", JSON.stringify(opts.value));
+        };
+
+        return {
+          monsterList,
+          weaks,
+          opts,
+          setOpts,
+        };
+      },
+    }).mount("#app");
+  </script>
+</html>
