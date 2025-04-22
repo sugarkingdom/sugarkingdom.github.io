@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FFXIV B级恶名精英狩猎地图</title>
+    <link rel="stylesheet" href="./vendors/viewer.min.css" />
+    <link rel="stylesheet" href="./assets/hunts-b.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div class="ctn">
+        <div class="list">
+          <div
+            class="area"
+            v-for="(areaData, areaIndex) in state.areas"
+            :key="areaIndex"
+          >
+            <div class="area_title">{{ areaData.area }}</div>
+            <div class="zone_list" v-if="areaData.zones">
+              <div
+                class="zone"
+                v-for="(zoneData, zoneIndex) in areaData.zones"
+                :key="zoneIndex"
+              >
+                <div class="mob_list">
+                  <div
+                    class="mob"
+                    v-for="(mob, mobIndex) in zoneData.mobs"
+                    :key="mobIndex"
+                  >
+                    <img
+                      @click="showMap(state.mapPath + mob + '.jpg')"
+                      :src="state.mobPath + mob + '.png'"
+                      :alt="mob"
+                      :title="mob"
+                    />
+                  </div>
+                </div>
+                <div class="zone_title">{{ zoneData.zone }}</div>
+              </div>
+            </div>
+            <div class="zone_list" v-else>
+              <div class="zone">
+                <div class="mob_list">
+                  <div
+                    class="mob"
+                    v-for="(mob, mobIndex) in areaData.mobs"
+                    :key="mobIndex"
+                  >
+                    <img
+                      @click="showMap(state.mapPath + mob + '.jpg')"
+                      :src="state.mobPath + mob + '.png'"
+                      :alt="mob"
+                      :title="mob"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="./vendors/vue.global.prod.js"></script>
+  <script src="./vendors/viewer.min.js"></script>
+  <script>
+    const { createApp, reactive } = Vue;
+    createApp({
+      setup() {
+        const state = reactive({
+          areas: [
+            {
+              area: "拉诺西亚",
+              zones: [
+                {
+                  zone: "中拉诺西亚",
+                  mobs: ["2-1-1-花林女郎"],
+                },
+                {
+                  zone: "拉诺西亚低地",
+                  mobs: ["2-1-2-宽耳凶蝠"],
+                },
+                {
+                  zone: "西拉诺西亚",
+                  mobs: ["2-1-3-暗盔魔蟹"],
+                },
+                {
+                  zone: "东拉诺西亚",
+                  mobs: ["2-1-4-血腥玛丽"],
+                },
+                {
+                  zone: "拉诺西亚高地",
+                  mobs: ["2-1-5-米腊德罗斯蜂鸟"],
+                },
+                {
+                  zone: "拉诺西亚外地",
+                  mobs: ["2-1-6-巫刻猎鹫"],
+                },
+              ],
+            },
+            {
+              area: "黑衣森林",
+              zones: [
+                {
+                  zone: "黑衣森林中部林区",
+                  mobs: ["2-2-1-白鬼鼠王"],
+                },
+                {
+                  zone: "黑衣森林东部林区",
+                  mobs: ["2-2-2-击刺魔蜂索菲"],
+                },
+                {
+                  zone: "黑衣森林南部林区",
+                  mobs: ["2-2-3-君王鬼蜻蜓"],
+                },
+                {
+                  zone: "黑衣森林北部林区",
+                  mobs: ["2-2-4-天玑巨熊"],
+                },
+              ],
+            },
+            {
+              area: "萨纳兰",
+              zones: [
+                {
+                  zone: "中萨纳兰",
+                  mobs: ["2-3-1-奥弗杰恩"],
+                },
+                {
+                  zone: "西萨纳兰",
+                  mobs: ["2-3-2-阴沟毒液"],
+                },
+                {
+                  zone: "东萨纳兰",
+                  mobs: ["2-3-3-加特林针鼹"],
+                },
+                {
+                  zone: "南萨纳兰",
+                  mobs: ["2-3-4-死灰复燃的阿尔宾"],
+                },
+                {
+                  zone: "北萨纳兰",
+                  mobs: ["2-3-5-永恒不灭的菲兰德副耀士"],
+                },
+              ],
+            },
+            {
+              area: "库尔扎斯中央高地",
+              mobs: ["2-4-1-纳乌尔"],
+            },
+            {
+              area: "摩杜纳",
+              mobs: ["2-5-1-水蛭王"],
+            },
+            {
+              area: "苍穹之禁城",
+              zones: [
+                {
+                  zone: "库尔扎斯西部高地",
+                  mobs: ["3-1-克鲁泽", "3-1-阿尔提克"],
+                },
+                {
+                  zone: "阿巴拉提亚云海",
+                  mobs: ["3-2-斯奎克", "3-2-飞舞翼萨努瓦力"],
+                },
+                {
+                  zone: "龙堡参天高地",
+                  mobs: ["3-3-提克斯塔", "3-3-骨颌彗星兵"],
+                },
+                {
+                  zone: "翻云雾海",
+                  mobs: ["3-4-惊慌稻草龙", "3-4-斯奇塔利斯"],
+                },
+                {
+                  zone: "龙堡内陆低地",
+                  mobs: ["3-5-布拉巨猿", "3-5-翼肢鲎"],
+                },
+                {
+                  zone: "魔大陆阿济兹拉",
+                  mobs: ["3-6-全能机甲", "3-6-利西达斯"],
+                },
+              ],
+            },
+            {
+              area: "红莲之狂潮",
+              zones: [
+                {
+                  zone: "基拉巴尼亚边区",
+                  mobs: ["4-1-奥祖鲁姆", "4-1-影中暗雅弥尼"],
+                },
+                {
+                  zone: "基拉巴尼亚山区",
+                  mobs: ["4-2-布卡卜", "4-2-蛇仆蚂蜓"],
+                },
+                {
+                  zone: "红玉海",
+                  mobs: ["4-3-剑豪刑具", "4-3-姑获鸟"],
+                },
+                {
+                  zone: "延夏",
+                  mobs: ["4-4-大太", "4-4-闪雷击鱼雷"],
+                },
+                {
+                  zone: "太阳神草原",
+                  mobs: ["4-5-俱利摩", "4-5-阿苏黄"],
+                },
+                {
+                  zone: "基拉巴尼亚湖区",
+                  mobs: ["4-6-奇洼", "4-6-玛涅斯"],
+                },
+              ],
+            },
+            {
+              area: "暗影之逆焰",
+              zones: [
+                {
+                  zone: "雷克兰德",
+                  mobs: ["5-1-伊兹帕帕洛特尔", "5-1-绒毛兽"],
+                },
+                {
+                  zone: "珂露西亚岛",
+                  mobs: ["5-2-三合鸟儿", "5-2-不屈号"],
+                },
+                {
+                  zone: "安穆·艾兰",
+                  mobs: ["5-3-大井巨虫", "5-3-残虐杂技师"],
+                },
+                {
+                  zone: "伊尔美格",
+                  mobs: ["5-4-杜莫伊", "5-4-狐首虺"],
+                },
+                {
+                  zone: "拉凯提卡大森林",
+                  mobs: ["5-5-启灵果", "5-5-帕查玛玛"],
+                },
+                {
+                  zone: "黑风海",
+                  mobs: ["5-6-助祭大蟹", "5-6-基乌嘶·渊斯"],
+                },
+              ],
+            },
+          ],
+          mobPath: "./upload/hunts-b/",
+          mapPath: "./upload/hunts-b/maps/",
+        });
+        const showMap = (url) => {
+          let image = new Image();
+          image.src = url;
+          let viewer = new Viewer(image, {
+            navbar: false,
+            transition: false,
+            hidden: function () {
+              viewer.destroy();
+            },
+          });
+          viewer.show();
+        };
+        return {
+          state,
+          showMap,
+        };
+      },
+    }).mount("#app");
+  </script>
+</html>

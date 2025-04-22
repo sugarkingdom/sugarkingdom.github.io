@@ -1,0 +1,73 @@
+body {
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #111111;
+  color: grey;
+  overflow-x: hidden;
+}
+
+.hidden,
+.hidden * {
+  display: none !important;
+  visibility: hidden;
+  -webkit-animation: none !important;
+  animation: none !important;
+}
+
+*:focus {
+  outline: 0;
+}
+
+img {
+  display: block;
+  user-select: none;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+img[select] {
+  user-select: initial;
+  -webkit-touch-callout: default;
+}
+
+*[noselect] {
+  user-select: none;
+}
+
+#app {
+  display: flex;
+}
+
+.ctn {
+  margin: 0 auto;
+}
+.zone_list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.mob_list {
+  display: flex;
+}
+.area_title {
+  text-align: center;
+  margin-top: 20px;
+}
+.zone_title {
+  text-align: center;
+  border-top: 1px solid grey;
+}
+.zone {
+  border: 1px solid grey;
+  min-width: 150px;
+}
+.mob {
+  width: 106px;
+  height: 106px;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  cursor: pointer;
+}

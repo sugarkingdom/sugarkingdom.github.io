@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FFXIV 恶名精英狩猎地图</title>
+    <link rel="stylesheet" href="./vendors/weui.min.css" />
+    <link rel="stylesheet" href="./vendors/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="./assets/hunts.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div class="area_select">
+        <div style="clear: both"></div>
+        <div v-for="(areaV, indexV) in state.areaData" :key="indexV">
+          <div v-for="areaZ in areaV" :key="areaZ.label">
+            <div class="weui-cells__title">{{ areaZ.label }}</div>
+            <div
+              class="weui-cells weui-cells_checkbox"
+              v-for="areaA in areaZ.children"
+              :key="areaA.label"
+            >
+              <label
+                class="weui-cell weui-check__label"
+                :for="indexV + '.0/' + areaZ.label + '/' + areaA.label"
+              >
+                <div class="weui-cell__hd">
+                  <input
+                    type="checkbox"
+                    class="weui-check area_check"
+                    name="area_check"
+                    :id="indexV + '.0/' + areaZ.label + '/' + areaA.label"
+                    v-model="state.checkedAreas[areaA.path]"
+                    @change="onAreaChange"
+                  />
+                  <i class="weui-icon-checked"></i>
+                </div>
+                <div class="weui-cell__bd">{{ areaA.label }}</div>
+              </label>
+            </div>
+            <div class="weui-cells weui-cells_checkbox" v-if="!areaZ.children">
+              <label
+                class="weui-cell weui-check__label"
+                :for="indexV + '.0/' + areaZ.label"
+              >
+                <div class="weui-cell__hd">
+                  <input
+                    type="checkbox"
+                    class="weui-check area_check"
+                    name="area_check"
+                    :id="indexV + '.0/' + areaZ.label"
+                    v-model="state.checkedAreas[areaZ.path]"
+                  />
+                  <i class="weui-icon-checked"></i>
+                </div>
+                <div class="weui-cell__bd">{{ areaZ.label }}</div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="area_map">
+        <div class="swiper">
+          <div class="swiper-wrapper">
+            <template v-for="(mob, index) in state.mobList" :key="index">
+              <div class="swiper-slide">
+                <img :src="state.uploadPath + mob.path" />
+              </div>
+            </template>
+          </div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="./vendors/vue.global.prod.js"></script>
+  <script src="./vendors/weui.min.js"></script>
+  <script src="./vendors/swiper-bundle.min.js"></script>
+  <script>
+    const { createApp, reactive, onMounted } = Vue;
+    createApp({
+      setup() {
+        const state = reactive({
+          areaData: {
+            2: [
+              {
+                label: "拉诺西亚",
+                children: [
+                  {
+                    label: "中拉诺西亚",
+                    path: "La Noscea/Middle La Noscea/s1f100_m.png",
+                  },
+                  {
+                    label: "拉诺西亚低地",
+                    path: "La Noscea/Lower La Noscea/s1f200_m.png",
+                  },
+                  {
+                    label: "西拉诺西亚",
+                    path: "La Noscea/Western La Noscea/s1f400_m.png",
+                  },
+                  {
+                    label: "东拉诺西亚",
+                    path: "La Noscea/Eastern La Noscea/s1f301_m.png",
+                  },
+                  {
+                    label: "拉诺西亚高地",
+                    path: "La Noscea/Upper La Noscea/s1f500_m.png",
+                  },
+                  {
+                    label: "拉诺西亚外地",
+                    path: "La Noscea/Outer La Noscea/s1f600_m.png",
+                  },
+                ],
+              },
+              {
+                label: "黑衣森林",
+                children: [
+                  {
+                    label: "黑衣森林中部林区",
+                    path: "The Black Shroud/Central Shroud/f1f100_m.png",
+                  },
+                  {
+                    label: "黑衣森林东部林区",
+                    path: "The Black Shroud/East Shroud 00/f1f200_m.png",
+                  },
+                  {
+                    label: "黑衣森林南部林区",
+                    path: "The Black Shroud/South Shroud 00/f1f300_m.png",
+                  },
+                  {
+                    label: "黑衣森林北部林区",
+                    path: "The Black Shroud/North Shroud/f1f400_m.png",
+                  },
+                ],
+              },
+              {
+                label: "萨纳兰",
+                children: [
+                  {
+                    label: "中萨纳兰",
+                    path: "Thanalan/Central Thanalan/w1f200_m.png",
+                  },
+                  {
+                    label: "西萨纳兰",
+                    path: "Thanalan/Western Thanalan/w1f100_m.png",
+                  },
+                  {
+                    label: "东萨纳兰",
+                    path: "Thanalan/Eastern Thanalan/w1f300_m.png",
+                  },
+                  {
+                    label: "南萨纳兰",
+                    path: "Thanalan/Southern Thanalan/w1f401_m.png",
+                  },
+                  {
+                    label: "北萨纳兰",
+                    path: "Thanalan/Northern Thanalan/w1f500_m.png",
+                  },
+                ],
+              },
+              {
+                label: "库尔扎斯中央高地",
+                path: "Coerthas/Coerthas Central Highlands/r1f100_m.png",
+              },
+              {
+                label: "摩杜纳",
+                path: "Mor Dhona/Mor Dhona/l1f101_m.png",
+              },
+            ],
+            3: [
+              {
+                label: "苍穹之禁城",
+                children: [
+                  {
+                    label: "库尔扎斯西部高地",
+                    path: "Coerthas/Coerthas Western Highlands/r2f100_m.png",
+                  },
+                  {
+                    label: "阿巴拉提亚云海",
+                    path: "Abalathia's Spine/The Sea of Clouds/a2f100_m.png",
+                  },
+                  {
+                    label: "龙堡参天高地",
+                    path: "Dravania/The Dravanian Forelands/d2f100_m.png",
+                  },
+                  {
+                    label: "翻云雾海",
+                    path: "Dravania/The Churning Mists/d2f300_m.png",
+                  },
+                  {
+                    label: "龙堡内陆低地",
+                    path: "Dravania/The Dravanian Hinterlands/d2f200_m.png",
+                  },
+                  {
+                    label: "魔大陆阿济兹拉",
+                    path: "Abalathia's Spine/Azys Lla/a2f200_m.png",
+                  },
+                ],
+              },
+            ],
+            4: [
+              {
+                label: "红莲之狂潮",
+                children: [
+                  {
+                    label: "基拉巴尼亚边区",
+                    path: "Gyr Abania/The Fringes/g3f100_m.png",
+                  },
+                  {
+                    label: "基拉巴尼亚山区",
+                    path: "Gyr Abania/The Peaks/g3f200_m.png",
+                  },
+                  {
+                    label: "红玉海",
+                    path: "Othard/The Ruby Sea/e3f100_m.png",
+                  },
+                  {
+                    label: "延夏",
+                    path: "Othard/Yanxia/e3f200_m.png",
+                  },
+                  {
+                    label: "太阳神草原",
+                    path: "Othard/The Azim Steppe/e3f300_m.png",
+                  },
+                  {
+                    label: "基拉巴尼亚湖区",
+                    path: "Gyr Abania/The Lochs/g3f300_m.png",
+                  },
+                ],
+              },
+            ],
+            5: [
+              {
+                label: "暗影之逆焰",
+                children: [
+                  {
+                    label: "雷克兰德",
+                    path: "Norvrandt/Lakeland/n4f100_m.png",
+                  },
+                  {
+                    label: "珂露西亚岛",
+                    path: "Norvrandt/Kholusia/n4f200_m.png",
+                  },
+                  {
+                    label: "安穆·艾兰",
+                    path: "Norvrandt/Amh Araeng/n4f300_m.png",
+                  },
+                  {
+                    label: "伊尔美格",
+                    path: "Norvrandt/Il Mheg/n4f400_m.png",
+                  },
+                  {
+                    label: "拉凯提卡大森林",
+                    path: "Norvrandt/The Rak'tika Greatwood/n4f500_m.png",
+                  },
+                  {
+                    label: "黑风海",
+                    path: "Norvrandt/The Tempest/n4f600_m.png",
+                  },
+                ],
+              },
+            ],
+          },
+          uploadPath: "./upload/hunts/Maps/",
+          mobList: [],
+          checkedAreas: {},
+          swiperOptions: {},
+        });
+        const onAreaChange = () => {
+          const checkedAreas = state.checkedAreas;
+          state.mobList = [];
+          Object.keys(checkedAreas).forEach((checkedArea) => {
+            if (checkedAreas[checkedArea]) {
+              state.mobList.push({
+                path: checkedArea,
+              });
+            }
+          });
+          setTimeout(() => {
+            swiperInstance.update();
+          }, 50);
+        };
+        let swiperInstance = null;
+        onMounted(() => {
+          swiperInstance = new Swiper(".swiper", {
+            pagination: {
+              el: ".swiper-pagination",
+            },
+          });
+        });
+        return {
+          state,
+          onAreaChange,
+        };
+      },
+    }).mount("#app");
+  </script>
+</html>
