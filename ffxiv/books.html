@@ -10,44 +10,59 @@
   <body>
     <div id="app">
       <div class="book_select">
-        <div style="clear: both"></div>
-        <div>
-          <div
-            v-for="(bookContent, bookName) in state.bookList"
-            :key="bookName"
-          >
-            <div class="weui-cells weui-cells_radio">
-              <label
-                class="weui-cell weui-cell_active weui-check__label"
-                :for="bookName"
-              >
-                <div class="weui-cell__bd">
-                  <p>{{ bookName }}</p>
-                </div>
-                <div class="weui-cell__ft">
-                  <input
-                    type="radio"
-                    class="weui-check book_select_check"
-                    name="book_select_check"
-                    @change="onBookSelectChange"
-                    :id="bookName"
-                    :value="bookName"
-                    v-model="state.checkedBook"
-                  /><span class="weui-icon-checked"></span>
-                </div>
-              </label>
-            </div>
+        <template
+          v-for="(bookContent, bookName) in state.bookList"
+          :key="bookName"
+        >
+          <div class="weui-cells weui-cells_radio">
+            <label
+              class="weui-cell weui-cell_active weui-check__label"
+              :for="bookName"
+            >
+              <div class="weui-cell__bd">
+                <p>{{ bookName }}</p>
+              </div>
+              <div class="weui-cell__ft">
+                <input
+                  type="radio"
+                  class="weui-check"
+                  @change="onBookSelectChange"
+                  :id="bookName"
+                  :value="bookName"
+                  v-model="state.checkedBook"
+                /><span class="weui-icon-checked"></span>
+              </div>
+            </label>
           </div>
+        </template>
+        <div class="weui-cells weui-cells_radio">
+          <label
+            class="weui-cell weui-cell_active weui-check__label"
+            for="clearBtn"
+          >
+            <div class="weui-cell__bd">
+              <p>{{ state.clearText }}</p>
+            </div>
+            <div class="weui-cell__ft">
+              <input
+                type="radio"
+                class="weui-check"
+                @click="onClearBtnClick"
+                id="clearBtn"
+                value="clear"
+                v-model="state.checkedBook"
+              />
+            </div>
+          </label>
         </div>
-        <div style="clear: both"></div>
       </div>
       <div class="book_content">
-        <div
+        <template
           v-for="(bookContents, bookContentsIndex) in state.bookList[state.checkedBook]"
           :key="bookContentsIndex"
         >
           <div class="weui-cells__title">{{ bookContents.area }}</div>
-          <div
+          <template
             v-for="(bookContent, bookContentIndex) in bookContents.contents"
             :key="bookContentIndex"
           >
@@ -59,106 +74,30 @@
                 <div class="weui-cell__hd">
                   <input
                     type="checkbox"
-                    class="weui-check book_content_check"
-                    name="book_content_check"
+                    class="weui-check"
                     @change="onBookContentChange"
                     :id="bookContent.name"
                     v-model="state.checkedBookTargets[bookContent.name]"
                   /><i class="weui-icon-checked"></i>
                 </div>
                 <div class="weui-cell__bd">
-                  <!--  -->
-                  <div v-if="bookContent.type == 'mob'">
-                    <img
-                      class="icon"
-                      src="./assets/img/060004_hr1.png"
-                      alt=""
-                    />
-                  </div>
-                  <div v-else-if="bookContent.type == 'fate-mob'">
-                    <img
-                      class="icon"
-                      src="./assets/img/060501_hr1.png"
-                      alt=""
-                    />
-                  </div>
-                  <div v-else-if="bookContent.type == 'fate-boss'">
-                    <img
-                      class="icon"
-                      src="./assets/img/060502_hr1.png"
-                      alt=""
-                    />
-                  </div>
-                  <div v-else-if="bookContent.type == 'fate-defense'">
-                    <img
-                      class="icon"
-                      src="./assets/img/060504_hr1.png"
-                      alt=""
-                    />
-                  </div>
-                  <div v-else-if="bookContent.type == 'fate-protect'">
-                    <img
-                      class="icon"
-                      src="./assets/img/060505_hr1.png"
-                      alt=""
-                    />
-                  </div>
-                  <div v-else-if="bookContent.type == 'levequest'">
-                    <img
-                      class="icon"
-                      src="./assets/img/061422_hr1.png"
-                      alt=""
-                    />
-                  </div>
-                  <div v-else-if="bookContent.type == 'dungeon'">
-                    <img
-                      class="icon"
-                      src="./assets/img/061801_hr1.png"
-                      alt=""
-                    />
-                  </div>
-                  <!--  -->
+                  <!-- icon -->
+                  <img
+                    class="icon"
+                    :src="state.bookOptions.icons[bookContent.type]"
+                    alt=""
+                  />
+                  <!-- text -->
                   <div style="width: 5px"></div>
-                  <div v-if="bookContent.type == 'mob'">
-                    <span
-                      >{{ `${bookContent.name} (${bookContent.pos})` }}</span
-                    >
-                  </div>
-                  <div v-else-if="bookContent.type == 'fate-mob'">
-                    <span
-                      >{{ `${bookContent.name} (X:${bookContent.x},
-                      Y:${bookContent.y})` }}</span
-                    >
-                  </div>
-                  <div v-else-if="bookContent.type == 'fate-boss'">
-                    <span
-                      >{{ `${bookContent.name} (X:${bookContent.x},
-                      Y:${bookContent.y})` }}</span
-                    >
-                  </div>
-                  <div v-else-if="bookContent.type == 'fate-defense'">
-                    <span
-                      >{{ `${bookContent.name} (X:${bookContent.x},
-                      Y:${bookContent.y})` }}</span
-                    >
-                  </div>
-                  <div v-else-if="bookContent.type == 'fate-protect'">
-                    <span
-                      >{{ `${bookContent.name} (X:${bookContent.x},
-                      Y:${bookContent.y})` }}</span
-                    >
-                  </div>
-                  <div v-else-if="bookContent.type == 'levequest'">
-                    <span>{{ `${bookContent.name}` }}</span>
-                  </div>
-                  <div v-else-if="bookContent.type == 'dungeon'">
-                    <span>{{ `${bookContent.name}` }}</span>
-                  </div>
+                  <span
+                    >{{ state.bookOptions.texts[bookContent.type](bookContent)
+                    }}</span
+                  >
                 </div>
               </label>
             </div>
-          </div>
-        </div>
+          </template>
+        </template>
       </div>
     </div>
   </body>
@@ -169,6 +108,26 @@
     createApp({
       setup() {
         const state = reactive({
+          bookOptions: {
+            icons: {
+              mob: "./assets/img/060004_hr1.png",
+              fate_mob: "./assets/img/060501_hr1.png",
+              fate_boss: "./assets/img/060502_hr1.png",
+              fate_defense: "./assets/img/060504_hr1.png",
+              fate_protect: "./assets/img/060505_hr1.png",
+              levequest: "./assets/img/061422_hr1.png",
+              dungeon: "./assets/img/061801_hr1.png",
+            },
+            texts: {
+              mob: (c) => `${c.name} (${c.pos})`,
+              fate_mob: (c) => `${c.name} (X:${c.x}, Y:${c.y})`,
+              fate_boss: (c) => `${c.name} (X:${c.x}, Y:${c.y})`,
+              fate_defense: (c) => `${c.name} (X:${c.x}, Y:${c.y})`,
+              fate_protect: (c) => `${c.name} (X:${c.x}, Y:${c.y})`,
+              levequest: (c) => `${c.name}`,
+              dungeon: (c) => `${c.name}`,
+            },
+          },
           bookList: {
             火天文书·第一卷: [
               {
@@ -178,7 +137,7 @@
                   { type: "mob", name: "鲁莽异端者", pos: "迷雾湿地" },
                   {
                     type: "levequest",
-                    name: "防卫指令：阿格里俄斯号的研究任务（双蛇）",
+                    name: "《火天一》 防卫指令：阿格里俄斯号的研究任务（双蛇）",
                   },
                 ],
               },
@@ -186,7 +145,7 @@
                 area: "库尔札斯中央高地",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "骑兵天敌一一妖蛇飞蜥",
                     x: 8.6,
                     y: 12.0,
@@ -194,7 +153,7 @@
                   { type: "mob", name: "伐木巨人", pos: "巨石丘" },
                   {
                     type: "levequest",
-                    name: "索敌指令：潜伏在库尔札斯的通缉犯（黑涡）",
+                    name: "《火天一》 索敌指令：潜伏在库尔札斯的通缉犯（黑涡）",
                   },
                 ],
               },
@@ -202,7 +161,7 @@
                 area: "拉诺西亚外地",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "雷雨呼唤者一一布朗格",
                     x: 25.1,
                     y: 17.9,
@@ -240,7 +199,7 @@
                   { type: "mob", name: "石蜥蜴", pos: "蓝雾" },
                   {
                     type: "levequest",
-                    name: "焚书任务：回收禁书《异界火焰的怪物》",
+                    name: "《火天一》 焚书任务：回收禁书《异界火焰的怪物》",
                   },
                 ],
               },
@@ -248,7 +207,7 @@
                 area: "黑衣森林东部林区",
                 contents: [
                   {
-                    type: "fate-defense",
+                    type: "fate_defense",
                     name: "百灵啼持久战",
                     x: 27.4,
                     y: 21.6,
@@ -272,7 +231,7 @@
                   { type: "mob", name: "发狂异端者", pos: "迷雾湿地" },
                   {
                     type: "levequest",
-                    name: "防卫指令：古代亚拉戈的遗物（恒辉）",
+                    name: "《火天二》 防卫指令：古代亚拉戈的遗物（恒辉）",
                   },
                 ],
               },
@@ -290,7 +249,7 @@
                 area: "西拉诺西亚",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "南防波堤之战 全力打击",
                     x: 18.9,
                     y: 22.0,
@@ -302,13 +261,16 @@
               {
                 area: "北萨纳兰",
                 contents: [
-                  { type: "levequest", name: "迎击任务：恶神之眼巴罗尔" },
+                  {
+                    type: "levequest",
+                    name: "《火天二》 迎击任务：恶神之眼巴罗尔",
+                  },
                 ],
               },
               {
                 area: "南萨纳兰",
                 contents: [
-                  { type: "fate-mob", name: "第二战斗大队", x: 21.2, y: 16.7 },
+                  { type: "fate_mob", name: "第二战斗大队", x: 21.2, y: 16.7 },
                   { type: "mob", name: "精炼剑手", pos: "赞拉克" },
                   { type: "mob", name: "不悔弓手", pos: "不悔战阵" },
                 ],
@@ -321,7 +283,7 @@
                 area: "黑衣森林北部林区",
                 contents: [
                   {
-                    type: "fate-mob",
+                    type: "fate_mob",
                     name: "鸟人军采伐所强攻战",
                     x: 19.5,
                     y: 19.2,
@@ -336,7 +298,7 @@
                   { type: "mob", name: "雷蛟", pos: "巨石丘" },
                   {
                     type: "levequest",
-                    name: "迎击指令：威胁前哨的魔物（双蛇）",
+                    name: "《火天二》 迎击指令：威胁前哨的魔物（双蛇）",
                   },
                 ],
               },
@@ -354,7 +316,7 @@
                 area: "摩杜纳",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "残忍食人魔一一波罗斯",
                     x: 31.0,
                     y: 5.1,
@@ -363,7 +325,7 @@
                   { type: "mob", name: "基迦巨人僧侣", pos: "银泪湖北岸" },
                   {
                     type: "levequest",
-                    name: "迎击指令：威胁调查地安全的基迦巨人族（黒涡）",
+                    name: "《火狱一》 迎击指令：威胁调查地安全的基迦巨人族（黒涡）",
                   },
                 ],
               },
@@ -371,7 +333,10 @@
                 area: "库尔札斯中央高地",
                 contents: [
                   { type: "mob", name: "撑船巨人", pos: "巨石丘" },
-                  { type: "levequest", name: "歼敌指令：冰霜龙鸟（恒辉）" },
+                  {
+                    type: "levequest",
+                    name: "《火狱一》 歼敌指令：冰霜龙鸟（恒辉）",
+                  },
                 ],
               },
               {
@@ -399,14 +364,17 @@
               {
                 area: "北萨纳兰",
                 contents: [
-                  { type: "levequest", name: "巡逻任务：确保补给通道的安全" },
+                  {
+                    type: "levequest",
+                    name: "《火狱一》 巡逻任务：确保补给通道的安全",
+                  },
                 ],
               },
               {
                 area: "南萨纳兰",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "命运代言人一一灰煤烟佩古基·春",
                     x: 24.3,
                     y: 26.1,
@@ -424,7 +392,7 @@
               {
                 area: "黑衣森林东部林区",
                 contents: [
-                  { type: "fate-mob", name: "以毒制毒", x: 23.7, y: 14.3 },
+                  { type: "fate_mob", name: "以毒制毒", x: 23.7, y: 14.3 },
                   { type: "mob", name: "嚎叫之森精", pos: "妖精领" },
                 ],
               },
@@ -445,7 +413,7 @@
                   { type: "mob", name: "湖畔眼镜蛇", pos: "银泪湖北岸" },
                   {
                     type: "levequest",
-                    name: "防卫指令：魔导机器的残骸（黒涡）",
+                    name: "《水天一》 防卫指令：魔导机器的残骸（黒涡）",
                   },
                 ],
               },
@@ -453,7 +421,7 @@
                 area: "库尔札斯中央高地",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "大口食人魔一一加尔加梅勒",
                     x: 34.3,
                     y: 13.7,
@@ -461,7 +429,7 @@
                   { type: "mob", name: "朗咒巨人", pos: "巨石丘" },
                   {
                     type: "levequest",
-                    name: "焚书任务：回收禁书《黑暗羽翼的怪物》",
+                    name: "《水天一》 焚书任务：回收禁书《黑暗羽翼的怪物》",
                   },
                 ],
               },
@@ -479,7 +447,7 @@
                 area: "西拉诺西亚",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "异国魔虫一一螳螂帝王",
                     x: 14.2,
                     y: 34.6,
@@ -498,7 +466,10 @@
                 area: "北萨纳兰",
                 contents: [
                   { type: "mob", name: "魔导先锋", pos: "劳班缓冲地" },
-                  { type: "levequest", name: "巡逻任务：确保补给通道的安全" },
+                  {
+                    type: "levequest",
+                    name: "《水天一》 巡逻任务：确保补给通道的安全",
+                  },
                 ],
               },
               {
@@ -510,7 +481,7 @@
               {
                 area: "东萨纳兰",
                 contents: [
-                  { type: "fate-mob", name: "矿脉虫巢", x: 25.9, y: 24.6 },
+                  { type: "fate_mob", name: "矿脉虫巢", x: 25.9, y: 24.6 },
                 ],
               },
               {
@@ -533,7 +504,7 @@
                 area: "摩杜纳",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "沼泽林遗恨一一恩布鲁",
                     x: 15.7,
                     y: 14.2,
@@ -542,7 +513,7 @@
                   { type: "mob", name: "基迦巨人比丘", pos: "银泪湖北岸" },
                   {
                     type: "levequest",
-                    name: "迎击指令：第五步兵大队所属部队（双蛇）",
+                    name: "《水天二》 迎击指令：第五步兵大队所属部队（双蛇）",
                   },
                 ],
               },
@@ -550,7 +521,10 @@
                 area: "库尔札斯中央高地",
                 contents: [
                   { type: "mob", name: "风扬守卫黑狼", pos: "风扬殖民地" },
-                  { type: "levequest", name: "巡逻任务：巡逻白云崖的街道" },
+                  {
+                    type: "levequest",
+                    name: "《水天二》 巡逻任务：巡逻白云崖的街道",
+                  },
                 ],
               },
               {
@@ -567,7 +541,7 @@
                 area: "西拉诺西亚",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "北防波堤之战 全力打击",
                     x: 20.6,
                     y: 19.1,
@@ -594,7 +568,12 @@
               },
               {
                 area: "北萨纳兰",
-                contents: [{ type: "levequest", name: "引导任务：失踪的警犬" }],
+                contents: [
+                  {
+                    type: "levequest",
+                    name: "《水天二》 引导任务：失踪的警犬",
+                  },
+                ],
               },
               {
                 area: "黑衣森林南部林区",
@@ -604,7 +583,7 @@
                 area: "黑衣森林东部林区",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "幽谷药师一一黎明药达奇希奥",
                     x: 32.4,
                     y: 14.4,
@@ -629,7 +608,7 @@
                   { type: "mob", name: "基迦巨人僧都", pos: "银泪湖北岸" },
                   {
                     type: "levequest",
-                    name: "歼敌指令：红发的俄刻阿诺斯（恒辉）",
+                    name: "《水狱一》 歼敌指令：红发的俄刻阿诺斯（恒辉）",
                   },
                 ],
               },
@@ -664,8 +643,11 @@
               {
                 area: "北萨纳兰",
                 contents: [
-                  { type: "fate-protect", name: "青磷大路", x: 21.8, y: 29.4 },
-                  { type: "levequest", name: "讨伐任务：犯罪组织巴特商会" },
+                  { type: "fate_protect", name: "青磷大路", x: 21.8, y: 29.4 },
+                  {
+                    type: "levequest",
+                    name: "《水狱一》 讨伐任务：犯罪组织巴特商会",
+                  },
                 ],
               },
               {
@@ -682,7 +664,7 @@
                 area: "黑衣森林北部林区",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "遗迹的亡灵骑士一一代达罗斯",
                     x: 21.8,
                     y: 19.8,
@@ -694,13 +676,16 @@
                 area: "库尔札斯中央高地",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "烈风勇士一一怀罗克四姐妹",
                     x: 34.7,
                     y: 21.3,
                   },
                   { type: "mob", name: "雪地白狼", pos: "巨石丘" },
-                  { type: "levequest", name: "迎击任务：徘徊的利剑牛头魔" },
+                  {
+                    type: "levequest",
+                    name: "《水狱一》 迎击任务：徘徊的利剑牛头魔",
+                  },
                 ],
               },
               {
@@ -717,7 +702,7 @@
                 area: "摩杜纳",
                 contents: [
                   {
-                    type: "fate-mob",
+                    type: "fate_mob",
                     name: "魔界花盛开的世界",
                     x: 13.5,
                     y: 12.1,
@@ -726,7 +711,7 @@
                   { type: "mob", name: "骏鹰", pos: "银泪湖北岸" },
                   {
                     type: "levequest",
-                    name: "迎击任务：验证哈帕利特奴隶末裔说的真伪",
+                    name: "《风天一》 迎击任务：验证哈帕利特奴隶末裔说的真伪",
                   },
                 ],
               },
@@ -734,7 +719,10 @@
                 area: "库尔札斯中央高地",
                 contents: [
                   { type: "mob", name: "风扬风爪剑士", pos: "风扬殖民地" },
-                  { type: "levequest", name: "歼敌指令：怒号的米玛斯（黒涡）" },
+                  {
+                    type: "levequest",
+                    name: "《风天一》 歼敌指令：怒号的米玛斯（黒涡）",
+                  },
                 ],
               },
               {
@@ -754,7 +742,7 @@
                 area: "拉诺西亚高地",
                 contents: [
                   {
-                    type: "fate-defense",
+                    type: "fate_defense",
                     name: "守护运输部队",
                     x: 26.8,
                     y: 18.9,
@@ -771,7 +759,10 @@
                 area: "北萨纳兰",
                 contents: [
                   { type: "mob", name: "冥鬼之眼", pos: "蓝雾" },
-                  { type: "levequest", name: "讨伐任务：犯罪组织巴特商会" },
+                  {
+                    type: "levequest",
+                    name: "《风天一》 讨伐任务：犯罪组织巴特商会",
+                  },
                 ],
               },
               {
@@ -788,7 +779,7 @@
                 area: "黑衣森林中央林区",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "阴险的魔物一一憎恨恶石",
                     x: 11.5,
                     y: 18.2,
@@ -812,7 +803,7 @@
                   { type: "mob", name: "基迦巨人沙门", pos: "银泪湖北岸" },
                   {
                     type: "levequest",
-                    name: "巡逻任务：抢夺宝石饰品的基迦巨人族",
+                    name: "《风天二》 巡逻任务：抢夺宝石饰品的基迦巨人族",
                   },
                 ],
               },
@@ -837,7 +828,7 @@
               {
                 area: "南萨纳兰",
                 contents: [
-                  { type: "fate-mob", name: "友人与家人", x: 18.4, y: 19.7 },
+                  { type: "fate_mob", name: "友人与家人", x: 18.4, y: 19.7 },
                   { type: "mob", name: "不悔战斗火蛟", pos: "不悔战阵" },
                   { type: "mob", name: "蜥蜴人弓手", pos: "赞拉克" },
                 ],
@@ -847,7 +838,7 @@
                 contents: [
                   {
                     type: "levequest",
-                    name: "焚书任务：回收禁书《异界火焰的怪物》",
+                    name: "《风天二》 焚书任务：回收禁书《异界火焰的怪物》",
                   },
                 ],
               },
@@ -855,7 +846,7 @@
                 area: "黑衣森林南部林区",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "最后的斗猪王一一派亚",
                     x: 32.1,
                     y: 25.4,
@@ -873,9 +864,12 @@
               {
                 area: "库尔札斯中央高地",
                 contents: [
-                  { type: "fate-mob", name: "力量之塔", x: 10.4, y: 28.6 },
+                  { type: "fate_mob", name: "力量之塔", x: 10.4, y: 28.6 },
                   { type: "mob", name: "风扬迷雾术士", pos: "风扬殖民地" },
-                  { type: "levequest", name: "防卫指令：追击者的遗物（双蛇）" },
+                  {
+                    type: "levequest",
+                    name: "《风天二》 防卫指令：追击者的遗物（双蛇）",
+                  },
                 ],
               },
               {
@@ -895,14 +889,14 @@
                   { type: "mob", name: "哈帕利特", pos: "银泪湖北岸" },
                   {
                     type: "levequest",
-                    name: "焚书任务：回收禁书《尖牙利齿的怪物》",
+                    name: "《土天一》 焚书任务：回收禁书《尖牙利齿的怪物》",
                   },
                 ],
               },
               {
                 area: "拉诺西亚外地",
                 contents: [
-                  { type: "fate-boss", name: "试掘地强攻", x: 23.8, y: 16.4 },
+                  { type: "fate_boss", name: "试掘地强攻", x: 23.8, y: 16.4 },
                   { type: "mob", name: "精英采石员", pos: "武伽玛罗武装矿山" },
                 ],
               },
@@ -921,7 +915,10 @@
               {
                 area: "北萨纳兰",
                 contents: [
-                  { type: "levequest", name: "迎击任务：恶神之眼巴罗尔" },
+                  {
+                    type: "levequest",
+                    name: "《土天一》 迎击任务：恶神之眼巴罗尔",
+                  },
                 ],
               },
               {
@@ -935,7 +932,7 @@
                 area: "东萨纳兰",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "丑恶合成兽一一巴杜枭",
                     x: 30.0,
                     y: 25.5,
@@ -956,7 +953,7 @@
                 area: "库尔札斯中央高地",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "雪山袭击者一一索贝克",
                     x: 4.8,
                     y: 21.9,
@@ -964,7 +961,7 @@
                   { type: "mob", name: "风扬敏捷战士", pos: "风扬殖民地" },
                   {
                     type: "levequest",
-                    name: "索敌指令：惊吓调查员的恶灵（恒辉）",
+                    name: "《土天一》 索敌指令：惊吓调查员的恶灵（恒辉）",
                   },
                 ],
               },
@@ -983,39 +980,39 @@
                 contents: [
                   {
                     type: "levequest",
-                    name: "《火天文书·第一卷》 焚书任务：回收禁书《异界火焰的怪物》",
+                    name: "《火天一》 焚书任务：回收禁书《异界火焰的怪物》",
                   },
                   {
                     type: "levequest",
-                    name: "《火天文书·第二卷》 迎击任务：恶神之眼巴罗尔",
+                    name: "《火天二》 迎击任务：恶神之眼巴罗尔",
                   },
                   {
                     type: "levequest",
-                    name: "《火狱文书·第一卷》 巡逻任务：确保补给通道的安全",
+                    name: "《火狱一》 巡逻任务：确保补给通道的安全",
                   },
                   {
                     type: "levequest",
-                    name: "《水天文书·第一卷》 巡逻任务：确保补给通道的安全",
+                    name: "《水天一》 巡逻任务：确保补给通道的安全",
                   },
                   {
                     type: "levequest",
-                    name: "《水天文书·第二卷》 引导任务：失踪的警犬",
+                    name: "《水天二》 引导任务：失踪的警犬",
                   },
                   {
                     type: "levequest",
-                    name: "《水狱文书·第一卷》 讨伐任务：犯罪组织巴特商会",
+                    name: "《水狱一》 讨伐任务：犯罪组织巴特商会",
                   },
                   {
                     type: "levequest",
-                    name: "《风天文书·第一卷》 讨伐任务：犯罪组织巴特商会",
+                    name: "《风天一》 讨伐任务：犯罪组织巴特商会",
                   },
                   {
                     type: "levequest",
-                    name: "《风天文书·第二卷》 焚书任务：回收禁书《异界火焰的怪物》",
+                    name: "《风天二》 焚书任务：回收禁书《异界火焰的怪物》",
                   },
                   {
                     type: "levequest",
-                    name: "《土天文书·第一卷》 迎击任务：恶神之眼巴罗尔",
+                    name: "《土天一》 迎击任务：恶神之眼巴罗尔",
                   },
                 ],
               },
@@ -1024,39 +1021,39 @@
                 contents: [
                   {
                     type: "levequest",
-                    name: "《火天文书·第一卷》 索敌指令：潜伏在库尔札斯的通缉犯（黑涡）",
+                    name: "《火天一》 索敌指令：潜伏在库尔札斯的通缉犯（黑涡）",
                   },
                   {
                     type: "levequest",
-                    name: "《火天文书·第二卷》 迎击指令：威胁前哨的魔物（双蛇）",
+                    name: "《火天二》 迎击指令：威胁前哨的魔物（双蛇）",
                   },
                   {
                     type: "levequest",
-                    name: "《火狱文书·第一卷》 歼敌指令：冰霜龙鸟（恒辉）",
+                    name: "《火狱一》 歼敌指令：冰霜龙鸟（恒辉）",
                   },
                   {
                     type: "levequest",
-                    name: "《水天文书·第一卷》 焚书任务：回收禁书《黑暗羽翼的怪物》",
+                    name: "《水天一》 焚书任务：回收禁书《黑暗羽翼的怪物》",
                   },
                   {
                     type: "levequest",
-                    name: "《水天文书·第二卷》 巡逻任务：巡逻白云崖的街道",
+                    name: "《水天二》 巡逻任务：巡逻白云崖的街道",
                   },
                   {
                     type: "levequest",
-                    name: "《水狱文书·第一卷》 迎击任务：徘徊的利剑牛头魔",
+                    name: "《水狱一》 迎击任务：徘徊的利剑牛头魔",
                   },
                   {
                     type: "levequest",
-                    name: "《风天文书·第一卷》 歼敌指令：怒号的米玛斯（黒涡）",
+                    name: "《风天一》 歼敌指令：怒号的米玛斯（黒涡）",
                   },
                   {
                     type: "levequest",
-                    name: "《风天文书·第二卷》 防卫指令：追击者的遗物（双蛇）",
+                    name: "《风天二》 防卫指令：追击者的遗物（双蛇）",
                   },
                   {
                     type: "levequest",
-                    name: "《土天文书·第一卷》 索敌指令：惊吓调查员的恶灵（恒辉）",
+                    name: "《土天一》 索敌指令：惊吓调查员的恶灵（恒辉）",
                   },
                 ],
               },
@@ -1065,141 +1062,139 @@
                 contents: [
                   {
                     type: "levequest",
-                    name: "《火天文书·第一卷》 防卫指令：阿格里俄斯号的研究任务（双蛇）",
+                    name: "《火天一》 防卫指令：阿格里俄斯号的研究任务（双蛇）",
                   },
                   {
                     type: "levequest",
-                    name: "《火天文书·第二卷》 防卫指令：古代亚拉戈的遗物（恒辉）",
+                    name: "《火天二》 防卫指令：古代亚拉戈的遗物（恒辉）",
                   },
                   {
                     type: "levequest",
-                    name: "《火狱文书·第一卷》 迎击指令：威胁调查地安全的基迦巨人族（黒涡）",
+                    name: "《火狱一》 迎击指令：威胁调查地安全的基迦巨人族（黒涡）",
                   },
                   {
                     type: "levequest",
-                    name: "《水天文书·第一卷》 防卫指令：魔导机器的残骸（黒涡）",
+                    name: "《水天一》 防卫指令：魔导机器的残骸（黒涡）",
                   },
                   {
                     type: "levequest",
-                    name: "《水天文书·第二卷》 迎击指令：第五步兵大队所属部队（双蛇）",
+                    name: "《水天二》 迎击指令：第五步兵大队所属部队（双蛇）",
                   },
                   {
                     type: "levequest",
-                    name: "《水狱文书·第一卷》 歼敌指令：红发的俄刻阿诺斯（恒辉）",
+                    name: "《水狱一》 歼敌指令：红发的俄刻阿诺斯（恒辉）",
                   },
                   {
                     type: "levequest",
-                    name: "《风天文书·第一卷》 迎击任务：验证哈帕利特奴隶末裔说的真伪",
+                    name: "《风天一》 迎击任务：验证哈帕利特奴隶末裔说的真伪",
                   },
                   {
                     type: "levequest",
-                    name: "《风天文书·第二卷》 巡逻任务：抢夺宝石饰品的基迦巨人族",
+                    name: "《风天二》 巡逻任务：抢夺宝石饰品的基迦巨人族",
                   },
                   {
                     type: "levequest",
-                    name: "《土天文书·第一卷》 焚书任务：回收禁书《尖牙利齿的怪物》",
+                    name: "《土天一》 焚书任务：回收禁书《尖牙利齿的怪物》",
+                    book: "土天文书·第一卷",
                   },
                 ],
               },
             ],
             危命总览: [
               {
-                area: "库尔札斯中央高地",
+                area: "火天文书·第一卷",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "骑兵天敌一一妖蛇飞蜥",
                     x: 8.6,
                     y: 12.0,
                   },
                   {
-                    type: "fate-boss",
-                    name: "大口食人魔一一加尔加梅勒",
-                    x: 34.3,
-                    y: 13.7,
-                  },
-                  {
-                    type: "fate-boss",
-                    name: "烈风勇士一一怀罗克四姐妹",
-                    x: 34.7,
-                    y: 21.3,
-                  },
-                  {
-                    type: "fate-boss",
-                    name: "雪山袭击者一一索贝克",
-                    x: 4.8,
-                    y: 21.9,
-                  },
-                ],
-              },
-              {
-                area: "拉诺西亚外地",
-                contents: [
-                  {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "雷雨呼唤者一一布朗格",
                     x: 25.1,
                     y: 17.9,
                   },
-                  { type: "fate-boss", name: "试掘地强攻", x: 23.8, y: 16.4 },
+                  {
+                    type: "fate_defense",
+                    name: "百灵啼持久战",
+                    x: 27.4,
+                    y: 21.6,
+                  },
                 ],
               },
               {
-                area: "西拉诺西亚",
+                area: "火天文书·第二卷",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "南防波堤之战 全力打击",
                     x: 18.9,
                     y: 22.0,
                   },
+                  { type: "fate_mob", name: "第二战斗大队", x: 21.2, y: 16.7 },
                   {
-                    type: "fate-boss",
-                    name: "异国魔虫一一螳螂帝王",
-                    x: 14.2,
-                    y: 34.6,
-                  },
-                  {
-                    type: "fate-boss",
-                    name: "北防波堤之战 全力打击",
-                    x: 20.6,
-                    y: 19.1,
+                    type: "fate_mob",
+                    name: "鸟人军采伐所强攻战",
+                    x: 19.5,
+                    y: 19.2,
                   },
                 ],
               },
               {
-                area: "摩杜纳",
+                area: "火狱文书·第一卷",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "残忍食人魔一一波罗斯",
                     x: 31.0,
                     y: 5.1,
                   },
                   {
-                    type: "fate-boss",
-                    name: "沼泽林遗恨一一恩布鲁",
-                    x: 15.7,
-                    y: 14.2,
-                  },
-                ],
-              },
-              {
-                area: "南萨纳兰",
-                contents: [
-                  {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "命运代言人一一灰煤烟佩古基·春",
                     x: 24.3,
                     y: 26.1,
                   },
+                  { type: "fate_mob", name: "以毒制毒", x: 23.7, y: 14.3 },
                 ],
               },
               {
-                area: "黑衣森林东部林区",
+                area: "水天文书·第一卷",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
+                    name: "大口食人魔一一加尔加梅勒",
+                    x: 34.3,
+                    y: 13.7,
+                  },
+                  {
+                    type: "fate_boss",
+                    name: "异国魔虫一一螳螂帝王",
+                    x: 14.2,
+                    y: 34.6,
+                  },
+                  { type: "fate_mob", name: "矿脉虫巢", x: 25.9, y: 24.6 },
+                ],
+              },
+              {
+                area: "水天文书·第二卷",
+                contents: [
+                  {
+                    type: "fate_boss",
+                    name: "沼泽林遗恨一一恩布鲁",
+                    x: 15.7,
+                    y: 14.2,
+                  },
+                  {
+                    type: "fate_boss",
+                    name: "北防波堤之战 全力打击",
+                    x: 20.6,
+                    y: 19.1,
+                  },
+                  {
+                    type: "fate_boss",
                     name: "幽谷药师一一黎明药达奇希奥",
                     x: 32.4,
                     y: 14.4,
@@ -1207,21 +1202,40 @@
                 ],
               },
               {
-                area: "黑衣森林北部林区",
+                area: "水狱文书·第一卷",
                 contents: [
+                  { type: "fate_protect", name: "青磷大路", x: 21.8, y: 29.4 },
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "遗迹的亡灵骑士一一代达罗斯",
                     x: 21.8,
                     y: 19.8,
                   },
+                  {
+                    type: "fate_boss",
+                    name: "烈风勇士一一怀罗克四姐妹",
+                    x: 34.7,
+                    y: 21.3,
+                  },
                 ],
               },
               {
-                area: "黑衣森林中央林区",
+                area: "风天文书·第一卷",
                 contents: [
                   {
-                    type: "fate-boss",
+                    type: "fate_mob",
+                    name: "魔界花盛开的世界",
+                    x: 13.5,
+                    y: 12.1,
+                  },
+                  {
+                    type: "fate_defense",
+                    name: "守护运输部队",
+                    x: 26.8,
+                    y: 18.9,
+                  },
+                  {
+                    type: "fate_boss",
                     name: "阴险的魔物一一憎恨恶石",
                     x: 11.5,
                     y: 18.2,
@@ -1229,24 +1243,33 @@
                 ],
               },
               {
-                area: "黑衣森林南部林区",
+                area: "风天文书·第二卷",
                 contents: [
+                  { type: "fate_mob", name: "友人与家人", x: 18.4, y: 19.7 },
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "最后的斗猪王一一派亚",
                     x: 32.1,
                     y: 25.4,
                   },
+                  { type: "fate_mob", name: "力量之塔", x: 10.4, y: 28.6 },
                 ],
               },
               {
-                area: "东萨纳兰",
+                area: "土天文书·第一卷",
                 contents: [
+                  { type: "fate_boss", name: "试掘地强攻", x: 23.8, y: 16.4 },
                   {
-                    type: "fate-boss",
+                    type: "fate_boss",
                     name: "丑恶合成兽一一巴杜枭",
                     x: 30.0,
                     y: 25.5,
+                  },
+                  {
+                    type: "fate_boss",
+                    name: "雪山袭击者一一索贝克",
+                    x: 4.8,
+                    y: 21.9,
                   },
                 ],
               },
@@ -1256,6 +1279,8 @@
           checkedBooks: {},
           checkedBookTargets: {},
           checkedBook: "",
+          isToClear: false,
+          clearText: "清空已选项",
         });
         const onBookSelectChange = () => {
           let checkedBooks = state.checkedBooks;
@@ -1295,6 +1320,31 @@
             state.checkedBook = localState.checkedBook;
           }
         };
+        let stateClearInterval = null;
+        let stateClearCountdown = 0;
+        const onClearBtnClick = () => {
+          if (!state.isToClear) {
+            stateClearCountdown = 3;
+            clearInterval(stateClearInterval);
+            state.clearText = `误点延时${stateClearCountdown}秒`;
+            stateClearInterval = setInterval(() => {
+              stateClearCountdown--;
+              state.clearText = `误点延时${stateClearCountdown}秒`;
+              if (stateClearCountdown <= 0) {
+                clearInterval(stateClearInterval);
+                state.clearText = `确认清空`;
+                state.isToClear = true;
+                setTimeout(() => {
+                  state.clearText = `清空已选项`;
+                  state.isToClear = false;
+                }, 2000);
+              }
+            }, 1000);
+            return;
+          }
+          localStorage.removeItem("ffxiv-books-state");
+          window.location.reload();
+        };
         onMounted(() => {
           loadLocalState();
           onBookSelectChange();
@@ -1303,6 +1353,7 @@
           state,
           onBookSelectChange,
           onBookContentChange,
+          onClearBtnClick,
         };
       },
     }).mount("#app");
