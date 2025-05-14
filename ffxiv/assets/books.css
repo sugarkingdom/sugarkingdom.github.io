@@ -31,7 +31,7 @@ body {
 }
 
 .book_content {
-  width: calc(100vw - 258px);
+  width: calc((100vw - 250px) / 2 - 8px);
   height: 100vh;
   margin-left: 8px;
   position: relative;
@@ -49,6 +49,18 @@ body {
   display: block;
   width: 24px;
   height: 24px;
+}
+
+.weui-cell {
+  padding: 0;
+}
+.weui-grid {
+  width: 20%;
+  opacity: 0.5;
+  &.active {
+    opacity: 1;
+    background-color: slategrey;
+  }
 }
 
 .weui-check__label:hover {
