@@ -21,7 +21,7 @@ body {
 }
 
 .book_select {
-  width: 250px;
+  width: 400px;
   height: 100vh;
   overflow-y: auto;
 }
@@ -31,24 +31,40 @@ body {
 }
 
 .book_content {
-  width: calc((100vw - 250px) / 2 - 8px);
+  width: calc((100vw - 400px) / 2 - 8px);
   height: 100vh;
   margin-left: 8px;
   position: relative;
   overflow-y: auto;
+  .fate_mob,
+  .fate_boss,
+  .fate_defense,
+  .fate_protect {
+    background-color: rgba(255, 0, 0, 0.15);
+  }
+  .done {
+    background-color: rgba(0, 128, 0, 0.15);
+  }
 }
 
-.book_content .weui-cell__bd {
-  display: flex;
+.item_quests {
+  width: 400px;
 }
-.book_content .weui-cells__title {
-  margin-top: 0;
-  padding-top: 10px;
-}
-.book_content .icon {
-  display: block;
-  width: 24px;
-  height: 24px;
+
+.book_content,
+.item_quests {
+  .weui-cell__bd {
+    display: flex;
+  }
+  .weui-cells__title {
+    margin-top: 0;
+    padding-top: 10px;
+  }
+  .icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .weui-cell {
@@ -57,6 +73,7 @@ body {
 .weui-grid {
   width: 20%;
   opacity: 0.5;
+  padding: 5px 0;
   &.active {
     opacity: 1;
     background-color: slategrey;
