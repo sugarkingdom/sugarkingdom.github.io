@@ -50,6 +50,7 @@
                     name="area_check"
                     :id="indexV + '.0/' + areaZ.label"
                     v-model="state.checkedAreas[areaZ.path]"
+                    @change="onAreaChange"
                   />
                   <i class="weui-icon-checked"></i>
                 </div>
@@ -88,27 +89,27 @@
                 children: [
                   {
                     label: "中拉诺西亚",
-                    path: "La Noscea/Middle La Noscea/s1f100_m.png",
+                    path: "拉诺西亚/中拉诺西亚/s1f100_m.png",
                   },
                   {
                     label: "拉诺西亚低地",
-                    path: "La Noscea/Lower La Noscea/s1f200_m.png",
+                    path: "拉诺西亚/拉诺西亚低地/s1f200_m.png",
                   },
                   {
                     label: "西拉诺西亚",
-                    path: "La Noscea/Western La Noscea/s1f400_m.png",
+                    path: "拉诺西亚/西拉诺西亚/s1f400_m.png",
                   },
                   {
                     label: "东拉诺西亚",
-                    path: "La Noscea/Eastern La Noscea/s1f301_m.png",
+                    path: "拉诺西亚/东拉诺西亚/s1f301_m.png",
                   },
                   {
                     label: "拉诺西亚高地",
-                    path: "La Noscea/Upper La Noscea/s1f500_m.png",
+                    path: "拉诺西亚/拉诺西亚高地/s1f500_m.png",
                   },
                   {
                     label: "拉诺西亚外地",
-                    path: "La Noscea/Outer La Noscea/s1f600_m.png",
+                    path: "拉诺西亚/拉诺西亚外地/s1f600_m.png",
                   },
                 ],
               },
@@ -117,19 +118,19 @@
                 children: [
                   {
                     label: "黑衣森林中部林区",
-                    path: "The Black Shroud/Central Shroud/f1f100_m.png",
+                    path: "黑衣森林/黑衣森林中部林区/f1f100_m.png",
                   },
                   {
                     label: "黑衣森林东部林区",
-                    path: "The Black Shroud/East Shroud 00/f1f200_m.png",
+                    path: "黑衣森林/黑衣森林东部林区/f1f200_m.png",
                   },
                   {
                     label: "黑衣森林南部林区",
-                    path: "The Black Shroud/South Shroud 00/f1f300_m.png",
+                    path: "黑衣森林/黑衣森林南部林区/f1f300_m.png",
                   },
                   {
                     label: "黑衣森林北部林区",
-                    path: "The Black Shroud/North Shroud/f1f400_m.png",
+                    path: "黑衣森林/黑衣森林北部林区/f1f400_m.png",
                   },
                 ],
               },
@@ -138,33 +139,33 @@
                 children: [
                   {
                     label: "中萨纳兰",
-                    path: "Thanalan/Central Thanalan/w1f200_m.png",
+                    path: "萨纳兰/中萨纳兰/w1f200_m.png",
                   },
                   {
                     label: "西萨纳兰",
-                    path: "Thanalan/Western Thanalan/w1f100_m.png",
+                    path: "萨纳兰/西萨纳兰/w1f100_m.png",
                   },
                   {
                     label: "东萨纳兰",
-                    path: "Thanalan/Eastern Thanalan/w1f300_m.png",
+                    path: "萨纳兰/东萨纳兰/w1f300_m.png",
                   },
                   {
                     label: "南萨纳兰",
-                    path: "Thanalan/Southern Thanalan/w1f401_m.png",
+                    path: "萨纳兰/南萨纳兰/w1f401_m.png",
                   },
                   {
                     label: "北萨纳兰",
-                    path: "Thanalan/Northern Thanalan/w1f500_m.png",
+                    path: "萨纳兰/北萨纳兰/w1f500_m.png",
                   },
                 ],
               },
               {
-                label: "库尔扎斯中央高地",
-                path: "Coerthas/Coerthas Central Highlands/r1f100_m.png",
+                label: "库尔札斯中央高地",
+                path: "库尔札斯/库尔札斯中央高地/r1f100_m.png",
               },
               {
                 label: "摩杜纳",
-                path: "Mor Dhona/Mor Dhona/l1f101_m.png",
+                path: "摩杜纳/摩杜纳/l1f101_m.png",
               },
             ],
             3: [
@@ -172,28 +173,28 @@
                 label: "苍穹之禁城",
                 children: [
                   {
-                    label: "库尔扎斯西部高地",
-                    path: "Coerthas/Coerthas Western Highlands/r2f100_m.png",
+                    label: "库尔札斯西部高地",
+                    path: "库尔札斯/库尔札斯西部高地/r2f100_m.png",
                   },
                   {
                     label: "阿巴拉提亚云海",
-                    path: "Abalathia's Spine/The Sea of Clouds/a2f100_m.png",
+                    path: "阿巴拉提亚/阿巴拉提亚云海/a2f100_m.png",
                   },
                   {
                     label: "龙堡参天高地",
-                    path: "Dravania/The Dravanian Forelands/d2f100_m.png",
+                    path: "龙堡/龙堡参天高地/d2f100_m.png",
                   },
                   {
                     label: "翻云雾海",
-                    path: "Dravania/The Churning Mists/d2f300_m.png",
+                    path: "龙堡/翻云雾海/d2f300_m.png",
                   },
                   {
                     label: "龙堡内陆低地",
-                    path: "Dravania/The Dravanian Hinterlands/d2f200_m.png",
+                    path: "龙堡/龙堡内陆低地/d2f200_m.png",
                   },
                   {
                     label: "魔大陆阿济兹拉",
-                    path: "Abalathia's Spine/Azys Lla/a2f200_m.png",
+                    path: "阿巴拉提亚/魔大陆阿济兹拉/a2f200_m.png",
                   },
                 ],
               },
@@ -204,27 +205,27 @@
                 children: [
                   {
                     label: "基拉巴尼亚边区",
-                    path: "Gyr Abania/The Fringes/g3f100_m.png",
+                    path: "基拉巴尼亚/基拉巴尼亚边区/g3f100_m.png",
                   },
                   {
                     label: "基拉巴尼亚山区",
-                    path: "Gyr Abania/The Peaks/g3f200_m.png",
+                    path: "基拉巴尼亚/基拉巴尼亚山区/g3f200_m.png",
                   },
                   {
                     label: "红玉海",
-                    path: "Othard/The Ruby Sea/e3f100_m.png",
+                    path: "奥萨德/红玉海/e3f100_m.png",
                   },
                   {
                     label: "延夏",
-                    path: "Othard/Yanxia/e3f200_m.png",
+                    path: "奥萨德/延夏/e3f200_m.png",
                   },
                   {
                     label: "太阳神草原",
-                    path: "Othard/The Azim Steppe/e3f300_m.png",
+                    path: "奥萨德/太阳神草原/e3f300_m.png",
                   },
                   {
                     label: "基拉巴尼亚湖区",
-                    path: "Gyr Abania/The Lochs/g3f300_m.png",
+                    path: "基拉巴尼亚/基拉巴尼亚湖区/g3f300_m.png",
                   },
                 ],
               },
@@ -235,33 +236,95 @@
                 children: [
                   {
                     label: "雷克兰德",
-                    path: "Norvrandt/Lakeland/n4f100_m.png",
+                    path: "诺弗兰特/雷克兰德/n4f100_m.png",
                   },
                   {
                     label: "珂露西亚岛",
-                    path: "Norvrandt/Kholusia/n4f200_m.png",
+                    path: "诺弗兰特/珂露西亚岛/n4f200_m.png",
                   },
                   {
                     label: "安穆·艾兰",
-                    path: "Norvrandt/Amh Araeng/n4f300_m.png",
+                    path: "诺弗兰特/安穆·艾兰/n4f300_m.png",
                   },
                   {
                     label: "伊尔美格",
-                    path: "Norvrandt/Il Mheg/n4f400_m.png",
+                    path: "诺弗兰特/伊尔美格/n4f400_m.png",
                   },
                   {
                     label: "拉凯提卡大森林",
-                    path: "Norvrandt/The Rak'tika Greatwood/n4f500_m.png",
+                    path: "诺弗兰特/拉凯提卡大森林/n4f500_m.png",
                   },
                   {
                     label: "黑风海",
-                    path: "Norvrandt/The Tempest/n4f600_m.png",
+                    path: "诺弗兰特/黑风海/n4f600_m.png",
+                  },
+                ],
+              },
+            ],
+            6: [
+              {
+                label: "晓月之终途",
+                children: [
+                  {
+                    label: "迷津",
+                    path: "北洋地域/迷津/k5f100_m.png",
+                  },
+                  {
+                    label: "萨维奈岛",
+                    path: "伊尔萨巴德/萨维奈岛/m5f100_m.png",
+                  },
+                  {
+                    label: "加雷马",
+                    path: "伊尔萨巴德/加雷马/m5f200_m.png",
+                  },
+                  {
+                    label: "叹息海",
+                    path: "星外天域/叹息海/u5f100_m.png",
+                  },
+                  {
+                    label: "厄尔庇斯",
+                    path: "古代世界/厄尔庇斯/n5f100_m.png",
+                  },
+                  {
+                    label: "天外天垓",
+                    path: "星外天域/天外天垓/u5f200_m.png",
+                  },
+                ],
+              },
+            ],
+            7: [
+              {
+                label: "金曦之遗辉",
+                children: [
+                  {
+                    label: "夏劳尼荒野",
+                    path: "萨卡图拉尔/夏劳尼荒野/x6f100_m.png",
+                  },
+                  {
+                    label: "奥阔帕恰山",
+                    path: "尤卡图拉尔/奥阔帕恰山/y6f100_m.png",
+                  },
+                  {
+                    label: "克扎玛乌卡湿地",
+                    path: "尤卡图拉尔/克扎玛乌卡湿地/y6f200_m.png",
+                  },
+                  {
+                    label: "亚克特尔树海",
+                    path: "尤卡图拉尔/亚克特尔树海/y6f300_m.png",
+                  },
+                  {
+                    label: "遗产之地",
+                    path: "萨卡图拉尔/遗产之地/x6f200_m.png",
+                  },
+                  {
+                    label: "活着的记忆",
+                    path: "无失世界/活着的记忆/x6f300_m.png",
                   },
                 ],
               },
             ],
           },
-          uploadPath: "./upload/hunts/Maps/",
+          uploadPath: "./upload/地图/",
           mobList: [],
           checkedAreas: {},
           swiperOptions: {},
